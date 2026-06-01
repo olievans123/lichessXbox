@@ -30,6 +30,7 @@ namespace LichessXbox.Views
             {
                 var studies = await AppState.Current.Api.GetStudiesByUserAsync(user);
                 StudyList.ItemsSource = studies;
+                if (studies.Count > 0) StudyList.Focus(FocusState.Programmatic);
                 if (studies.Count == 0) StatusText.Text = $"No public studies found for {user}.";
             }
             catch

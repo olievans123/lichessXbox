@@ -31,11 +31,11 @@
 
             <Grid>
                 <StackPanel>
-                    <TextBlock Text="Score" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
+                    <TextBlock Text="Score" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                     <TextBlock x:Name="ScoreText" Text="0" FontSize="34" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
                 </StackPanel>
                 <StackPanel HorizontalAlignment="Right">
-                    <TextBlock Text="Time" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
+                    <TextBlock Text="Time" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                     <TextBlock x:Name="TimeText" Text="30" FontSize="34" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
                 </StackPanel>
             </Grid>

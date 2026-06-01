@@ -26,7 +26,7 @@
 
         <!-- Board -->
         <Viewbox Grid.Column="1" Stretch="Uniform">
-            <controls:ChessBoardControl x:Name="Board" Interactive="True" Width="760" Height="760" />
+            <controls:ChessBoardControl x:Name="Board" Interactive="True" />
         </Viewbox>
 
         <!-- Hidden host for the local Stockfish engine -->
@@ -36,7 +36,7 @@
         <!-- Side panel -->
         <ScrollViewer Grid.Column="2" Margin="20,0,0,0" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
             <StackPanel Spacing="16" Padding="0,0,10,16">
-                <TextBlock Text="Analysis" FontSize="36" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                <TextBlock Text="Analysis" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
                 <!-- Engine eval -->
                 <Border Style="{StaticResource CardBorder}" Padding="20">
@@ -71,7 +71,7 @@
                         <TextBlock x:Name="ExplorerEmpty" Text="No opening data for this position." FontSize="14"
                                    Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
                         <ListView x:Name="ExplorerList" SelectionMode="None" IsItemClickEnabled="True"
-                                  ItemClick="Explorer_ItemClick" MaxHeight="320">
+                                  ItemClick="Explorer_ItemClick" MaxHeight="240">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Padding="4,8">
@@ -102,7 +102,7 @@
                         <TextBlock x:Name="TablebaseSummary" Text="Tablebase" FontSize="20" FontWeight="SemiBold"
                                    Foreground="{StaticResource AccentGreenLightBrush}" />
                         <ListView x:Name="TablebaseList" SelectionMode="None" IsItemClickEnabled="True"
-                                  ItemClick="Tablebase_ItemClick" MaxHeight="220">
+                                  ItemClick="Tablebase_ItemClick" MaxHeight="160">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Padding="4,6">

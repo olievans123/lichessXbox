@@ -50,7 +50,7 @@ namespace LichessXbox.Views
             ShowAccount(account);
         }
 
-        void ShowAccount(LichessAccount a)
+        async void ShowAccount(LichessAccount a)
         {
             SignedOutCard.Visibility = Visibility.Collapsed;
             SignedInPanel.Visibility = Visibility.Visible;
@@ -66,7 +66,7 @@ namespace LichessXbox.Views
             if (a.ClassicalRating.HasValue) ratings.Add(new RatingTile("Classical", a.ClassicalRating.Value));
             RatingsGrid.ItemsSource = ratings;
             NoRatings.Visibility = (ratings.Count == 0) ? Visibility.Visible : Visibility.Collapsed;
-            SignOutButton.Focus(FocusState.Programmatic);
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => SignOutButton.Focus(FocusState.Programmatic));
         }
 
         // ----------------------------------------------------- QR device pairing
@@ -76,6 +76,7 @@ namespace LichessXbox.Views
             QrPanel.Visibility = Visibility.Visible;
             ManualPanel.Visibility = Visibility.Collapsed;
             StatusText.Visibility = Visibility.Collapsed;
+            _ = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => ManualToggleButton.Focus(FocusState.Programmatic));
             _ = StartPairingAsync();
         }
 

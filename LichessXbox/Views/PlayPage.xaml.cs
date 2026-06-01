@@ -44,7 +44,9 @@ namespace LichessXbox.Views
             for (int i = 1; i <= 8; i++) levels.Add(new AiLevel(i));
             LevelGrid.ItemsSource = levels;
 
-            VariantGrid.ItemsSource = ChessVariant.All;
+            var variants = ChessVariant.All;
+            VariantGrid.ItemsSource = variants;
+            _selectedVariant = variants[0];
             VariantGrid.SelectedIndex = 0;
 
             _challenges.CollectionChanged += (s, e) =>
@@ -260,6 +262,7 @@ namespace LichessXbox.Views
             RematchButton.Visibility = Visibility.Collapsed;
             NewGameButton.Visibility = Visibility.Collapsed;
             DrawOfferBanner.Visibility = Visibility.Collapsed;
+            Board.Interactive = true;
             ShowOnly(GamePanel);
             // Clear stale design-time labels until the first gameFull arrives.
             StatusBanner.Text = "Connecting…";

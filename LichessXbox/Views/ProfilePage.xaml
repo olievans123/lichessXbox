@@ -12,7 +12,7 @@
             <Border MaxWidth="760" VerticalAlignment="Center" HorizontalAlignment="Center"
                     Style="{StaticResource CardBorder}" Padding="32">
                 <StackPanel Spacing="14">
-                    <TextBlock Text="Sign in to Lichess" FontSize="26" FontWeight="Bold"
+                    <TextBlock Text="Sign in to Lichess" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold"
                                Foreground="{StaticResource TextPrimaryBrush}" />
 
                     <!-- QR device pairing (default) -->
@@ -28,15 +28,15 @@
                             <StackPanel Grid.Column="1" Margin="22,0,0,0" VerticalAlignment="Center" Spacing="10">
                                 <TextBlock Text="Scan with your phone" FontSize="20" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimaryBrush}" />
-                                <TextBlock TextWrapping="Wrap" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}"
+                                <TextBlock TextWrapping="Wrap" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
                                            Text="Log in to Lichess on your phone and approve — your Xbox signs in automatically, no typing. (Phone must be on the same Wi-Fi.)" />
                                 <StackPanel Orientation="Horizontal" Spacing="10">
                                     <ProgressRing x:Name="QrBusy" IsActive="True" Width="22" Height="22"
                                                   Foreground="{StaticResource AccentGreenLightBrush}" />
-                                    <TextBlock x:Name="QrStatus" Text="Preparing…" FontSize="14"
+                                    <TextBlock x:Name="QrStatus" Text="Preparing…" FontSize="{StaticResource CaptionSize}"
                                                Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
                                 </StackPanel>
-                                <Button Style="{StaticResource TileButton}" Click="ShowManual_Click"
+                                <Button x:Name="ManualToggleButton" Style="{StaticResource TileButton}" Click="ShowManual_Click"
                                         Content="Enter a token manually instead" HorizontalContentAlignment="Center" MinWidth="280" />
                             </StackPanel>
                         </Grid>
@@ -44,11 +44,11 @@
 
                     <!-- Manual token paste (only if selected) -->
                     <StackPanel x:Name="ManualPanel" Spacing="12" Visibility="Collapsed">
-                        <TextBlock TextWrapping="Wrap" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}"
+                        <TextBlock TextWrapping="Wrap" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
                                    Text="On your phone or computer, open this link, create a token (chess scopes pre-selected), then paste it here:" />
                         <Border Background="#22000000" CornerRadius="8" Padding="14,10">
                             <TextBlock Text="lichess.org/account/oauth/token/create?scopes[]=board:play&amp;scopes[]=challenge:write&amp;scopes[]=puzzle:read&amp;description=Lichess+for+Xbox"
-                                       FontSize="14" FontFamily="Consolas" Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
+                                       FontSize="{StaticResource CaptionSize}" FontFamily="Consolas" Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
                         </Border>
                         <TextBox x:Name="TokenBox" PlaceholderText="lip_xxxxxxxxxxxxxxxx" FontSize="16"
                                  Height="52" VerticalContentAlignment="Center" />
@@ -62,31 +62,32 @@
 
                     <ProgressRing x:Name="Busy" IsActive="False" Width="30" Height="30"
                                   Foreground="{StaticResource AccentGreenLightBrush}" HorizontalAlignment="Left" />
-                    <TextBlock x:Name="StatusText" Foreground="{StaticResource ErrorBrush}" FontSize="15"
+                    <TextBlock x:Name="StatusText" Foreground="{StaticResource ErrorBrush}" FontSize="{StaticResource CaptionSize}"
                                Visibility="Collapsed" TextWrapping="Wrap" />
                 </StackPanel>
             </Border>
         </ScrollViewer>
 
         <!-- Signed in -->
-        <StackPanel x:Name="SignedInPanel" Spacing="28" Visibility="Collapsed" MaxWidth="640">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+        <StackPanel x:Name="SignedInPanel" Spacing="18" Visibility="Collapsed" MaxWidth="640">
             <StackPanel Orientation="Horizontal" Spacing="24">
                 <Border Width="72" Height="72" CornerRadius="24" Background="{StaticResource AccentGradientBrush}">
                     <TextBlock x:Name="AvatarInitial" Text="?" FontSize="36" FontWeight="Bold" Foreground="#0E1207"
                                HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Border>
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock x:Name="UsernameText" Text="" FontSize="32" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                    <TextBlock x:Name="UsernameText" Text="" FontSize="32" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
                     <TextBlock x:Name="SubtitleText" Text="Lichess member" FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" />
                 </StackPanel>
             </StackPanel>
 
             <TextBlock Text="Ratings" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
-            <TextBlock x:Name="NoRatings" Text="No rated games yet." FontSize="15" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
+            <TextBlock x:Name="NoRatings" Text="No rated games yet." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
             <GridView x:Name="RatingsGrid" SelectionMode="None" IsItemClickEnabled="False">
                 <GridView.ItemTemplate>
                     <DataTemplate>
-                        <Border Width="150" Height="100" CornerRadius="16" Margin="8"
+                        <Border Width="150" Height="84" CornerRadius="16" Margin="6"
                                 Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="#33FFFFFF" BorderThickness="1">
                             <StackPanel Margin="20" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding Mode}" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" />
@@ -100,5 +101,6 @@
             <Button x:Name="SignOutButton" Style="{StaticResource TileButton}" Click="SignOut_Click"
                     Content="Sign out" MinWidth="200" HorizontalContentAlignment="Center" HorizontalAlignment="Left" />
         </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>

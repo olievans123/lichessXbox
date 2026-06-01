@@ -15,7 +15,8 @@
             <controls:ChessBoardControl x:Name="Board" Interactive="True" Width="760" Height="760" />
         </Viewbox>
 
-        <StackPanel Grid.Column="1" Margin="24,0,0,0" Spacing="12" VerticalAlignment="Top">
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+        <StackPanel Margin="24,0,0,0" Spacing="8" VerticalAlignment="Top">
             <TextBlock Text="Puzzles" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
             <StackPanel Orientation="Horizontal" Spacing="10">
@@ -30,7 +31,7 @@
             <ComboBox x:Name="ThemeBox" Visibility="Collapsed" HorizontalAlignment="Stretch" Style="{StaticResource ThemedComboBox}" FontSize="16"
                       Header="Theme" SelectionChanged="ThemeBox_SelectionChanged" />
 
-            <Border x:Name="StreakCard" Visibility="Collapsed" Style="{StaticResource CardBorder}" Padding="20,14">
+            <Border x:Name="StreakCard" Visibility="Collapsed" Style="{StaticResource CardBorder}" Padding="16,10">
                 <StackPanel Orientation="Horizontal" Spacing="12">
                     <TextBlock Text="🔥" FontSize="28" />
                     <StackPanel>
@@ -40,20 +41,20 @@
                 </StackPanel>
             </Border>
 
-            <Border Style="{StaticResource CardBorder}" Padding="22">
+            <Border Style="{StaticResource CardBorder}" Padding="16">
                 <StackPanel Spacing="10">
                     <TextBlock x:Name="ToMoveText" Text="" FontSize="24" FontWeight="SemiBold"
                                Foreground="{StaticResource AccentGreenLightBrush}" />
                     <TextBlock x:Name="HintText" Text="Find the best move." FontSize="18"
                                Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
-                    <StackPanel Orientation="Horizontal" Spacing="20" Margin="0,6,0,0">
+                    <StackPanel Spacing="4" Margin="0,6,0,0">
                         <TextBlock x:Name="RatingText" Text="" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" />
-                        <TextBlock x:Name="ThemesText" Text="" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock x:Name="ThemesText" Text="" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
                     </StackPanel>
                 </StackPanel>
             </Border>
 
-            <Border x:Name="ResultCard" Style="{StaticResource CardBorder}" Padding="22" Visibility="Collapsed">
+            <Border x:Name="ResultCard" Style="{StaticResource CardBorder}" Padding="16" Visibility="Collapsed">
                 <TextBlock x:Name="ResultText" FontSize="26" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
             </Border>
 
@@ -67,5 +68,6 @@
             <ProgressRing x:Name="Busy" IsActive="False" Width="36" Height="36"
                           Foreground="{StaticResource AccentGreenLightBrush}" HorizontalAlignment="Left" />
         </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>

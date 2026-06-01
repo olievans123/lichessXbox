@@ -1,4 +1,3 @@
-using System;
 using LichessXbox.Models;
 using LichessXbox.Services;
 using Windows.UI.Xaml;
@@ -23,21 +22,23 @@ namespace LichessXbox.Views
             {
                 var tournaments = await AppState.Current.Api.GetTournamentsAsync();
                 TournamentList.ItemsSource = tournaments;
-                TournamentList.Focus(FocusState.Programmatic);
                 if (tournaments == null || tournaments.Count == 0)
                 {
                     ListStatus.Text = "No tournaments right now.";
                     ListStatus.Visibility = Visibility.Visible;
+                    ListStatus.Focus(FocusState.Programmatic);
                 }
                 else
                 {
                     ListStatus.Visibility = Visibility.Collapsed;
+                    TournamentList.Focus(FocusState.Programmatic);
                 }
             }
             catch
             {
                 ListStatus.Text = "Couldn't load tournaments.";
                 ListStatus.Visibility = Visibility.Visible;
+                ListStatus.Focus(FocusState.Programmatic);
             }
             finally { Busy.IsActive = false; }
         }
@@ -49,6 +50,8 @@ namespace LichessXbox.Views
             DetailTitle.Text = t.Name;
             JoinButton.Visibility = AppState.Current.IsSignedIn && t.Group != "Finished"
                 ? Visibility.Visible : Visibility.Collapsed;
+            JoinButton.Content = "Join";
+            JoinButton.IsEnabled = true;
             StandingsList.ItemsSource = null;
 
             DetailStatus.Text = "Loading standings…";

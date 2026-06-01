@@ -20,25 +20,33 @@
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0" Margin="0,0,0,10">
-                <StackPanel>
-                    <TextBlock x:Name="TopName" Text="—" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock x:Name="TopName" Text="—" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
                     <TextBlock x:Name="TopRating" Text="" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
                 </StackPanel>
-                <Border HorizontalAlignment="Right" Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="14,6">
+                <Border Grid.Column="1" Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="14,6">
                     <TextBlock x:Name="TopClock" Text="--:--" FontSize="26" FontFamily="Consolas" Foreground="{StaticResource TextPrimaryBrush}" />
                 </Border>
             </Grid>
 
             <Viewbox Grid.Row="1" Stretch="Uniform">
-                <controls:ChessBoardControl x:Name="Board" Interactive="False" Width="720" Height="720" />
+                <controls:ChessBoardControl x:Name="Board" Interactive="False" />
             </Viewbox>
 
             <Grid Grid.Row="2" Margin="0,10,0,0">
-                <StackPanel>
-                    <TextBlock x:Name="BottomName" Text="—" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock x:Name="BottomName" Text="—" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
                     <TextBlock x:Name="BottomRating" Text="" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
                 </StackPanel>
-                <Border HorizontalAlignment="Right" Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="14,6">
+                <Border Grid.Column="1" Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="14,6">
                     <TextBlock x:Name="BottomClock" Text="--:--" FontSize="26" FontFamily="Consolas" Foreground="{StaticResource TextPrimaryBrush}" />
                 </Border>
             </Grid>
@@ -49,7 +57,7 @@
             <StackPanel Spacing="16" Padding="0,0,10,16">
                 <StackPanel Orientation="Horizontal" Spacing="10">
                     <Border Width="14" Height="14" CornerRadius="7" Background="{StaticResource LiveBrush}" VerticalAlignment="Center" />
-                    <TextBlock x:Name="HeaderText" Text="Lichess TV" FontSize="30" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                    <TextBlock x:Name="HeaderText" Text="Lichess TV" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
                 </StackPanel>
 
                 <TextBlock Text="Channels" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
@@ -72,49 +80,49 @@
                 </ListView>
 
                 <TextBlock Text="Live streamers" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                <ItemsControl x:Name="StreamerList">
-                    <ItemsControl.ItemTemplate>
+                <ListView x:Name="StreamerList" SelectionMode="None" IsItemClickEnabled="False">
+                    <ListView.ItemTemplate>
                         <DataTemplate>
                             <Border CornerRadius="10" Padding="14,10" Margin="0,0,0,8"
-                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="#22FFFFFF" BorderThickness="1">
+                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                 <StackPanel>
                                     <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
                                     <TextBlock Text="{Binding Status}" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    </ListView.ItemTemplate>
+                </ListView>
 
                 <TextBlock Text="Simuls" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                <ItemsControl x:Name="SimulList">
-                    <ItemsControl.ItemTemplate>
+                <ListView x:Name="SimulList" SelectionMode="None" IsItemClickEnabled="False">
+                    <ListView.ItemTemplate>
                         <DataTemplate>
                             <Border CornerRadius="10" Padding="14,10" Margin="0,0,0,8"
-                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="#22FFFFFF" BorderThickness="1">
+                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                 <StackPanel>
                                     <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
                                     <TextBlock Text="{Binding Info}" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" />
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    </ListView.ItemTemplate>
+                </ListView>
 
                 <TextBlock Text="Broadcasts" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                <ItemsControl x:Name="BroadcastList">
-                    <ItemsControl.ItemTemplate>
+                <ListView x:Name="BroadcastList" SelectionMode="None" IsItemClickEnabled="False">
+                    <ListView.ItemTemplate>
                         <DataTemplate>
                             <Border CornerRadius="10" Padding="14,10" Margin="0,0,0,8"
-                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="#22FFFFFF" BorderThickness="1">
+                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                 <StackPanel>
                                     <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
                                     <TextBlock Text="{Binding Description}" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" MaxLines="2" />
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    </ListView.ItemTemplate>
+                </ListView>
             </StackPanel>
         </ScrollViewer>
     </Grid>

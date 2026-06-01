@@ -235,6 +235,7 @@ namespace LichessXbox.Models
         public int Score { get; set; }
         public int Rating { get; set; }
         public string ScoreText => Score + " pts";
+        public string RatingText => Rating > 0 ? Rating.ToString() : "";
     }
 
     // ===================== Studies =====================

@@ -5,6 +5,7 @@
     Background="Transparent">
 
     <Grid Padding="40,28">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
         <StackPanel Spacing="18" MaxWidth="620" HorizontalAlignment="Left">
             <TextBlock Text="Studies" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
             <TextBlock Text="Browse any Lichess member's public studies and open them on the analysis board."
@@ -19,7 +20,7 @@
 
             <ProgressRing x:Name="Busy" IsActive="False" Width="36" Height="36" HorizontalAlignment="Left"
                           Foreground="{StaticResource AccentGreenLightBrush}" />
-            <TextBlock x:Name="StatusText" Text="" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}" />
+            <TextBlock x:Name="StatusText" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
 
             <ListView x:Name="StudyList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Study_ItemClick" MaxHeight="300">
                 <ListView.ItemTemplate>
@@ -29,7 +30,7 @@
                             <Grid>
                                 <StackPanel>
                                     <TextBlock Text="{Binding Name}" FontSize="19" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
-                                    <TextBlock Text="{Binding Owner}" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
+                                    <TextBlock Text="{Binding Owner}" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" />
                                 </StackPanel>
                                 <TextBlock Text="Open ▶" FontSize="14" Foreground="{StaticResource AccentGreenLightBrush}"
                                            HorizontalAlignment="Right" VerticalAlignment="Center" />
@@ -39,5 +40,6 @@
                 </ListView.ItemTemplate>
             </ListView>
         </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>

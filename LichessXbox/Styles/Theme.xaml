@@ -9,9 +9,6 @@
     <Color x:Key="AppSurfaceHighColor">#2A251D</Color>
     <Color x:Key="AccentGreenColor">#6FA630</Color>
     <Color x:Key="AccentGreenLightColor">#8FCB3F</Color>
-    <Color x:Key="BoardLightColor">#EBECD0</Color>
-    <Color x:Key="BoardDarkColor">#739552</Color>
-    <Color x:Key="MoveHighlightColor">#F2D26B</Color>
     <Color x:Key="TextPrimaryColor">#F4F1EA</Color>
     <Color x:Key="TextSecondaryColor">#A8A296</Color>
 
@@ -20,9 +17,6 @@
     <SolidColorBrush x:Key="AppSurfaceHighBrush" Color="{StaticResource AppSurfaceHighColor}" />
     <SolidColorBrush x:Key="AccentGreenBrush" Color="{StaticResource AccentGreenColor}" />
     <SolidColorBrush x:Key="AccentGreenLightBrush" Color="{StaticResource AccentGreenLightColor}" />
-    <SolidColorBrush x:Key="BoardLightBrush" Color="{StaticResource BoardLightColor}" />
-    <SolidColorBrush x:Key="BoardDarkBrush" Color="{StaticResource BoardDarkColor}" />
-    <SolidColorBrush x:Key="MoveHighlightBrush" Color="{StaticResource MoveHighlightColor}" Opacity="0.55" />
     <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}" />
     <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}" />
     <SolidColorBrush x:Key="HairlineBrush" Color="#33FFFFFF" />
@@ -55,7 +49,7 @@
         <Setter Property="CornerRadius" Value="18" />
         <Setter Property="Padding" Value="28" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="BorderBrush" Value="#33FFFFFF" />
+        <Setter Property="BorderBrush" Value="{StaticResource HairlineBrush}" />
     </Style>
 
     <!-- ============ Big focusable menu/action button ============ -->
@@ -92,7 +86,7 @@
                         <!-- Focus ring: its own brush, materialised per templated instance -->
                         <Border x:Name="FocusRing" CornerRadius="16" Opacity="0" BorderThickness="3">
                             <Border.BorderBrush>
-                                <SolidColorBrush Color="{StaticResource AccentGreenLightColor}" />
+                                <SolidColorBrush Color="#FFFFFF" />
                             </Border.BorderBrush>
                         </Border>
                         <ContentPresenter x:Name="Content"
@@ -151,7 +145,7 @@
 
     <!-- Compact navigation-pane button so the full menu fits without being cut off -->
     <Style x:Key="NavButton" TargetType="Button" BasedOn="{StaticResource TileButton}">
-        <Setter Property="Padding" Value="16,9" />
+        <Setter Property="Padding" Value="16,7" />
         <Setter Property="FontSize" Value="17" />
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>

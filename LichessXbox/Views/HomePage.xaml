@@ -18,7 +18,7 @@
         <StackPanel Grid.Column="0" Spacing="18" VerticalAlignment="Center" Margin="0,0,20,0">
                 <StackPanel Spacing="4">
                     <TextBlock x:Name="GreetingText" Text="Welcome" FontSize="16"
-                               Foreground="{StaticResource AccentGreenLightBrush}" FontWeight="SemiBold" />
+                               Foreground="{StaticResource AccentGreenLightBrush}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
                     <TextBlock Text="Play the world." FontSize="32" FontWeight="Bold"
                                Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
                     <TextBlock Text="Free chess on your TV. No ads, no nonsense — powered by lichess.org."
@@ -31,7 +31,7 @@
                             <TextBlock Text="♟" FontFamily="Segoe UI Symbol" FontSize="32" Foreground="{StaticResource AccentGreenLightBrush}" />
                             <StackPanel>
                                 <TextBlock Text="Play online" FontSize="21" FontWeight="SemiBold" />
-                                <TextBlock Text="Bullet · Blitz · Rapid · Classical" FontSize="14"
+                                <TextBlock Text="Bullet · Blitz · Rapid · Classical" FontSize="{StaticResource CaptionSize}"
                                            Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
                             </StackPanel>
                         </StackPanel>
@@ -41,7 +41,7 @@
                             <TextBlock Text="📺" FontSize="28" />
                             <StackPanel>
                                 <TextBlock Text="Watch TV" FontSize="21" FontWeight="SemiBold" />
-                                <TextBlock Text="The best live game, right now" FontSize="14"
+                                <TextBlock Text="The best live game, right now" FontSize="{StaticResource CaptionSize}"
                                            Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
                             </StackPanel>
                         </StackPanel>
@@ -51,7 +51,7 @@
                             <TextBlock Text="🧩" FontSize="28" />
                             <StackPanel>
                                 <TextBlock Text="Solve puzzles" FontSize="21" FontWeight="SemiBold" />
-                                <TextBlock Text="Sharpen your tactics" FontSize="14"
+                                <TextBlock Text="Sharpen your tactics" FontSize="{StaticResource CaptionSize}"
                                            Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
                             </StackPanel>
                         </StackPanel>

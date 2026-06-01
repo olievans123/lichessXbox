@@ -128,26 +128,12 @@
     <Compile Include="Views\HomePage.xaml.cs">
       <DependentUpon>HomePage.xaml</DependentUpon>
     </Compile>
-    <Page Include="Views\LoginPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="Views\LoginPage.xaml.cs">
-      <DependentUpon>LoginPage.xaml</DependentUpon>
-    </Compile>
     <Page Include="Views\PlayPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Compile Include="Views\PlayPage.xaml.cs">
       <DependentUpon>PlayPage.xaml</DependentUpon>
-    </Compile>
-    <Page Include="Views\TvPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="Views\TvPage.xaml.cs">
-      <DependentUpon>TvPage.xaml</DependentUpon>
     </Compile>
     <Page Include="Views\PuzzlesPage.xaml">
       <Generator>MSBuild:Compile</Generator>

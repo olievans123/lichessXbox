@@ -16,17 +16,18 @@
             </Border>
         </Viewbox>
 
-        <StackPanel Grid.Column="1" Margin="28,0,0,0" Spacing="16">
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+        <StackPanel Margin="28,0,0,0" Spacing="12">
             <TextBlock Text="Board editor" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
-            <TextBlock Text="Pick a piece, then place it on the board. Eraser clears a square." FontSize="15"
+            <TextBlock Text="Pick a piece, then place it on the board. Eraser clears a square." FontSize="{StaticResource CaptionSize}"
                        Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
 
             <Border Style="{StaticResource CardBorder}" Padding="16">
                 <StackPanel Spacing="10">
                     <TextBlock Text="Palette" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" />
-                    <StackPanel x:Name="WhitePalette" Orientation="Horizontal" Spacing="6" />
-                    <StackPanel x:Name="BlackPalette" Orientation="Horizontal" Spacing="6" />
-                    <StackPanel x:Name="ToolPalette" Orientation="Horizontal" Spacing="6" />
+                    <StackPanel x:Name="WhitePalette" Orientation="Horizontal" Spacing="4" />
+                    <StackPanel x:Name="BlackPalette" Orientation="Horizontal" Spacing="4" />
+                    <StackPanel x:Name="ToolPalette" Orientation="Horizontal" Spacing="4" />
                 </StackPanel>
             </Border>
 
@@ -36,14 +37,15 @@
                               IsOn="True" Toggled="Side_Toggled" />
             </Grid>
 
-            <TextBox x:Name="FenBox" IsReadOnly="True" FontSize="16" Height="64" TextWrapping="Wrap"
+            <TextBox x:Name="FenBox" IsReadOnly="True" FontSize="16" MinHeight="64" TextWrapping="Wrap"
                      Header="FEN" />
 
             <StackPanel Orientation="Horizontal" Spacing="10">
-                <Button Style="{StaticResource PrimaryButton}" Click="Analyze_Click" Content="Analyze" MinWidth="150" />
-                <Button Style="{StaticResource TileButton}" Click="Start_Click" Content="Start pos" HorizontalContentAlignment="Center" MinWidth="130" />
-                <Button Style="{StaticResource TileButton}" Click="Clear_Click" Content="Clear" HorizontalContentAlignment="Center" MinWidth="110" />
+                <Button Style="{StaticResource PrimaryButton}" Click="Analyze_Click" Content="Analyze" MinWidth="120" />
+                <Button Style="{StaticResource TileButton}" Click="Start_Click" Content="Start pos" HorizontalContentAlignment="Center" MinWidth="110" />
+                <Button Style="{StaticResource TileButton}" Click="Clear_Click" Content="Clear" HorizontalContentAlignment="Center" MinWidth="90" />
             </StackPanel>
         </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>

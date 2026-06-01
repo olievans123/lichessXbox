@@ -30,7 +30,7 @@ namespace LichessXbox.Views
         {
             StartChannel(_currentChannel, "Lichess TV");
             await LoadListsAsync();
-            ChannelList.Focus(Windows.UI.Xaml.FocusState.Programmatic);
+            if (ChannelList.Items.Count > 0) ChannelList.Focus(Windows.UI.Xaml.FocusState.Programmatic);
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e) => _streamCts?.Cancel();

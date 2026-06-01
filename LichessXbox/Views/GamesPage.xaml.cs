@@ -25,6 +25,7 @@ namespace LichessXbox.Views
             {
                 SignInPrompt.Visibility = Visibility.Visible;
                 Content.Visibility = Visibility.Collapsed;
+                GoSignInButton.Focus(FocusState.Programmatic);
                 return;
             }
             SignInPrompt.Visibility = Visibility.Collapsed;
@@ -77,7 +78,7 @@ namespace LichessXbox.Views
             GraphCanvas.Children.Clear();
             if (points == null || points.Count < 2) { RatingRange.Text = "No rating history yet."; return; }
 
-            double w = 320, h = 150, pad = 10;
+            double w = 260, h = 150, pad = 10;
             // Lay out after the canvas has a size; fall back to fixed dims.
             if (GraphCanvas.ActualWidth > 10) w = GraphCanvas.ActualWidth;
             if (GraphCanvas.ActualHeight > 10) h = GraphCanvas.ActualHeight;
@@ -103,6 +104,11 @@ namespace LichessXbox.Views
             GraphCanvas.Children.Add(line);
 
             RatingRange.Text = $"{minR} – {maxR}  ·  {n} games tracked";
+        }
+
+        void GoSignIn_Click(object sender, RoutedEventArgs e)
+        {
+            ((Window.Current.Content as Frame)?.Content as MainPage)?.NavigateTo("profile");
         }
 
         void Game_ItemClick(object sender, ItemClickEventArgs e)

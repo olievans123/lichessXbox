@@ -50,6 +50,7 @@ namespace LichessXbox.Views
             foreach (var t in Themes)
                 ThemeBox.Items.Add(new ComboBoxItem { Content = t.Name, Tag = t.Key });
             ThemeBox.SelectedIndex = 0;
+            ModeTraining.BorderBrush = (Windows.UI.Xaml.Media.Brush)Application.Current.Resources["AccentGreenLightBrush"];
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e) => await LoadCurrentAsync();
@@ -142,7 +143,7 @@ namespace LichessXbox.Views
             _solverIsWhite = _start.WhiteToMove;
             _solutionIndex = 0;
             _solved = false;
-            Board.LastMove = chosen > 0 ? (ChessMove?)null : null;
+            Board.LastMove = null;
         }
 
         int ChooseStartIndex(List<ChessPosition> positions, int ply)
@@ -170,7 +171,7 @@ namespace LichessXbox.Views
             ThemesText.Text = _puzzle.Themes.Count > 0 ? string.Join(" · ", _puzzle.Themes.Take(3)) : "";
             ResultCard.Visibility = Visibility.Collapsed;
             RetryButton.Visibility = Visibility.Collapsed;
-            Board.Focus(FocusState.Programmatic);
+            Board.FocusBoard();
         }
 
         // -------------------------------------------------------- solving

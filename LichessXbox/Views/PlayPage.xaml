@@ -10,7 +10,7 @@
         <!-- ============ SIGN-IN REQUIRED ============ -->
         <StackPanel x:Name="SignInPrompt" Visibility="Collapsed"
                     VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="20" MaxWidth="540">
-            <TextBlock Text="Sign in to play" FontSize="40" FontWeight="Bold"
+            <TextBlock Text="Sign in to play" FontSize="{StaticResource TitleSize}" FontWeight="Bold"
                        Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" />
             <TextBlock Text="You need a free Lichess account to play online games."
                        FontSize="18" Foreground="{StaticResource TextSecondaryBrush}"
@@ -25,8 +25,8 @@
                 <TextBlock Text="New game" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
                 <!-- Quick pairing -->
-                <TextBlock Text="Quick pairing" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                <TextBlock Text="Find a human opponent online (this searches until someone is matched)." FontSize="14"
+                <TextBlock Text="Quick pairing" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                <TextBlock Text="Find a human opponent online (this searches until someone is matched)." FontSize="16"
                            Foreground="{StaticResource TextSecondaryBrush}" />
                 <GridView x:Name="PresetGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Preset_ItemClick">
                     <GridView.ItemTemplate>
@@ -47,7 +47,7 @@
                 </GridView>
 
                 <!-- Play the computer -->
-                <TextBlock Text="Play the computer" FontSize="22" FontWeight="SemiBold"
+                <TextBlock Text="Play the computer" FontSize="20" FontWeight="SemiBold"
                            Foreground="{StaticResource AccentGreenLightBrush}" Margin="0,8,0,0" />
                 <TextBlock Text="Choose a Stockfish difficulty (1 = easiest, 8 = strongest)." FontSize="16"
                            Foreground="{StaticResource TextSecondaryBrush}" />
@@ -67,7 +67,7 @@
                 </GridView>
 
                 <!-- Challenge a player -->
-                <TextBlock Text="Challenge a player" FontSize="22" FontWeight="SemiBold"
+                <TextBlock Text="Challenge a player" FontSize="20" FontWeight="SemiBold"
                            Foreground="{StaticResource AccentGreenLightBrush}" Margin="0,8,0,0" />
                 <StackPanel Orientation="Horizontal" Spacing="14">
                     <TextBox x:Name="FriendBox" PlaceholderText="Lichess username" Width="300" Height="56"
@@ -78,27 +78,27 @@
                 </StackPanel>
 
                 <!-- Variant (Standard by default; choose before pairing) -->
-                <TextBlock Text="Variant" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" Margin="0,8,0,0" />
+                <TextBlock Text="Variant" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" Margin="0,8,0,0" />
                 <GridView x:Name="VariantGrid" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Variant_ItemClick">
                     <GridView.ItemTemplate>
                         <DataTemplate>
-                            <Border Width="132" Height="78" CornerRadius="16" Margin="5"
+                            <Border Width="132" Height="88" CornerRadius="16" Margin="5"
                                     Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                 <StackPanel VerticalAlignment="Center" Spacing="2">
                                     <TextBlock Text="{Binding Glyph}" FontSize="20" HorizontalAlignment="Center" />
-                                    <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold" TextAlignment="Center"
+                                    <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" TextAlignment="Center"
                                                Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
                     </GridView.ItemTemplate>
                 </GridView>
-                <TextBlock x:Name="VariantNote" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}"
+                <TextBlock x:Name="VariantNote" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}"
                            Visibility="Collapsed" TextWrapping="Wrap"
                            Text="Variant games are played with server-validated moves; some inputs (Crazyhouse drops, Chess960 castling) aren't fully supported on the board yet." />
 
                 <!-- Incoming challenges -->
-                <TextBlock Text="Challenges" FontSize="22" FontWeight="SemiBold"
+                <TextBlock Text="Challenges" FontSize="20" FontWeight="SemiBold"
                            Foreground="{StaticResource AccentGreenLightBrush}" Margin="0,8,0,0" />
                 <TextBlock x:Name="NoChallengesText" Text="No incoming challenges." FontSize="16"
                            Foreground="{StaticResource TextSecondaryBrush}" />
@@ -146,10 +146,11 @@
             </Grid.ColumnDefinitions>
 
             <Viewbox Grid.Column="0" Stretch="Uniform">
-                <controls:ChessBoardControl x:Name="Board" Interactive="True" Width="760" Height="760" />
+                <controls:ChessBoardControl x:Name="Board" Interactive="True" />
             </Viewbox>
 
-            <StackPanel Grid.Column="1" Margin="20,0,0,0" Spacing="16">
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+            <StackPanel Margin="20,0,0,0" Spacing="16">
                 <!-- Opponent (top) -->
                 <Border Style="{StaticResource CardBorder}" Padding="20">
                     <Grid>
@@ -159,7 +160,7 @@
                             <TextBlock x:Name="TopRating" Text="" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}" />
                         </StackPanel>
                         <Border HorizontalAlignment="Right" VerticalAlignment="Center"
-                                Background="#22000000" CornerRadius="10" Padding="16,8">
+                                Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="16,8">
                             <TextBlock x:Name="TopClock" Text="--:--" FontSize="30" FontFamily="Consolas"
                                        Foreground="{StaticResource TextPrimaryBrush}" />
                         </Border>
@@ -186,7 +187,7 @@
                             <TextBlock x:Name="BottomRating" Text="" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}" />
                         </StackPanel>
                         <Border HorizontalAlignment="Right" VerticalAlignment="Center"
-                                Background="#22000000" CornerRadius="10" Padding="16,8">
+                                Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="16,8">
                             <TextBlock x:Name="BottomClock" Text="--:--" FontSize="30" FontFamily="Consolas"
                                        Foreground="{StaticResource TextPrimaryBrush}" />
                         </Border>
@@ -197,30 +198,36 @@
                 <Border x:Name="DrawOfferBanner" Visibility="Collapsed" CornerRadius="12" Padding="16,12"
                         Background="#33F2D26B" BorderBrush="#88F2D26B" BorderThickness="1">
                     <Grid>
-                        <TextBlock Text="Opponent offers a draw" FontSize="17" VerticalAlignment="Center"
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Opponent offers a draw" FontSize="17" VerticalAlignment="Center"
+                                   TextWrapping="Wrap"
                                    Foreground="{StaticResource TextPrimaryBrush}" />
-                        <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
-                            <Button Style="{StaticResource PrimaryButton}" Content="Accept" Click="AcceptDraw_Click" MinWidth="120" />
-                            <Button Style="{StaticResource TileButton}" Content="Decline" HorizontalContentAlignment="Center" Click="DeclineDraw_Click" MinWidth="110" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                            <Button Style="{StaticResource PrimaryButton}" Content="Accept" Click="AcceptDraw_Click" MinWidth="92" />
+                            <Button Style="{StaticResource TileButton}" Content="Decline" HorizontalContentAlignment="Center" Click="DeclineDraw_Click" MinWidth="92" />
                         </StackPanel>
                     </Grid>
                 </Border>
 
                 <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,4,0,0">
                     <Button x:Name="ResignButton" Style="{StaticResource TileButton}" Click="Resign_Click"
-                            Content="Resign" HorizontalContentAlignment="Center" MinWidth="150" />
+                            Content="Resign" HorizontalContentAlignment="Center" MinWidth="92" />
                     <Button x:Name="DrawButton" Style="{StaticResource TileButton}" Click="OfferDraw_Click"
-                            Content="Offer draw" HorizontalContentAlignment="Center" MinWidth="150" />
+                            Content="Offer draw" HorizontalContentAlignment="Center" MinWidth="92" />
                     <Button x:Name="TakebackButton" Style="{StaticResource TileButton}" Click="Takeback_Click"
-                            Content="Takeback" HorizontalContentAlignment="Center" MinWidth="150" />
+                            Content="Takeback" HorizontalContentAlignment="Center" MinWidth="92" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Spacing="12">
                     <Button x:Name="RematchButton" Style="{StaticResource PrimaryButton}" Click="Rematch_Click"
-                            Content="Rematch" MinWidth="190" Visibility="Collapsed" />
+                            Content="Rematch" MinWidth="144" Visibility="Collapsed" />
                     <Button x:Name="NewGameButton" Style="{StaticResource TileButton}" Click="NewGame_Click"
-                            Content="New game" HorizontalContentAlignment="Center" MinWidth="190" Visibility="Collapsed" />
+                            Content="New game" HorizontalContentAlignment="Center" MinWidth="144" Visibility="Collapsed" />
                 </StackPanel>
             </StackPanel>
+            </ScrollViewer>
         </Grid>
     </Grid>
 </Page>

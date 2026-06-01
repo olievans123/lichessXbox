@@ -14,7 +14,11 @@ namespace LichessXbox
         public MainPage()
         {
             this.InitializeComponent();
-            this.Loaded += (s, e) => GoTo("home");
+            this.Loaded += (s, e) =>
+            {
+                GoTo("home");
+                HomeNav.Focus(FocusState.Programmatic);
+            };
         }
 
         void Nav_Click(object sender, RoutedEventArgs e)

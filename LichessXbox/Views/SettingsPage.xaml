@@ -8,7 +8,7 @@
         <StackPanel Padding="48,32" Spacing="22" MaxWidth="640" HorizontalAlignment="Left">
             <TextBlock Text="Settings" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
-            <TextBlock Text="Board theme" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+            <TextBlock Text="Board theme" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
             <GridView x:Name="ThemeGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Theme_ItemClick">
                 <GridView.ItemTemplate>
                     <DataTemplate>
@@ -42,7 +42,7 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
                             <TextBlock Text="Outline piece set" FontSize="20" Foreground="{StaticResource TextPrimaryBrush}" />
-                            <TextBlock Text="Use hollow glyphs for the white pieces." FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
+                            <TextBlock Text="Use hollow glyphs for the white pieces." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                         </StackPanel>
                         <ToggleSwitch x:Name="OutlineToggle" Grid.Column="1" Toggled="Outline_Toggled" />
                     </Grid>
@@ -53,7 +53,7 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
                             <TextBlock Text="UI sounds" FontSize="20" Foreground="{StaticResource TextPrimaryBrush}" />
-                            <TextBlock Text="Play navigation sounds when moving focus." FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
+                            <TextBlock Text="Play navigation sounds when moving focus." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                         </StackPanel>
                         <ToggleSwitch x:Name="SoundToggle" Grid.Column="1" Toggled="Sound_Toggled" />
                     </Grid>
@@ -64,7 +64,7 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
                             <TextBlock Text="Move sounds" FontSize="20" Foreground="{StaticResource TextPrimaryBrush}" />
-                            <TextBlock Text="Play a sound for each move, capture, and check." FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
+                            <TextBlock Text="Play a sound for each move, capture, and check." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                         </StackPanel>
                         <ToggleSwitch x:Name="MoveSoundToggle" Grid.Column="1" Toggled="MoveSound_Toggled" />
                     </Grid>
@@ -74,7 +74,7 @@
             <Border Style="{StaticResource CardBorder}" Padding="24">
                 <StackPanel Spacing="6">
                     <TextBlock Text="More tools" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                    <TextBlock Text="Board editor and the coordinate trainer are in their own tabs." FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
+                    <TextBlock Text="Board editor and the coordinate trainer are in their own tabs." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                     <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,8,0,0">
                         <Button Style="{StaticResource TileButton}" Click="Editor_Click" Content="Board editor" HorizontalContentAlignment="Center" MinWidth="180" />
                         <Button Style="{StaticResource TileButton}" Click="Coords_Click" Content="Coordinate trainer" HorizontalContentAlignment="Center" MinWidth="220" />

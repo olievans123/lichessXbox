@@ -121,13 +121,15 @@ namespace LichessXbox.Views
                 var exp = await AppState.Current.Api.GetExplorerAsync(fen);
                 if (cts.IsCancellationRequested) return;
                 _explorer.Clear();
+                int n = exp?.Moves.Count ?? 0;
+                ExplorerEmpty.Visibility = n == 0 ? Visibility.Visible : Visibility.Collapsed;
                 if (exp != null)
                 {
                     OpeningText.Text = string.IsNullOrEmpty(exp.OpeningName) ? "Opening explorer" : exp.OpeningName;
                     foreach (var m in exp.Moves) _explorer.Add(m);
                 }
             }
-            catch { }
+            catch { ExplorerEmpty.Visibility = Visibility.Visible; }
 
             // Tablebase (only for <= 7 pieces)
             try

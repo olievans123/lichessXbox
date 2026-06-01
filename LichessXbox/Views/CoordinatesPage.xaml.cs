@@ -26,7 +26,7 @@ namespace LichessXbox.Views
             BuildGrid();
             _timer.Interval = TimeSpan.FromSeconds(1);
             _timer.Tick += Tick;
-            StartButton.Focus(FocusState.Programmatic);
+            StartButton.FocusOnLoad();
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e) => _timer.Stop();

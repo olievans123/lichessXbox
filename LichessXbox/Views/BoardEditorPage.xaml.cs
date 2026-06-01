@@ -2,7 +2,6 @@ using System;
 using LichessXbox.Chess;
 using LichessXbox.Helpers;
 using Windows.UI;
-using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -81,7 +80,7 @@ namespace LichessXbox.Views
         {
             var btn = new Button
             {
-                Width = 52, Height = 52,
+                Width = 40, Height = 40,
                 Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x2A, 0x25, 0x1D)),
                 BorderBrush = new SolidColorBrush(piece == _selected ? Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F) : Color.FromArgb(0x33, 0xFF, 0xFF, 0xFF)),
                 BorderThickness = new Thickness(2),
@@ -91,7 +90,7 @@ namespace LichessXbox.Views
                 {
                     Text = piece == '.' ? "⌫" : PieceGlyph(piece),
                     FontFamily = new FontFamily("Segoe UI Symbol"),
-                    FontSize = piece == '.' ? 24 : 34,
+                    FontSize = piece == '.' ? 20 : 26,
                     Foreground = new SolidColorBrush(char.IsUpper(piece) ? Colors.White : Color.FromArgb(0xFF, 0x9A, 0x94, 0x88)),
                     HorizontalAlignment = HorizontalAlignment.Center,
                 },
