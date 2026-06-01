@@ -24,12 +24,12 @@ namespace LichessXbox.Views
             if (!AppState.Current.IsSignedIn)
             {
                 SignInPrompt.Visibility = Visibility.Visible;
-                Content.Visibility = Visibility.Collapsed;
+                GamesContent.Visibility = Visibility.Collapsed;
                 GoSignInButton.Focus(FocusState.Programmatic);
                 return;
             }
             SignInPrompt.Visibility = Visibility.Collapsed;
-            Content.Visibility = Visibility.Visible;
+            GamesContent.Visibility = Visibility.Visible;
 
             var account = await AppState.Current.EnsureAccountAsync();
             if (account == null) return;

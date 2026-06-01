@@ -16,7 +16,7 @@
             <Button x:Name="GoSignInButton" Style="{StaticResource PrimaryButton}" Click="GoSignIn_Click" HorizontalAlignment="Center" MinWidth="240" Content="Sign in with Lichess" />
         </StackPanel>
 
-        <ScrollViewer x:Name="Content" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" Visibility="Collapsed">
+        <ScrollViewer x:Name="GamesContent" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" Visibility="Collapsed">
             <Grid Padding="0,0,12,24">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />

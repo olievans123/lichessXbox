@@ -83,10 +83,11 @@
                                 <SolidColorBrush Color="#FFFFFF" Opacity="0.10" />
                             </Border.Background>
                         </Border>
-                        <!-- Focus ring: its own brush, materialised per templated instance -->
+                        <!-- Focus ring: its own brush, materialised per templated instance.
+                             Green to match the rest of the app's focus visuals. -->
                         <Border x:Name="FocusRing" CornerRadius="16" Opacity="0" BorderThickness="3">
                             <Border.BorderBrush>
-                                <SolidColorBrush Color="#FFFFFF" />
+                                <SolidColorBrush Color="{StaticResource AccentGreenLightColor}" />
                             </Border.BorderBrush>
                         </Border>
                         <ContentPresenter x:Name="Content"

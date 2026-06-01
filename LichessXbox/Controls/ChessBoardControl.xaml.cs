@@ -5,6 +5,7 @@ using LichessXbox.Helpers;
 using LichessXbox.Services;
 using Windows.System;
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -69,11 +70,11 @@ namespace LichessXbox.Controls
             this.KeyDown += OnKeyDown;
             this.GotFocus += (s, e) => { if (Interactive) ShowCursor(); };
             this.LostFocus += (s, e) => _cursor.Visibility = Visibility.Collapsed;
-            this.Loaded += (s, e) => Render();
+            this.Loaded += (s, e) => { Render(); HookCoreWindow(); };
 
             Action reTheme = () => ReTheme();
             BoardTheme.Changed += reTheme;
-            this.Unloaded += (s, e) => BoardTheme.Changed -= reTheme;
+            this.Unloaded += (s, e) => { BoardTheme.Changed -= reTheme; UnhookCoreWindow(); };
         }
 
         #region public properties
@@ -391,37 +392,81 @@ namespace LichessXbox.Controls
             Grid.SetColumn(_cursor, _cursorCol);
         }
 
+        // Routed key path: fires when the board UserControl itself holds focus.
         void OnKeyDown(object sender, KeyRoutedEventArgs e)
         {
             if (PromotionOverlay.Visibility == Visibility.Visible) return; // buttons handle it
             if (!Interactive) return;
+            e.Handled = HandleKey(e.Key);
+        }
 
-            switch (e.Key)
+        // Window-level fallback: drives the board even when XAML focus never landed on
+        // it (timing on first show) — the #1 reported "can't make any moves" symptom.
+        // Guarded so it never steals input from a real focused control (Resign, nav…).
+        void OnCoreKeyDown(CoreWindow sender, KeyEventArgs e)
+        {
+            if (e.Handled || !Interactive) return;
+            if (ActualWidth <= 0 || ActualHeight <= 0) return;             // board not on screen
+            if (PromotionOverlay.Visibility == Visibility.Visible) return;
+
+            var focused = FocusManager.GetFocusedElement();
+            if (ReferenceEquals(focused, this)) return;                    // we're focused → routed handler runs
+            if (focused is Control) return;                                // a real control owns input → leave it alone
+
+            if (HandleKey(e.VirtualKey))
+            {
+                e.Handled = true;
+                Focus(FocusState.Programmatic);                            // try to (re)claim focus for next time
+            }
+        }
+
+        // Shared key logic. Returns true if the press was consumed; false lets the key
+        // bubble so gamepad XY-focus can leave the board at its edges.
+        bool HandleKey(VirtualKey key)
+        {
+            switch (key)
             {
                 case VirtualKey.Up:
                 case VirtualKey.GamepadDPadUp:
                 case VirtualKey.GamepadLeftThumbstickUp:
-                    e.Handled = MoveCursor(-1, 0); break;
+                    return MoveCursor(-1, 0);
                 case VirtualKey.Down:
                 case VirtualKey.GamepadDPadDown:
                 case VirtualKey.GamepadLeftThumbstickDown:
-                    e.Handled = MoveCursor(1, 0); break;
+                    return MoveCursor(1, 0);
                 case VirtualKey.Left:
                 case VirtualKey.GamepadDPadLeft:
                 case VirtualKey.GamepadLeftThumbstickLeft:
-                    e.Handled = MoveCursor(0, -1); break;
+                    return MoveCursor(0, -1);
                 case VirtualKey.Right:
                 case VirtualKey.GamepadDPadRight:
                 case VirtualKey.GamepadLeftThumbstickRight:
-                    e.Handled = MoveCursor(0, 1); break;
+                    return MoveCursor(0, 1);
                 case VirtualKey.Enter:
                 case VirtualKey.Space:
                 case VirtualKey.GamepadA:
-                    Activate(); e.Handled = true; break;
+                    Activate(); return true;
                 case VirtualKey.Escape:
                 case VirtualKey.GamepadB:
-                    if (_selected >= 0) { ClearSelection(); Render(); e.Handled = true; } break;
+                    if (_selected >= 0) { ClearSelection(); Render(); return true; }
+                    return false;
+                default:
+                    return false;
             }
+        }
+
+        void HookCoreWindow()
+        {
+            var cw = Window.Current?.CoreWindow;
+            if (cw == null) return;
+            cw.KeyDown -= OnCoreKeyDown;   // guard against double-subscribe on re-load
+            cw.KeyDown += OnCoreKeyDown;
+        }
+
+        void UnhookCoreWindow()
+        {
+            var cw = Window.Current?.CoreWindow;
+            if (cw != null) cw.KeyDown -= OnCoreKeyDown;
         }
 
         // Returns true if the cursor actually moved. At a board edge it returns false and
@@ -458,9 +503,12 @@ namespace LichessXbox.Controls
 
         bool TryFocus()
         {
-            if (Visibility != Visibility.Visible) return false;
+            // Not displayed yet (collapsed parent / pre-layout) — wait for the next pass.
+            if (Visibility != Visibility.Visible || ActualWidth <= 0) return false;
             bool ok = Focus(FocusState.Programmatic);
-            if (ok) ShowCursor();
+            // Show the move cursor the moment we're live, even if Focus() didn't take —
+            // the window-level key fallback still drives moves in that case.
+            if (Interactive) ShowCursor();
             return ok;
         }
 
