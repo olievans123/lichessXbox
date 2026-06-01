@@ -8,7 +8,7 @@
     <Grid Padding="40,28">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="320" />
+            <ColumnDefinition Width="300" />
         </Grid.ColumnDefinitions>
 
         <Viewbox Grid.Column="0" Stretch="Uniform">
@@ -16,8 +16,8 @@
         </Viewbox>
 
         <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-        <StackPanel Margin="24,0,0,0" Padding="0,0,10,16" Spacing="16" VerticalAlignment="Top">
-            <TextBlock Text="Puzzles" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+        <StackPanel Margin="24,0,0,0" Padding="0,0,10,16" Spacing="12" VerticalAlignment="Top">
+            <TextBlock Text="Puzzles" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
             <Grid ColumnSpacing="8">
                 <Grid.ColumnDefinitions>

@@ -149,7 +149,7 @@
         <Grid x:Name="GamePanel" Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="320" />
+                <ColumnDefinition Width="300" />
             </Grid.ColumnDefinitions>
 
             <Viewbox Grid.Column="0" Stretch="Uniform">
@@ -157,9 +157,9 @@
             </Viewbox>
 
             <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-            <StackPanel Margin="20,0,0,0" Spacing="16">
+            <StackPanel Margin="20,0,0,0" Spacing="12">
                 <!-- Opponent (top) -->
-                <Border Style="{StaticResource CardBorder}" Padding="20">
+                <Border Style="{StaticResource CardBorder}" Padding="16">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -176,14 +176,14 @@
                             </StackPanel>
                         </StackPanel>
                         <Border Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="16,8">
+                                Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="12,6">
                             <TextBlock x:Name="TopClock" Text="--:--" FontSize="{StaticResource SubtitleSize}" FontFamily="Consolas"
                                        Foreground="{StaticResource TextPrimaryBrush}" />
                         </Border>
                     </Grid>
                 </Border>
 
-                <Border Style="{StaticResource CardBorder}" Padding="20">
+                <Border Style="{StaticResource CardBorder}" Padding="16">
                     <StackPanel Spacing="6">
                         <TextBlock x:Name="StatusBanner" Text="Your move" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                    Foreground="{StaticResource AccentGreenLightBrush}" />
@@ -195,7 +195,7 @@
                 </Border>
 
                 <!-- You (bottom) -->
-                <Border Style="{StaticResource CardBorder}" Padding="20">
+                <Border Style="{StaticResource CardBorder}" Padding="16">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -212,7 +212,7 @@
                             </StackPanel>
                         </StackPanel>
                         <Border Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="16,8">
+                                Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="12,6">
                             <TextBlock x:Name="BottomClock" Text="--:--" FontSize="{StaticResource SubtitleSize}" FontFamily="Consolas"
                                        Foreground="{StaticResource TextPrimaryBrush}" />
                         </Border>

@@ -9,7 +9,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="320" />
+            <ColumnDefinition Width="300" />
         </Grid.ColumnDefinitions>
 
         <!-- Eval bar -->
@@ -35,11 +35,11 @@
 
         <!-- Side panel -->
         <ScrollViewer Grid.Column="2" Margin="20,0,0,0" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-            <StackPanel Spacing="16" Padding="0,0,10,16">
-                <TextBlock Text="Analysis" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+            <StackPanel Spacing="12" Padding="0,0,10,16">
+                <TextBlock Text="Analysis" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
                 <!-- Engine eval -->
-                <Border Style="{StaticResource CardBorder}" Padding="20">
+                <Border Style="{StaticResource CardBorder}" Padding="16">
                     <StackPanel Spacing="8">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -47,7 +47,7 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="14">
-                                <TextBlock x:Name="EvalText" Text="—" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                                <TextBlock x:Name="EvalText" Text="—" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
                                 <TextBlock x:Name="DepthText" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Bottom" Margin="0,0,0,8" />
                             </StackPanel>
                             <ToggleSwitch x:Name="LocalEngineToggle" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top"
@@ -75,7 +75,7 @@
                 </Grid>
 
                 <!-- Opening explorer -->
-                <Border Style="{StaticResource CardBorder}" Padding="20">
+                <Border Style="{StaticResource CardBorder}" Padding="16">
                     <StackPanel Spacing="10">
                         <TextBlock x:Name="OpeningText" Text="Opening explorer" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                    Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
@@ -108,7 +108,7 @@
                 </Border>
 
                 <!-- Tablebase -->
-                <Border x:Name="TablebaseCard" Style="{StaticResource CardBorder}" Padding="20" Visibility="Collapsed">
+                <Border x:Name="TablebaseCard" Style="{StaticResource CardBorder}" Padding="16" Visibility="Collapsed">
                     <StackPanel Spacing="10">
                         <TextBlock x:Name="TablebaseSummary" Text="Tablebase" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                    Foreground="{StaticResource AccentGreenLightBrush}" />
@@ -131,7 +131,7 @@
                 </Border>
 
                 <!-- FEN import -->
-                <Border Style="{StaticResource CardBorder}" Padding="20">
+                <Border Style="{StaticResource CardBorder}" Padding="16">
                     <StackPanel Spacing="10">
                         <TextBlock Text="Load position (FEN)" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                         <TextBox x:Name="FenBox" FontSize="{StaticResource CaptionSize}" Height="52" VerticalContentAlignment="Center"
