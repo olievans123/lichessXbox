@@ -24,6 +24,9 @@ namespace LichessXbox.Services
         const string Authorize = "https://lichess.org/oauth";
         const string TokenEndpoint = "https://lichess.org/api/token";
         const string Scopes = "board:play puzzle:read preference:read";
+        // Loopback redirect (Lichess accepts it; custom schemes get HTTP 400). The login
+        // WebView intercepts the redirect here without actually loading it.
+        public const string RedirectUri = "http://localhost/lichess-xbox-auth";
 
         const string VaultResource = "LichessXbox";
         const string VaultUser = "bearer";
@@ -81,6 +84,26 @@ namespace LichessXbox.Services
 
             return await ExchangeCodeAsync(code, verifier, redirect);
         }
+
+        /// <summary>Build the authorize URL + PKCE verifier + state for an in-app login WebView.</summary>
+        public (string url, string verifier, string state) BuildAuthorization()
+        {
+            string verifier = Pkce.GenerateCodeVerifier();
+            string challenge = Pkce.Challenge(verifier);
+            string state = Pkce.RandomState();
+            string url = Authorize +
+                "?response_type=code" +
+                "&client_id=" + Uri.EscapeDataString(ClientId) +
+                "&redirect_uri=" + Uri.EscapeDataString(RedirectUri) +
+                "&code_challenge_method=S256&code_challenge=" + Uri.EscapeDataString(challenge) +
+                "&scope=" + Uri.EscapeDataString(Scopes) +
+                "&state=" + Uri.EscapeDataString(state);
+            return (url, verifier, state);
+        }
+
+        /// <summary>Exchange the authorization code captured from the WebView redirect for a token.</summary>
+        public Task<bool> CompleteAuthAsync(string code, string verifier) =>
+            ExchangeCodeAsync(code, verifier, RedirectUri);
 
         async Task<bool> ExchangeCodeAsync(string code, string verifier, string redirect)
         {
