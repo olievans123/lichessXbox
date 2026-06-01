@@ -294,6 +294,7 @@ namespace LichessXbox.Views
                 Board.WhiteAtBottom = _playerIsWhite;
                 Board.PlayerIsWhite = _playerIsWhite;
                 Board.Interactive = true;
+                Board.FocusBoard();   // re-focus now that the game is live (focus on first show can fail)
 
                 ApplyState(msg["state"] as JObject);
             }

@@ -437,13 +437,31 @@ namespace LichessXbox.Controls
             return true;
         }
 
-        /// <summary>Give the board gamepad focus (deferred so it works right after the board becomes visible).</summary>
+        int _focusTries;
+
+        /// <summary>
+        /// Give the board gamepad focus. Focus() can silently fail if the board has just
+        /// become visible and isn't laid out yet, so retry on the next layout passes until
+        /// it sticks (the symptom otherwise: no move-cursor and you can't make moves).
+        /// </summary>
         public void FocusBoard()
         {
-            _ = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            _focusTries = 0;
+            if (TryFocus()) return;
+            EventHandler<object> h = null;
+            h = (s, e) =>
             {
-                if (Interactive) { Focus(FocusState.Programmatic); ShowCursor(); }
-            });
+                if (TryFocus() || ++_focusTries > 20) LayoutUpdated -= h;
+            };
+            LayoutUpdated += h;
+        }
+
+        bool TryFocus()
+        {
+            if (Visibility != Visibility.Visible) return false;
+            bool ok = Focus(FocusState.Programmatic);
+            if (ok) ShowCursor();
+            return ok;
         }
 
         static int Clamp(int v) => v < 0 ? 0 : (v > 7 ? 7 : v);
