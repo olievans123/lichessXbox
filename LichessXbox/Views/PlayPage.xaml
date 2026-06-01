@@ -25,8 +25,8 @@
                 <TextBlock Text="New game" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
                 <!-- Quick pairing -->
-                <TextBlock Text="Quick pairing" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                <TextBlock Text="Find a human opponent online (this searches until someone is matched)." FontSize="16"
+                <TextBlock Text="Quick pairing" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                <TextBlock Text="Find a human opponent online (this searches until someone is matched)." FontSize="{StaticResource BodySize}"
                            Foreground="{StaticResource TextSecondaryBrush}" />
                 <GridView x:Name="PresetGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Preset_ItemClick">
                     <GridView.ItemTemplate>
@@ -36,7 +36,7 @@
                                     BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                 <StackPanel Margin="20" VerticalAlignment="Center" Spacing="6">
                                     <TextBlock Text="{Binding Glyph}" FontSize="36" />
-                                    <TextBlock Text="{Binding Label}" FontSize="22" FontWeight="SemiBold"
+                                    <TextBlock Text="{Binding Label}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                                Foreground="{StaticResource TextPrimaryBrush}" />
                                     <TextBlock Text="{Binding RatedLabel}" FontSize="{StaticResource CaptionSize}"
                                                Foreground="{StaticResource TextSecondaryBrush}" />
@@ -47,9 +47,9 @@
                 </GridView>
 
                 <!-- Play the computer -->
-                <TextBlock Text="Play the computer" FontSize="20" FontWeight="SemiBold"
+                <TextBlock Text="Play the computer" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                            Foreground="{StaticResource AccentGreenLightBrush}" Margin="0,8,0,0" />
-                <TextBlock Text="Choose a Stockfish difficulty (1 = easiest, 8 = strongest)." FontSize="16"
+                <TextBlock Text="Choose a Stockfish difficulty (1 = easiest, 8 = strongest)." FontSize="{StaticResource BodySize}"
                            Foreground="{StaticResource TextSecondaryBrush}" />
                 <GridView x:Name="LevelGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Ai_ItemClick">
                     <GridView.ItemTemplate>
@@ -58,7 +58,7 @@
                                     Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                 <StackPanel VerticalAlignment="Center">
                                     <TextBlock Text="🤖" FontSize="26" HorizontalAlignment="Center" />
-                                    <TextBlock Text="{Binding Label}" FontSize="17" FontWeight="SemiBold"
+                                    <TextBlock Text="{Binding Label}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                                Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" />
                                 </StackPanel>
                             </Border>
@@ -67,7 +67,7 @@
                 </GridView>
 
                 <!-- Challenge a player -->
-                <TextBlock Text="Challenge a player" FontSize="20" FontWeight="SemiBold"
+                <TextBlock Text="Challenge a player" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                            Foreground="{StaticResource AccentGreenLightBrush}" Margin="0,8,0,0" />
                 <StackPanel Orientation="Horizontal" Spacing="14">
                     <TextBox x:Name="FriendBox" PlaceholderText="Lichess username" Width="300" Height="56"
@@ -80,7 +80,7 @@
                            FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource ErrorBrush}" />
 
                 <!-- Variant (Standard by default; choose before pairing) -->
-                <TextBlock Text="Variant" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" Margin="0,8,0,0" />
+                <TextBlock Text="Variant" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" Margin="0,8,0,0" />
                 <GridView x:Name="VariantGrid" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Variant_ItemClick">
                     <GridView.ItemTemplate>
                         <DataTemplate>
@@ -100,9 +100,9 @@
                            Text="Variant games are played with server-validated moves; some inputs (Crazyhouse drops, Chess960 castling) aren't fully supported on the board yet." />
 
                 <!-- Incoming challenges -->
-                <TextBlock Text="Challenges" FontSize="20" FontWeight="SemiBold"
+                <TextBlock Text="Challenges" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                            Foreground="{StaticResource AccentGreenLightBrush}" Margin="0,8,0,0" />
-                <TextBlock x:Name="NoChallengesText" Text="No incoming challenges." FontSize="16"
+                <TextBlock x:Name="NoChallengesText" Text="No incoming challenges." FontSize="{StaticResource BodySize}"
                            Foreground="{StaticResource TextSecondaryBrush}" />
                 <ItemsControl x:Name="ChallengesList">
                     <ItemsControl.ItemTemplate>
@@ -115,7 +115,7 @@
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding ChallengerName}" FontSize="20" FontWeight="SemiBold"
+                                        <TextBlock Text="{Binding ChallengerName}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                                    TextTrimming="CharacterEllipsis"
                                                    Foreground="{StaticResource TextPrimaryBrush}" />
                                         <TextBlock Text="{Binding Description}" FontSize="{StaticResource CaptionSize}"
@@ -139,7 +139,7 @@
         <StackPanel x:Name="SeekingPanel" Visibility="Collapsed"
                     VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="24">
             <ProgressRing IsActive="True" Width="72" Height="72" Foreground="{StaticResource AccentGreenLightBrush}" />
-            <TextBlock x:Name="SeekingText" Text="Finding an opponent…" FontSize="28"
+            <TextBlock x:Name="SeekingText" Text="Finding an opponent…" FontSize="{StaticResource SubtitleSize}"
                        Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" />
             <Button x:Name="CancelSeekButton" Style="{StaticResource TileButton}" Click="CancelSeek_Click"
                     HorizontalAlignment="Center" Content="Cancel" MinWidth="200" HorizontalContentAlignment="Center" />
@@ -166,14 +166,14 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
-                            <TextBlock x:Name="TopName" Text="Opponent" FontSize="22" FontWeight="SemiBold"
+                            <TextBlock x:Name="TopName" Text="Opponent" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                        TextTrimming="CharacterEllipsis"
                                        Foreground="{StaticResource TextPrimaryBrush}" />
                             <TextBlock x:Name="TopRating" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                         </StackPanel>
                         <Border Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
                                 Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="16,8">
-                            <TextBlock x:Name="TopClock" Text="--:--" FontSize="30" FontFamily="Consolas"
+                            <TextBlock x:Name="TopClock" Text="--:--" FontSize="{StaticResource SubtitleSize}" FontFamily="Consolas"
                                        Foreground="{StaticResource TextPrimaryBrush}" />
                         </Border>
                     </Grid>
@@ -181,7 +181,7 @@
 
                 <Border Style="{StaticResource CardBorder}" Padding="20">
                     <StackPanel Spacing="6">
-                        <TextBlock x:Name="StatusBanner" Text="Your move" FontSize="22" FontWeight="SemiBold"
+                        <TextBlock x:Name="StatusBanner" Text="Your move" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                    Foreground="{StaticResource AccentGreenLightBrush}" />
                         <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="180" HorizontalScrollMode="Disabled">
                             <TextBlock x:Name="MoveList" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
@@ -198,14 +198,14 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
-                            <TextBlock x:Name="BottomName" Text="You" FontSize="22" FontWeight="SemiBold"
+                            <TextBlock x:Name="BottomName" Text="You" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                        TextTrimming="CharacterEllipsis"
                                        Foreground="{StaticResource TextPrimaryBrush}" />
                             <TextBlock x:Name="BottomRating" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                         </StackPanel>
                         <Border Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
                                 Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="16,8">
-                            <TextBlock x:Name="BottomClock" Text="--:--" FontSize="30" FontFamily="Consolas"
+                            <TextBlock x:Name="BottomClock" Text="--:--" FontSize="{StaticResource SubtitleSize}" FontFamily="Consolas"
                                        Foreground="{StaticResource TextPrimaryBrush}" />
                         </Border>
                     </Grid>
@@ -215,7 +215,7 @@
                 <Border x:Name="DrawOfferBanner" Visibility="Collapsed" CornerRadius="16" Padding="16,12"
                         Background="#33F2D26B" BorderBrush="#88F2D26B" BorderThickness="1">
                     <StackPanel Spacing="10">
-                        <TextBlock Text="Opponent offers a draw" FontSize="17" TextWrapping="Wrap"
+                        <TextBlock Text="Opponent offers a draw" FontSize="{StaticResource BodySize}" TextWrapping="Wrap"
                                    Foreground="{StaticResource TextPrimaryBrush}" />
                         <Grid ColumnSpacing="10">
                             <Grid.ColumnDefinitions>

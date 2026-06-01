@@ -9,11 +9,11 @@
         <StackPanel Spacing="18" MaxWidth="620" HorizontalAlignment="Left">
             <TextBlock Text="Studies" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
             <TextBlock Text="Browse any Lichess member's public studies and open them on the analysis board."
-                       FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" />
+                       FontSize="{StaticResource BodySize}" Foreground="{StaticResource TextSecondaryBrush}" />
 
             <StackPanel Orientation="Horizontal" Spacing="14">
                 <TextBox x:Name="UserBox" PlaceholderText="Lichess username" Width="280" Height="56"
-                         FontSize="18" VerticalContentAlignment="Center" />
+                         FontSize="{StaticResource BodySize}" VerticalContentAlignment="Center" />
                 <Button x:Name="LoadButton" Style="{StaticResource PrimaryButton}" Click="Load_Click"
                         Content="Find studies" MinWidth="180" Height="56" VerticalAlignment="Center" />
             </StackPanel>
@@ -33,8 +33,8 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
-                                    <TextBlock Text="{Binding Name}" FontSize="19" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
-                                    <TextBlock Text="{Binding Owner}" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding Name}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
+                                    <TextBlock Text="{Binding Owner}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
                                 </StackPanel>
                                 <TextBlock Grid.Column="1" Text="Open ▶" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource AccentGreenLightBrush}"
                                            HorizontalAlignment="Right" VerticalAlignment="Center" Margin="12,0,0,0" />

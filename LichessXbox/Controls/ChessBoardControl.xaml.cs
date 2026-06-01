@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LichessXbox.Chess;
+using LichessXbox.Helpers;
 using LichessXbox.Services;
 using Windows.UI;
 using Windows.UI.Text;
