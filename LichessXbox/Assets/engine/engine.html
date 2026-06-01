@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>engine</title></head>
+<body>
+<script>
+  // Bridge between the UWP WebView and a Stockfish web worker.
+  // C# calls send(cmd); the engine's output is pushed back via window.external.notify.
+  var engine = null;
+  var queue = [];
+
+  function notify(s) { try { window.external.notify(s); } catch (e) {} }
+
+  function attach(worker) {
+    engine = worker;
+    engine.onmessage = function (e) {
+      var line = (typeof e.data === 'string') ? e.data : (e.data && e.data.data) || '';
+      if (line) notify(line);
+    };
+    engine.onerror = function (e) { notify('engineerror ' + (e.message || 'worker')); };
+    notify('engineready');
+    // Flush anything queued before the worker was ready.
+    for (var i = 0; i < queue.length; i++) engine.postMessage(queue[i]);
+    queue = [];
+  }
+
+  // Called from C#: forward a UCI command to the engine.
+  function send(cmd) {
+    if (engine) engine.postMessage(cmd);
+    else queue.push(cmd);
+  }
+
+  // Try a bundled engine first (offline), then a CDN fallback (online).
+  var sources = [
+    'stockfish.js',
+    'https://cdn.jsdelivr.net/npm/stockfish@10.0.2/stockfish.js'
+  ];
+
+  (function boot(i) {
+    if (i >= sources.length) { notify('engineerror no-engine-source'); return; }
+    try {
+      var w = new Worker(sources[i]);
+      // If the script fails to load, onerror fires — try the next source.
+      var failed = false;
+      w.onerror = function () { if (!failed) { failed = true; w.terminate && w.terminate(); boot(i + 1); } };
+      // Give it a moment; if no error, treat as attached.
+      attach(w);
+    } catch (err) {
+      boot(i + 1);
+    }
+  })(0);
+</script>
+</body>
+</html>

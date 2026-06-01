@@ -1,0 +1,30 @@
+<Page
+    x:Class="LichessXbox.Views.LoginPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="Transparent">
+
+    <Grid>
+        <Border MaxWidth="620" VerticalAlignment="Center" HorizontalAlignment="Center"
+                Style="{StaticResource CardBorder}" Padding="48">
+            <StackPanel Spacing="22" HorizontalAlignment="Center">
+                <Border Width="84" Height="84" CornerRadius="20" Background="{StaticResource AccentGradientBrush}" HorizontalAlignment="Center">
+                    <TextBlock Text="♞" FontFamily="Segoe UI Symbol" FontSize="56" Foreground="#0E1207"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <TextBlock Text="Sign in to Lichess" FontSize="34" FontWeight="Bold"
+                           Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" />
+                <TextBlock TextWrapping="Wrap" TextAlignment="Center" FontSize="18"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           Text="Connect your free lichess.org account to play rated and casual games with your controller. We use secure OAuth — your password is never seen by this app." />
+                <Button x:Name="SignInButton" Style="{StaticResource PrimaryButton}" Click="SignIn_Click"
+                        MinWidth="280" HorizontalAlignment="Center">
+                    <TextBlock Text="Sign in with Lichess" FontSize="20" />
+                </Button>
+                <ProgressRing x:Name="Busy" IsActive="False" Width="36" Height="36" Foreground="{StaticResource AccentGreenLightBrush}" />
+                <TextBlock x:Name="StatusText" Foreground="#E0A0A0" FontSize="16"
+                           HorizontalAlignment="Center" Visibility="Collapsed" TextWrapping="Wrap" TextAlignment="Center" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Page>

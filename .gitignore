@@ -1,0 +1,30 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+bld/
+.vs/
+
+# UWP packaging
+AppPackages/
+BundleArtifacts/
+*.appx
+*.appxbundle
+*.msixbundle
+*.cer
+
+# Signing keys — never commit these (CI generates its own)
+*.pfx
+
+# NuGet
+packages/
+*.nupkg
+
+# VS junk
+*.user
+*.suo
+*.cache
+
+# macOS
+.DS_Store

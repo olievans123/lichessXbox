@@ -1,0 +1,168 @@
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using Windows.Security.Authentication.Web;
+using Windows.Security.Credentials;
+
+namespace LichessXbox.Services
+{
+    /// <summary>
+    /// OAuth2 + PKCE login against Lichess. Lichess is an open OAuth provider:
+    /// no client secret and no app pre-registration are required for a public
+    /// client. We use the UWP <see cref="WebAuthenticationBroker"/> which works
+    /// on Xbox, then exchange the code for a token over PKCE.
+    ///
+    /// The bearer token is stored in the Windows <see cref="PasswordVault"/> so the
+    /// user stays signed in between sessions.
+    /// </summary>
+    public sealed class LichessAuthService
+    {
+        // Any stable string works as a public client_id on Lichess.
+        public const string ClientId = "lichess-xbox-app";
+        const string Authorize = "https://lichess.org/oauth";
+        const string TokenEndpoint = "https://lichess.org/api/token";
+        const string Scopes = "board:play puzzle:read preference:read";
+
+        const string VaultResource = "LichessXbox";
+        const string VaultUser = "bearer";
+
+        readonly HttpClient _http = new HttpClient();
+
+        public string Token { get; private set; }
+        public bool IsAuthenticated => !string.IsNullOrEmpty(Token);
+
+        public LichessAuthService()
+        {
+            Token = LoadStoredToken();
+        }
+
+        public async Task<bool> SignInAsync()
+        {
+            string verifier = Pkce.GenerateCodeVerifier();
+            string challenge = Pkce.Challenge(verifier);
+            string state = Pkce.RandomState();
+
+            // The broker's callback URI is unique to this app install; Lichess
+            // accepts it as the redirect_uri for a public client.
+            string redirect = WebAuthenticationBroker.GetCurrentApplicationCallbackUri().AbsoluteUri;
+
+            string authUrl =
+                Authorize +
+                "?response_type=code" +
+                "&client_id=" + Uri.EscapeDataString(ClientId) +
+                "&redirect_uri=" + Uri.EscapeDataString(redirect) +
+                "&code_challenge_method=S256" +
+                "&code_challenge=" + Uri.EscapeDataString(challenge) +
+                "&scope=" + Uri.EscapeDataString(Scopes) +
+                "&state=" + Uri.EscapeDataString(state);
+
+            WebAuthenticationResult result;
+            try
+            {
+                result = await WebAuthenticationBroker.AuthenticateAsync(
+                    WebAuthenticationOptions.None, new Uri(authUrl), new Uri(redirect));
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Auth broker failed: " + ex);
+                return false;
+            }
+
+            if (result.ResponseStatus != WebAuthenticationStatus.Success)
+                return false;
+
+            var query = ParseQuery(result.ResponseData);
+            if (!query.TryGetValue("code", out string code)) return false;
+            if (query.TryGetValue("state", out string returnedState) && returnedState != state) return false;
+
+            return await ExchangeCodeAsync(code, verifier, redirect);
+        }
+
+        async Task<bool> ExchangeCodeAsync(string code, string verifier, string redirect)
+        {
+            var body = new Dictionary<string, string>
+            {
+                ["grant_type"] = "authorization_code",
+                ["code"] = code,
+                ["code_verifier"] = verifier,
+                ["redirect_uri"] = redirect,
+                ["client_id"] = ClientId,
+            };
+
+            using (var content = new FormUrlEncodedContent(body))
+            using (var resp = await _http.PostAsync(TokenEndpoint, content))
+            {
+                string json = await resp.Content.ReadAsStringAsync();
+                if (!resp.IsSuccessStatusCode) return false;
+                var obj = JObject.Parse(json);
+                Token = obj.Value<string>("access_token");
+                if (string.IsNullOrEmpty(Token)) return false;
+                StoreToken(Token);
+                return true;
+            }
+        }
+
+        public async Task SignOutAsync()
+        {
+            // Best-effort token revocation, then clear local storage.
+            if (!string.IsNullOrEmpty(Token))
+            {
+                try
+                {
+                    var req = new HttpRequestMessage(HttpMethod.Delete, "https://lichess.org/api/token");
+                    req.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Token);
+                    await _http.SendAsync(req);
+                }
+                catch { /* ignore */ }
+            }
+            Token = null;
+            ClearStoredToken();
+        }
+
+        // ----------------------------------------------------- token storage
+
+        static void StoreToken(string token)
+        {
+            var vault = new PasswordVault();
+            ClearStoredToken();
+            vault.Add(new PasswordCredential(VaultResource, VaultUser, token));
+        }
+
+        static string LoadStoredToken()
+        {
+            try
+            {
+                var vault = new PasswordVault();
+                var cred = vault.Retrieve(VaultResource, VaultUser);
+                cred.RetrievePassword();
+                return cred.Password;
+            }
+            catch { return null; }
+        }
+
+        static void ClearStoredToken()
+        {
+            try
+            {
+                var vault = new PasswordVault();
+                foreach (var c in vault.FindAllByResource(VaultResource)) vault.Remove(c);
+            }
+            catch { /* nothing stored */ }
+        }
+
+        static Dictionary<string, string> ParseQuery(string responseUri)
+        {
+            var dict = new Dictionary<string, string>();
+            int q = responseUri.IndexOf('?');
+            if (q < 0) return dict;
+            foreach (var pair in responseUri.Substring(q + 1).Split('&'))
+            {
+                var kv = pair.Split(new[] { '=' }, 2);
+                if (kv.Length == 2) dict[kv[0]] = Uri.UnescapeDataString(kv[1]);
+            }
+            return dict;
+        }
+    }
+}

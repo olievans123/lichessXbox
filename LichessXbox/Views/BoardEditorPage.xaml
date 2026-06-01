@@ -1,0 +1,49 @@
+<Page
+    x:Class="LichessXbox.Views.BoardEditorPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="Transparent">
+
+    <Grid Padding="32,24">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="420" />
+        </Grid.ColumnDefinitions>
+
+        <Viewbox Grid.Column="0" Stretch="Uniform">
+            <Border CornerRadius="10" Background="#0E0C09" Padding="8">
+                <Grid x:Name="EditorGrid" Width="704" Height="704" />
+            </Border>
+        </Viewbox>
+
+        <StackPanel Grid.Column="1" Margin="28,0,0,0" Spacing="16">
+            <TextBlock Text="Board editor" FontSize="34" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+            <TextBlock Text="Pick a piece, then place it on the board. Eraser clears a square." FontSize="15"
+                       Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
+
+            <Border Style="{StaticResource CardBorder}" Padding="16">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Palette" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" />
+                    <StackPanel x:Name="WhitePalette" Orientation="Horizontal" Spacing="6" />
+                    <StackPanel x:Name="BlackPalette" Orientation="Horizontal" Spacing="6" />
+                    <StackPanel x:Name="ToolPalette" Orientation="Horizontal" Spacing="6" />
+                </StackPanel>
+            </Border>
+
+            <Grid>
+                <TextBlock Text="Side to move" FontSize="18" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                <ToggleSwitch x:Name="SideToggle" HorizontalAlignment="Right" OnContent="White" OffContent="Black"
+                              IsOn="True" Toggled="Side_Toggled" />
+            </Grid>
+
+            <TextBox x:Name="FenBox" IsReadOnly="True" FontSize="13" Height="64" TextWrapping="Wrap"
+                     Header="FEN" />
+
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button Style="{StaticResource PrimaryButton}" Click="Analyze_Click" Content="Analyze" MinWidth="150" />
+                <Button Style="{StaticResource TileButton}" Click="Start_Click" Content="Start pos" HorizontalContentAlignment="Center" MinWidth="130" />
+                <Button Style="{StaticResource TileButton}" Click="Clear_Click" Content="Clear" HorizontalContentAlignment="Center" MinWidth="110" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Page>

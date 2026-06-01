@@ -1,0 +1,70 @@
+name: Build UWP (Xbox sideload package)
+
+# Compiles the UWP app on a Microsoft-hosted Windows runner and publishes a
+# sideload-ready package. Download the artifact and upload it to your Xbox via
+# the Device Portal (https://<xbox-ip>:11443) from any browser — no local Windows needed.
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:   # lets you run it manually from the Actions tab
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    env:
+      Solution: LichessXbox.sln
+      Configuration: Release
+      Platform: x64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Restore packages
+        run: nuget restore $env:Solution
+
+      # Create a self-signed cert whose subject matches Package.appxmanifest
+      # (Publisher="CN=LichessXbox"), export it to a .pfx for signing and a .cer
+      # to install on the Xbox.
+      - name: Create signing certificate
+        shell: pwsh
+        run: |
+          $pwd = ConvertTo-SecureString -String "LichessXboxCI" -Force -AsPlainText
+          $cert = New-SelfSignedCertificate `
+            -Type Custom -Subject "CN=LichessXbox" `
+            -KeyUsage DigitalSignature `
+            -CertStoreLocation "Cert:\CurrentUser\My" `
+            -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3")
+          Export-PfxCertificate -Cert $cert -FilePath "$env:GITHUB_WORKSPACE\sign.pfx" -Password $pwd | Out-Null
+          Export-Certificate  -Cert $cert -FilePath "$env:GITHUB_WORKSPACE\LichessXbox.cer" | Out-Null
+          echo "PFX_THUMBPRINT=$($cert.Thumbprint)" >> $env:GITHUB_ENV
+
+      - name: Build sideload package
+        run: >
+          msbuild $env:Solution
+          /p:Configuration=$env:Configuration
+          /p:Platform=$env:Platform
+          /p:AppxBundle=Always
+          /p:AppxBundlePlatforms="x64"
+          /p:UapAppxPackageBuildMode=SideloadOnly
+          /p:AppxPackageSigningEnabled=true
+          /p:PackageCertificateKeyFile=sign.pfx
+          /p:PackageCertificateThumbprint=$env:PFX_THUMBPRINT
+          /p:PackageCertificatePassword=LichessXboxCI
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LichessXbox-sideload
+          # The AppPackages folder holds the .msixbundle, its Dependencies, and the .cer.
+          path: |
+            **/AppPackages/**
+            LichessXbox.cer
+          if-no-files-found: error

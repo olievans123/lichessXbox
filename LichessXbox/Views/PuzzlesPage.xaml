@@ -1,0 +1,71 @@
+<Page
+    x:Class="LichessXbox.Views.PuzzlesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:LichessXbox.Controls"
+    Background="Transparent">
+
+    <Grid Padding="40,28">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="400" />
+        </Grid.ColumnDefinitions>
+
+        <Viewbox Grid.Column="0" Stretch="Uniform">
+            <controls:ChessBoardControl x:Name="Board" Interactive="True" Width="760" Height="760" />
+        </Viewbox>
+
+        <StackPanel Grid.Column="1" Margin="32,0,0,0" Spacing="16" VerticalAlignment="Center">
+            <TextBlock Text="Puzzles" FontSize="40" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button x:Name="ModeTraining" Style="{StaticResource TileButton}" Tag="training" Click="Mode_Click"
+                        Content="Training" HorizontalContentAlignment="Center" MinWidth="130" />
+                <Button x:Name="ModeStreak" Style="{StaticResource TileButton}" Tag="streak" Click="Mode_Click"
+                        Content="Streak" HorizontalContentAlignment="Center" MinWidth="120" />
+                <Button x:Name="ModeThemed" Style="{StaticResource TileButton}" Tag="themed" Click="Mode_Click"
+                        Content="Themed" HorizontalContentAlignment="Center" MinWidth="120" />
+            </StackPanel>
+
+            <ComboBox x:Name="ThemeBox" Visibility="Collapsed" Width="280" FontSize="16"
+                      Header="Theme" SelectionChanged="ThemeBox_SelectionChanged" />
+
+            <Border x:Name="StreakCard" Visibility="Collapsed" Style="{StaticResource CardBorder}" Padding="20,14">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <TextBlock Text="🔥" FontSize="28" />
+                    <StackPanel>
+                        <TextBlock Text="Current streak" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock x:Name="StreakText" Text="0" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource CardBorder}" Padding="22">
+                <StackPanel Spacing="10">
+                    <TextBlock x:Name="ToMoveText" Text="" FontSize="24" FontWeight="SemiBold"
+                               Foreground="{StaticResource AccentGreenLightBrush}" />
+                    <TextBlock x:Name="HintText" Text="Find the best move." FontSize="18"
+                               Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal" Spacing="20" Margin="0,6,0,0">
+                        <TextBlock x:Name="RatingText" Text="" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock x:Name="ThemesText" Text="" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border x:Name="ResultCard" Style="{StaticResource CardBorder}" Padding="22" Visibility="Collapsed">
+                <TextBlock x:Name="ResultText" FontSize="26" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+            </Border>
+
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <Button x:Name="NextButton" Style="{StaticResource PrimaryButton}" Click="Next_Click"
+                        Content="Next puzzle" MinWidth="190" />
+                <Button x:Name="RetryButton" Style="{StaticResource TileButton}" Click="Retry_Click"
+                        Content="Retry" MinWidth="140" HorizontalContentAlignment="Center" Visibility="Collapsed" />
+            </StackPanel>
+
+            <ProgressRing x:Name="Busy" IsActive="False" Width="36" Height="36"
+                          Foreground="{StaticResource AccentGreenLightBrush}" HorizontalAlignment="Left" />
+        </StackPanel>
+    </Grid>
+</Page>

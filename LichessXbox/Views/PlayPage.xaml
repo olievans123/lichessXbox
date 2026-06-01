@@ -1,0 +1,221 @@
+<Page
+    x:Class="LichessXbox.Views.PlayPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:LichessXbox.Controls"
+    Background="Transparent">
+
+    <Grid Padding="40,28">
+
+        <!-- ============ SIGN-IN REQUIRED ============ -->
+        <StackPanel x:Name="SignInPrompt" Visibility="Collapsed"
+                    VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="20" MaxWidth="540">
+            <TextBlock Text="Sign in to play" FontSize="40" FontWeight="Bold"
+                       Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" />
+            <TextBlock Text="You need a free Lichess account to play online games."
+                       FontSize="18" Foreground="{StaticResource TextSecondaryBrush}"
+                       TextAlignment="Center" TextWrapping="Wrap" />
+            <Button x:Name="GoSignInButton" Style="{StaticResource PrimaryButton}" Click="GoSignIn_Click"
+                    HorizontalAlignment="Center" MinWidth="240" Content="Sign in with Lichess" />
+        </StackPanel>
+
+        <!-- ============ LOBBY ============ -->
+        <ScrollViewer x:Name="LobbyPanel" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+            <StackPanel Spacing="22" Padding="0,0,12,24">
+                <TextBlock Text="New game" FontSize="40" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+
+                <!-- Variant -->
+                <TextBlock Text="Variant" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                <GridView x:Name="VariantGrid" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Variant_ItemClick">
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Width="150" Height="86" CornerRadius="14" Margin="6"
+                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="#33FFFFFF" BorderThickness="1">
+                                <StackPanel VerticalAlignment="Center" Spacing="2">
+                                    <TextBlock Text="{Binding Glyph}" FontSize="22" HorizontalAlignment="Center" />
+                                    <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold" TextAlignment="Center"
+                                               Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+                <TextBlock x:Name="VariantNote" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}"
+                           Visibility="Collapsed" TextWrapping="Wrap"
+                           Text="Variant games are played with server-validated moves; some inputs (Crazyhouse drops, Chess960 castling) aren't fully supported on the board yet." />
+
+                <!-- Quick pairing -->
+                <TextBlock Text="Quick pairing" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                <GridView x:Name="PresetGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Preset_ItemClick">
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Width="240" Height="140" CornerRadius="16" Margin="8"
+                                    Background="{StaticResource AppSurfaceHighBrush}"
+                                    BorderBrush="#33FFFFFF" BorderThickness="1">
+                                <StackPanel Margin="20" VerticalAlignment="Center" Spacing="6">
+                                    <TextBlock Text="{Binding Glyph}" FontSize="36" />
+                                    <TextBlock Text="{Binding Label}" FontSize="22" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}" />
+                                    <TextBlock Text="{Binding RatedLabel}" FontSize="14"
+                                               Foreground="{StaticResource TextSecondaryBrush}" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+
+                <!-- Play the computer -->
+                <TextBlock Text="Play the computer" FontSize="22" FontWeight="SemiBold"
+                           Foreground="{StaticResource AccentGreenLightBrush}" Margin="0,8,0,0" />
+                <TextBlock Text="Choose a Stockfish difficulty (1 = easiest, 8 = strongest)." FontSize="16"
+                           Foreground="{StaticResource TextSecondaryBrush}" />
+                <GridView x:Name="LevelGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Ai_ItemClick">
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Width="110" Height="100" CornerRadius="14" Margin="6"
+                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="#33FFFFFF" BorderThickness="1">
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="🤖" FontSize="26" HorizontalAlignment="Center" />
+                                    <TextBlock Text="{Binding Label}" FontSize="17" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+
+                <!-- Challenge a player -->
+                <TextBlock Text="Challenge a player" FontSize="22" FontWeight="SemiBold"
+                           Foreground="{StaticResource AccentGreenLightBrush}" Margin="0,8,0,0" />
+                <StackPanel Orientation="Horizontal" Spacing="14">
+                    <TextBox x:Name="FriendBox" PlaceholderText="Lichess username" Width="360" Height="56"
+                             FontSize="18" VerticalContentAlignment="Center" />
+                    <Button x:Name="ChallengeButton" Style="{StaticResource PrimaryButton}" Click="Challenge_Click"
+                            Content="Challenge" MinWidth="180" />
+                </StackPanel>
+
+                <!-- Incoming challenges -->
+                <TextBlock Text="Challenges" FontSize="22" FontWeight="SemiBold"
+                           Foreground="{StaticResource AccentGreenLightBrush}" Margin="0,8,0,0" />
+                <TextBlock x:Name="NoChallengesText" Text="No incoming challenges." FontSize="16"
+                           Foreground="{StaticResource TextSecondaryBrush}" />
+                <ItemsControl x:Name="ChallengesList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border CornerRadius="14" Margin="0,0,0,10" Padding="20,14"
+                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="#33FFFFFF" BorderThickness="1">
+                                <Grid>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding ChallengerName}" FontSize="20" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextPrimaryBrush}" />
+                                        <TextBlock Text="{Binding Description}" FontSize="14"
+                                                   Foreground="{StaticResource TextSecondaryBrush}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                        <Button Style="{StaticResource PrimaryButton}" Content="Accept"
+                                                Tag="{Binding Id}" Click="AcceptChallenge_Click" MinWidth="130" />
+                                        <Button Style="{StaticResource TileButton}" Content="Decline" HorizontalContentAlignment="Center"
+                                                Tag="{Binding Id}" Click="DeclineChallenge_Click" MinWidth="120" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- ============ SEEKING ============ -->
+        <StackPanel x:Name="SeekingPanel" Visibility="Collapsed"
+                    VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="24">
+            <ProgressRing IsActive="True" Width="72" Height="72" Foreground="{StaticResource AccentGreenLightBrush}" />
+            <TextBlock x:Name="SeekingText" Text="Finding an opponent…" FontSize="28"
+                       Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" />
+            <Button x:Name="CancelSeekButton" Style="{StaticResource TileButton}" Click="CancelSeek_Click"
+                    HorizontalAlignment="Center" Content="Cancel" MinWidth="200" HorizontalContentAlignment="Center" />
+        </StackPanel>
+
+        <!-- ============ GAME ============ -->
+        <Grid x:Name="GamePanel" Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="420" />
+            </Grid.ColumnDefinitions>
+
+            <Viewbox Grid.Column="0" Stretch="Uniform">
+                <controls:ChessBoardControl x:Name="Board" Interactive="True" Width="760" Height="760" />
+            </Viewbox>
+
+            <StackPanel Grid.Column="1" Margin="32,0,0,0" Spacing="16">
+                <!-- Opponent (top) -->
+                <Border Style="{StaticResource CardBorder}" Padding="20">
+                    <Grid>
+                        <StackPanel>
+                            <TextBlock x:Name="TopName" Text="Opponent" FontSize="22" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimaryBrush}" />
+                            <TextBlock x:Name="TopRating" Text="" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}" />
+                        </StackPanel>
+                        <Border HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Background="#22000000" CornerRadius="10" Padding="16,8">
+                            <TextBlock x:Name="TopClock" Text="--:--" FontSize="30" FontFamily="Consolas"
+                                       Foreground="{StaticResource TextPrimaryBrush}" />
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource CardBorder}" Padding="20">
+                    <StackPanel Spacing="6">
+                        <TextBlock x:Name="StatusBanner" Text="Your move" FontSize="22" FontWeight="SemiBold"
+                                   Foreground="{StaticResource AccentGreenLightBrush}" />
+                        <TextBlock x:Name="MoveList" Text="" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}"
+                                   TextWrapping="Wrap" MaxHeight="180" />
+                    </StackPanel>
+                </Border>
+
+                <!-- You (bottom) -->
+                <Border Style="{StaticResource CardBorder}" Padding="20">
+                    <Grid>
+                        <StackPanel>
+                            <TextBlock x:Name="BottomName" Text="You" FontSize="22" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimaryBrush}" />
+                            <TextBlock x:Name="BottomRating" Text="" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}" />
+                        </StackPanel>
+                        <Border HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Background="#22000000" CornerRadius="10" Padding="16,8">
+                            <TextBlock x:Name="BottomClock" Text="--:--" FontSize="30" FontFamily="Consolas"
+                                       Foreground="{StaticResource TextPrimaryBrush}" />
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Incoming draw offer -->
+                <Border x:Name="DrawOfferBanner" Visibility="Collapsed" CornerRadius="12" Padding="16,12"
+                        Background="#33F2D26B" BorderBrush="#88F2D26B" BorderThickness="1">
+                    <Grid>
+                        <TextBlock Text="Opponent offers a draw" FontSize="17" VerticalAlignment="Center"
+                                   Foreground="{StaticResource TextPrimaryBrush}" />
+                        <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+                            <Button Style="{StaticResource PrimaryButton}" Content="Accept" Click="AcceptDraw_Click" MinWidth="120" />
+                            <Button Style="{StaticResource TileButton}" Content="Decline" HorizontalContentAlignment="Center" Click="DeclineDraw_Click" MinWidth="110" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,4,0,0">
+                    <Button x:Name="ResignButton" Style="{StaticResource TileButton}" Click="Resign_Click"
+                            Content="Resign" HorizontalContentAlignment="Center" MinWidth="150" />
+                    <Button x:Name="DrawButton" Style="{StaticResource TileButton}" Click="OfferDraw_Click"
+                            Content="Offer draw" HorizontalContentAlignment="Center" MinWidth="150" />
+                    <Button x:Name="TakebackButton" Style="{StaticResource TileButton}" Click="Takeback_Click"
+                            Content="Takeback" HorizontalContentAlignment="Center" MinWidth="150" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <Button x:Name="RematchButton" Style="{StaticResource PrimaryButton}" Click="Rematch_Click"
+                            Content="Rematch" MinWidth="190" Visibility="Collapsed" />
+                    <Button x:Name="NewGameButton" Style="{StaticResource TileButton}" Click="NewGame_Click"
+                            Content="New game" HorizontalContentAlignment="Center" MinWidth="190" Visibility="Collapsed" />
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>
