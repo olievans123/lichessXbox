@@ -415,6 +415,7 @@ namespace LichessXbox.Controls
         GamepadButtons _prevButtons;
         double _prevLX, _prevLY;
         bool _padPrimed;
+        int _heldRow, _heldCol, _holdTicks;   // for direction auto-repeat
 
         /// <summary>Temporary: show a tiny input-state readout on interactive boards. Set false to hide.</summary>
         public static bool InputDebug = true;
@@ -460,19 +461,35 @@ namespace LichessXbox.Controls
             if (!_padPrimed) { _prevButtons = b; _prevLX = lx; _prevLY = ly; _padPrimed = true; ShowCursor(); return; }
 
             const double T = 0.5;
-            GamepadButtons pressed = b & ~_prevButtons;   // rising edges only
-            bool up    = (pressed & GamepadButtons.DPadUp) != 0    || (ly >  T && _prevLY <=  T);
-            bool down  = (pressed & GamepadButtons.DPadDown) != 0  || (ly < -T && _prevLY >= -T);
-            bool left  = (pressed & GamepadButtons.DPadLeft) != 0  || (lx < -T && _prevLX >= -T);
-            bool right = (pressed & GamepadButtons.DPadRight) != 0 || (lx >  T && _prevLX <=  T);
-
-            bool acted = false;
             ShowCursor();
-            if (up)         { MoveCursor(-1, 0); acted = true; }
-            else if (down)  { MoveCursor(1, 0);  acted = true; }
-            else if (left)  { MoveCursor(0, -1); acted = true; }
-            else if (right) { MoveCursor(0, 1);  acted = true; }
+            bool acted = false;
 
+            // Current held direction (D-pad or left stick), single axis at a time.
+            int dRow = 0, dCol = 0;
+            if (((b & GamepadButtons.DPadUp) != 0) || ly > T) dRow = -1;
+            else if (((b & GamepadButtons.DPadDown) != 0) || ly < -T) dRow = 1;
+            else if (((b & GamepadButtons.DPadLeft) != 0) || lx < -T) dCol = -1;
+            else if (((b & GamepadButtons.DPadRight) != 0) || lx > T) dCol = 1;
+
+            // Press-then-auto-repeat: step once on a new direction, then repeat while held
+            // (~300 ms before the first repeat, then every ~100 ms) so a held D-pad/stick
+            // tracks across the board instead of needing one tap per square.
+            if (dRow != 0 || dCol != 0)
+            {
+                if (dRow != _heldRow || dCol != _heldCol)
+                {
+                    MoveCursor(dRow, dCol); acted = true;
+                    _heldRow = dRow; _heldCol = dCol; _holdTicks = 0;
+                }
+                else if (++_holdTicks >= 6 && (_holdTicks - 6) % 2 == 0)
+                {
+                    MoveCursor(dRow, dCol); acted = true;
+                }
+            }
+            else { _heldRow = 0; _heldCol = 0; _holdTicks = 0; }
+
+            // A / B are edge-triggered (no repeat).
+            GamepadButtons pressed = b & ~_prevButtons;
             if ((pressed & GamepadButtons.A) != 0)      { Activate(); acted = true; }
             else if ((pressed & GamepadButtons.B) != 0) { if (_selected >= 0) { ClearSelection(); Render(); } acted = true; }
 
