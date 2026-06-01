@@ -5,7 +5,7 @@ using LichessXbox.Helpers;
 using LichessXbox.Services;
 using Windows.System;
 using Windows.UI;
-using Windows.UI.Core;
+using Windows.Gaming.Input;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -70,11 +70,13 @@ namespace LichessXbox.Controls
             this.KeyDown += OnKeyDown;
             this.GotFocus += (s, e) => { if (Interactive) ShowCursor(); };
             this.LostFocus += (s, e) => _cursor.Visibility = Visibility.Collapsed;
-            this.Loaded += (s, e) => { Render(); HookCoreWindow(); };
+            PrimeGamepadSubsystem();
+            _padTimer.Tick += OnGamepadTick;
+            this.Loaded += (s, e) => { Render(); _padTimer.Start(); };
 
             Action reTheme = () => ReTheme();
             BoardTheme.Changed += reTheme;
-            this.Unloaded += (s, e) => { BoardTheme.Changed -= reTheme; UnhookCoreWindow(); };
+            this.Unloaded += (s, e) => { BoardTheme.Changed -= reTheme; _padTimer.Stop(); };
         }
 
         #region public properties
@@ -400,24 +402,92 @@ namespace LichessXbox.Controls
             e.Handled = HandleKey(e.Key);
         }
 
-        // Window-level fallback: drives the board even when XAML focus never landed on
-        // it (timing on first show) — the #1 reported "can't make any moves" symptom.
-        // Guarded so it never steals input from a real focused control (Resign, nav…).
-        void OnCoreKeyDown(CoreWindow sender, KeyEventArgs e)
+        // ---- Hardware gamepad fallback --------------------------------------------
+        // The routed KeyDown above only fires while the board UserControl holds XAML
+        // focus, and on Xbox that focus can silently fail to land on first show — the
+        // "doesn't focus / can't make any moves" symptom. So we ALSO read the physical
+        // controller directly (Windows.Gaming.Input, focus-independent) on a timer and
+        // drive the board when no other control owns input. NOTE: CoreWindow.KeyDown does
+        // NOT reliably deliver gamepad buttons on Xbox, which is why earlier fallbacks via
+        // key events did not help — reading the Gamepad directly does.
+        readonly DispatcherTimer _padTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(50) };
+        GamepadButtons _prevButtons;
+        double _prevLX, _prevLY;
+        bool _padPrimed;
+
+        /// <summary>Temporary: show a tiny input-state readout on interactive boards. Set false to hide.</summary>
+        public static bool InputDebug = true;
+
+        // Subscribing once ensures the gamepad subsystem starts tracking controllers,
+        // so Gamepad.Gamepads is reliably populated when we poll it.
+        static bool _gamepadPrimed;
+        static void PrimeGamepadSubsystem()
         {
-            if (e.Handled || !Interactive) return;
-            if (ActualWidth <= 0 || ActualHeight <= 0) return;             // board not on screen
-            if (PromotionOverlay.Visibility == Visibility.Visible) return;
+            if (_gamepadPrimed) return;
+            _gamepadPrimed = true;
+            Gamepad.GamepadAdded += (s, g) => { };
+            Gamepad.GamepadRemoved += (s, g) => { };
+        }
 
+        void OnGamepadTick(object sender, object e)
+        {
+            if (InputDebug) UpdateDiag();
+
+            if (!Interactive || ActualWidth <= 0 || ActualHeight <= 0 ||
+                PromotionOverlay.Visibility == Visibility.Visible) { _padPrimed = false; return; }
+
+            var pads = Gamepad.Gamepads;
+            if (pads.Count == 0) { _padPrimed = false; return; }
+
+            // If XAML focus is already on the board, the routed handler runs; if it's on
+            // another real control (Resign, a list, nav), let that control own the input.
             var focused = FocusManager.GetFocusedElement();
-            if (ReferenceEquals(focused, this)) return;                    // we're focused → routed handler runs
-            if (focused is Control) return;                                // a real control owns input → leave it alone
+            if (ReferenceEquals(focused, this) || focused is Control) { _padPrimed = false; return; }
 
-            if (HandleKey(e.VirtualKey))
-            {
-                e.Handled = true;
-                Focus(FocusState.Programmatic);                            // try to (re)claim focus for next time
-            }
+            GamepadReading r;
+            try { r = pads[0].GetCurrentReading(); } catch { return; }
+            var b = r.Buttons;
+            double lx = r.LeftThumbstickX, ly = r.LeftThumbstickY;
+
+            // First active frame: record a baseline so a held button doesn't auto-fire.
+            if (!_padPrimed) { _prevButtons = b; _prevLX = lx; _prevLY = ly; _padPrimed = true; ShowCursor(); return; }
+
+            const double T = 0.5;
+            GamepadButtons pressed = b & ~_prevButtons;   // rising edges only
+            bool up    = (pressed & GamepadButtons.DPadUp) != 0    || (ly >  T && _prevLY <=  T);
+            bool down  = (pressed & GamepadButtons.DPadDown) != 0  || (ly < -T && _prevLY >= -T);
+            bool left  = (pressed & GamepadButtons.DPadLeft) != 0  || (lx < -T && _prevLX >= -T);
+            bool right = (pressed & GamepadButtons.DPadRight) != 0 || (lx >  T && _prevLX <=  T);
+
+            bool acted = false;
+            ShowCursor();
+            if (up)         { MoveCursor(-1, 0); acted = true; }
+            else if (down)  { MoveCursor(1, 0);  acted = true; }
+            else if (left)  { MoveCursor(0, -1); acted = true; }
+            else if (right) { MoveCursor(0, 1);  acted = true; }
+
+            if ((pressed & GamepadButtons.A) != 0)      { Activate(); acted = true; }
+            else if ((pressed & GamepadButtons.B) != 0) { if (_selected >= 0) { ClearSelection(); Render(); } acted = true; }
+
+            _prevButtons = b; _prevLX = lx; _prevLY = ly;
+
+            // Once we've handled something, try to claim real focus so the normal routed
+            // path (and edge-to-side-panel navigation) take over from here.
+            if (acted) Focus(FocusState.Programmatic);
+        }
+
+        // Tiny on-board readout so an input failure can be diagnosed from a screenshot:
+        // pad = controllers seen, int = Interactive, w = laid-out width, foc = focused
+        // element type, sel = selected square. Hidden unless the board is interactive.
+        void UpdateDiag()
+        {
+            if (DiagPanel == null) return;
+            if (!Interactive) { DiagPanel.Visibility = Visibility.Collapsed; return; }
+            object f = FocusManager.GetFocusedElement();
+            string fn = f == null ? "null" : f.GetType().Name;
+            int pads = Gamepad.Gamepads.Count;
+            DiagText.Text = $"pad:{pads} int:1 w:{(int)ActualWidth} foc:{fn} sel:{_selected}";
+            DiagPanel.Visibility = Visibility.Visible;
         }
 
         // Shared key logic. Returns true if the press was consumed; false lets the key
@@ -453,20 +523,6 @@ namespace LichessXbox.Controls
                 default:
                     return false;
             }
-        }
-
-        void HookCoreWindow()
-        {
-            var cw = Window.Current?.CoreWindow;
-            if (cw == null) return;
-            cw.KeyDown -= OnCoreKeyDown;   // guard against double-subscribe on re-load
-            cw.KeyDown += OnCoreKeyDown;
-        }
-
-        void UnhookCoreWindow()
-        {
-            var cw = Window.Current?.CoreWindow;
-            if (cw != null) cw.KeyDown -= OnCoreKeyDown;
         }
 
         // Returns true if the cursor actually moved. At a board edge it returns false and
