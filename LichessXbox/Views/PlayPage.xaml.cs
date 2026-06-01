@@ -81,6 +81,14 @@ namespace LichessXbox.Views
             LobbyPanel.Visibility = panel == LobbyPanel ? Visibility.Visible : Visibility.Collapsed;
             SeekingPanel.Visibility = panel == SeekingPanel ? Visibility.Visible : Visibility.Collapsed;
             GamePanel.Visibility = panel == GamePanel ? Visibility.Visible : Visibility.Collapsed;
+
+            // Give the newly shown panel a sensible initial gamepad focus.
+            Control target = null;
+            if (panel == SignInPrompt) target = GoSignInButton;
+            else if (panel == LobbyPanel) target = PresetGrid;
+            else if (panel == SeekingPanel) target = CancelSeekButton;
+            if (panel == GamePanel) Board.FocusBoard();
+            else target?.Focus(FocusState.Programmatic);
         }
 
         void GoSignIn_Click(object sender, RoutedEventArgs e)
@@ -158,7 +166,9 @@ namespace LichessXbox.Views
             SeekingText.Text = $"Starting a game vs Stockfish level {lvl.Level}…";
             ShowOnly(SeekingPanel);
             // Casual, no-clock game vs the AI for a relaxed couch experience.
+            _seekCts = new CancellationTokenSource();
             string gameId = await AppState.Current.Api.CreateAiChallengeAsync(lvl.Level, null, Variant);
+            if (_seekCts != null && _seekCts.IsCancellationRequested) return;
             if (!string.IsNullOrEmpty(gameId)) StartGame(gameId);
             else if (!_gameActive) ShowOnly(LobbyPanel);
         }
@@ -251,6 +261,12 @@ namespace LichessXbox.Views
             NewGameButton.Visibility = Visibility.Collapsed;
             DrawOfferBanner.Visibility = Visibility.Collapsed;
             ShowOnly(GamePanel);
+            // Clear stale design-time labels until the first gameFull arrives.
+            StatusBanner.Text = "Connecting…";
+            TopName.Text = "";
+            BottomName.Text = "";
+            TopRating.Text = "";
+            BottomRating.Text = "";
 
             _ = RunStreamAsync(() => AppState.Current.Api.StreamBoardGameAsync(gameId, OnGameState, ct), ct);
         }

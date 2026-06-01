@@ -16,6 +16,7 @@ namespace LichessXbox.Views
             SoundToggle.IsOn = ElementSoundPlayer.State == ElementSoundPlayerState.On;
             MoveSoundToggle.IsOn = BoardTheme.MoveSounds;
             _loaded = true;
+            ThemeGrid.FocusOnLoad();
         }
 
         void Theme_ItemClick(object sender, ItemClickEventArgs e)

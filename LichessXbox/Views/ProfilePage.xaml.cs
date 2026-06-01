@@ -65,6 +65,8 @@ namespace LichessXbox.Views
             if (a.RapidRating.HasValue) ratings.Add(new RatingTile("Rapid", a.RapidRating.Value));
             if (a.ClassicalRating.HasValue) ratings.Add(new RatingTile("Classical", a.ClassicalRating.Value));
             RatingsGrid.ItemsSource = ratings;
+            NoRatings.Visibility = (ratings.Count == 0) ? Visibility.Visible : Visibility.Collapsed;
+            SignOutButton.Focus(FocusState.Programmatic);
         }
 
         // ----------------------------------------------------- QR device pairing
@@ -82,6 +84,7 @@ namespace LichessXbox.Views
             StopPairing();
             QrPanel.Visibility = Visibility.Collapsed;
             ManualPanel.Visibility = Visibility.Visible;
+            TokenBox.Focus(FocusState.Programmatic);
         }
 
         void ShowQr_Click(object sender, RoutedEventArgs e) => ShowQr();

@@ -17,7 +17,7 @@
              (compact buttons; scrolls if the list is taller than the pane). -->
         <ScrollViewer Grid.Column="0" Background="#2A000000"
                       VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-            <StackPanel Padding="12,16,12,16" Spacing="5">
+            <StackPanel x:Name="NavItems" Padding="12,16,12,16" Spacing="5">
                 <StackPanel Orientation="Horizontal" Spacing="12" Margin="6,2,6,12">
                     <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource AccentGradientBrush}">
                         <TextBlock Text="♞" FontFamily="Segoe UI Symbol" FontSize="26" Foreground="#0E1207"
@@ -25,7 +25,7 @@
                     </Border>
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="lichess" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
-                        <TextBlock Text="for Xbox" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="for Xbox" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" />
                     </StackPanel>
                 </StackPanel>
 

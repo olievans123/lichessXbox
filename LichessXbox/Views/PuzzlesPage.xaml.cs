@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using LichessXbox.Chess;
 using LichessXbox.Models;
 using LichessXbox.Services;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace LichessXbox.Views
@@ -57,6 +59,10 @@ namespace LichessXbox.Views
         void Mode_Click(object sender, RoutedEventArgs e)
         {
             _mode = (sender as FrameworkElement)?.Tag as string ?? "training";
+            foreach (var b in new[] { ModeTraining, ModeStreak, ModeThemed })
+                b.BorderBrush = (b == sender)
+                    ? (Brush)Application.Current.Resources["AccentGreenLightBrush"]
+                    : new SolidColorBrush(Colors.Transparent);
             ThemeBox.Visibility = _mode == "themed" ? Visibility.Visible : Visibility.Collapsed;
             StreakCard.Visibility = _mode == "streak" ? Visibility.Visible : Visibility.Collapsed;
             _streak = 0;
@@ -93,7 +99,16 @@ namespace LichessXbox.Views
                         break;
                 }
 
-                if (_puzzle == null) { HintText.Text = "Couldn't load a puzzle. Try again."; return; }
+                if (_puzzle == null)
+                {
+                    HintText.Text = "Couldn't load a puzzle. Try again.";
+                    Board.Interactive = false;
+                    ResultText.Text = "Couldn't load a puzzle. Try again.";
+                    ResultCard.Visibility = Visibility.Visible;
+                    RetryButton.Visibility = Visibility.Visible;
+                    RetryButton.Focus(FocusState.Programmatic);
+                    return;
+                }
                 BuildStartPosition();
                 SetupBoard();
             }
@@ -155,6 +170,7 @@ namespace LichessXbox.Views
             ThemesText.Text = _puzzle.Themes.Count > 0 ? string.Join(" · ", _puzzle.Themes.Take(3)) : "";
             ResultCard.Visibility = Visibility.Collapsed;
             RetryButton.Visibility = Visibility.Collapsed;
+            Board.Focus(FocusState.Programmatic);
         }
 
         // -------------------------------------------------------- solving

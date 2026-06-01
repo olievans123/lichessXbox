@@ -37,7 +37,7 @@ namespace LichessXbox.Views
             TablebaseList.ItemsSource = _tablebase;
             Board.MoveRequested += Board_MoveRequested;
             this.KeyDown += Page_KeyDown;
-            this.Loaded += (s, e) => Sync();
+            this.Loaded += (s, e) => { Sync(); Board.FocusBoard(); };
         }
 
         ChessPosition Current => _history[_ply];

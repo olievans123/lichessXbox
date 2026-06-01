@@ -7,7 +7,7 @@
     <Grid Padding="32,24">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="400" />
+            <ColumnDefinition Width="320" />
         </Grid.ColumnDefinitions>
 
         <Viewbox Grid.Column="0" Stretch="Uniform">
@@ -17,7 +17,7 @@
         </Viewbox>
 
         <StackPanel Grid.Column="1" Margin="28,0,0,0" Spacing="20" VerticalAlignment="Center">
-            <TextBlock Text="Coordinate trainer" FontSize="32" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+            <TextBlock Text="Coordinate trainer" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
             <TextBlock Text="Find the named square as fast as you can. 30 seconds." FontSize="16"
                        Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
 

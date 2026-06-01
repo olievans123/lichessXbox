@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Background="Transparent">
 
-    <Grid Padding="48,36">
+    <Grid Padding="32,24">
 
         <!-- Signed out: scan-to-pair by default (token returns to the console automatically) -->
         <ScrollViewer x:Name="SignedOutCard" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
@@ -62,34 +62,35 @@
 
                     <ProgressRing x:Name="Busy" IsActive="False" Width="30" Height="30"
                                   Foreground="{StaticResource AccentGreenLightBrush}" HorizontalAlignment="Left" />
-                    <TextBlock x:Name="StatusText" Foreground="#E0A0A0" FontSize="15"
+                    <TextBlock x:Name="StatusText" Foreground="{StaticResource ErrorBrush}" FontSize="15"
                                Visibility="Collapsed" TextWrapping="Wrap" />
                 </StackPanel>
             </Border>
         </ScrollViewer>
 
         <!-- Signed in -->
-        <StackPanel x:Name="SignedInPanel" Spacing="28" Visibility="Collapsed" MaxWidth="900">
+        <StackPanel x:Name="SignedInPanel" Spacing="28" Visibility="Collapsed" MaxWidth="640">
             <StackPanel Orientation="Horizontal" Spacing="24">
-                <Border Width="96" Height="96" CornerRadius="24" Background="{StaticResource AccentGradientBrush}">
-                    <TextBlock x:Name="AvatarInitial" Text="?" FontSize="48" FontWeight="Bold" Foreground="#0E1207"
+                <Border Width="72" Height="72" CornerRadius="24" Background="{StaticResource AccentGradientBrush}">
+                    <TextBlock x:Name="AvatarInitial" Text="?" FontSize="36" FontWeight="Bold" Foreground="#0E1207"
                                HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Border>
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock x:Name="UsernameText" Text="" FontSize="44" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                    <TextBlock x:Name="UsernameText" Text="" FontSize="32" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
                     <TextBlock x:Name="SubtitleText" Text="Lichess member" FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" />
                 </StackPanel>
             </StackPanel>
 
             <TextBlock Text="Ratings" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+            <TextBlock x:Name="NoRatings" Text="No rated games yet." FontSize="15" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
             <GridView x:Name="RatingsGrid" SelectionMode="None" IsItemClickEnabled="False">
                 <GridView.ItemTemplate>
                     <DataTemplate>
-                        <Border Width="180" Height="120" CornerRadius="16" Margin="8"
+                        <Border Width="150" Height="100" CornerRadius="16" Margin="8"
                                 Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="#33FFFFFF" BorderThickness="1">
                             <StackPanel Margin="20" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding Mode}" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" />
-                                <TextBlock Text="{Binding Value}" FontSize="40" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                                <TextBlock Text="{Binding Value}" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
                             </StackPanel>
                         </Border>
                     </DataTemplate>

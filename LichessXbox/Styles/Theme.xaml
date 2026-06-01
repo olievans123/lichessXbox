@@ -25,6 +25,10 @@
     <SolidColorBrush x:Key="MoveHighlightBrush" Color="{StaticResource MoveHighlightColor}" Opacity="0.55" />
     <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}" />
     <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}" />
+    <SolidColorBrush x:Key="HairlineBrush" Color="#33FFFFFF" />
+    <SolidColorBrush x:Key="ErrorBrush" Color="#E0795E" />
+    <SolidColorBrush x:Key="LiveBrush" Color="#E0463A" />
+    <SolidColorBrush x:Key="ClockChipBrush" Color="#22000000" />
 
     <!-- Hero gradient used behind the home / login screens -->
     <LinearGradientBrush x:Key="HeroGradientBrush" StartPoint="0,0" EndPoint="1,1">
@@ -150,6 +154,12 @@
         <Setter Property="Padding" Value="16,9" />
         <Setter Property="FontSize" Value="17" />
         <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <!-- Combo boxes get the green focus ring to match the rest of the app -->
+    <Style x:Key="ThemedComboBox" TargetType="ComboBox">
+        <Setter Property="FocusVisualPrimaryBrush" Value="{StaticResource AccentGreenLightBrush}" />
+        <Setter Property="FocusVisualSecondaryBrush" Value="#99000000" />
     </Style>
 
     <!-- Tint the gamepad focus rectangle green to match the rest of the app

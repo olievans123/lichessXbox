@@ -8,7 +8,7 @@
     <Grid Padding="40,28">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="380" />
+            <ColumnDefinition Width="320" />
         </Grid.ColumnDefinitions>
 
         <Viewbox Grid.Column="0" Stretch="Uniform">
@@ -17,7 +17,7 @@
 
         <StackPanel Grid.Column="1" Margin="32,0,0,0" Spacing="16" VerticalAlignment="Center">
             <StackPanel Orientation="Horizontal" Spacing="10">
-                <Border Width="14" Height="14" CornerRadius="7" Background="#E0463A" VerticalAlignment="Center" />
+                <Border Width="14" Height="14" CornerRadius="7" Background="{StaticResource LiveBrush}" VerticalAlignment="Center" />
                 <TextBlock Text="LIVE · Lichess TV" FontSize="18" FontWeight="SemiBold"
                            Foreground="{StaticResource TextPrimaryBrush}" />
             </StackPanel>
@@ -28,7 +28,7 @@
                         <TextBlock x:Name="TopName" Text="—" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
                         <TextBlock x:Name="TopRating" Text="" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}" />
                     </StackPanel>
-                    <Border HorizontalAlignment="Right" VerticalAlignment="Center" Background="#22000000" CornerRadius="10" Padding="16,8">
+                    <Border HorizontalAlignment="Right" VerticalAlignment="Center" Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="16,8">
                         <TextBlock x:Name="TopClock" Text="--:--" FontSize="28" FontFamily="Consolas" Foreground="{StaticResource TextPrimaryBrush}" />
                     </Border>
                 </Grid>
@@ -40,7 +40,7 @@
                         <TextBlock x:Name="BottomName" Text="—" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
                         <TextBlock x:Name="BottomRating" Text="" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}" />
                     </StackPanel>
-                    <Border HorizontalAlignment="Right" VerticalAlignment="Center" Background="#22000000" CornerRadius="10" Padding="16,8">
+                    <Border HorizontalAlignment="Right" VerticalAlignment="Center" Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="16,8">
                         <TextBlock x:Name="BottomClock" Text="--:--" FontSize="28" FontFamily="Consolas" Foreground="{StaticResource TextPrimaryBrush}" />
                     </Border>
                 </Grid>

@@ -14,6 +14,11 @@ namespace LichessXbox.Views
             this.InitializeComponent();
         }
 
+        protected override void OnNavigatedTo(Windows.UI.Xaml.Navigation.NavigationEventArgs e)
+        {
+            UserBox.Focus(FocusState.Programmatic);
+        }
+
         async void Load_Click(object sender, RoutedEventArgs e)
         {
             string user = UserBox.Text?.Trim();

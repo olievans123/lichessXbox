@@ -5,13 +5,13 @@
     Background="Transparent">
 
     <Grid Padding="40,28">
-        <StackPanel Spacing="18" MaxWidth="900" HorizontalAlignment="Left">
-            <TextBlock Text="Studies" FontSize="40" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+        <StackPanel Spacing="18" MaxWidth="620" HorizontalAlignment="Left">
+            <TextBlock Text="Studies" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
             <TextBlock Text="Browse any Lichess member's public studies and open them on the analysis board."
                        FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" />
 
             <StackPanel Orientation="Horizontal" Spacing="14">
-                <TextBox x:Name="UserBox" PlaceholderText="Lichess username" Width="360" Height="56"
+                <TextBox x:Name="UserBox" PlaceholderText="Lichess username" Width="280" Height="56"
                          FontSize="18" VerticalContentAlignment="Center" />
                 <Button x:Name="LoadButton" Style="{StaticResource PrimaryButton}" Click="Load_Click"
                         Content="Find studies" MinWidth="180" />
@@ -21,7 +21,7 @@
                           Foreground="{StaticResource AccentGreenLightBrush}" />
             <TextBlock x:Name="StatusText" Text="" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}" />
 
-            <ListView x:Name="StudyList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Study_ItemClick" MaxHeight="640">
+            <ListView x:Name="StudyList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Study_ItemClick" MaxHeight="300">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Border CornerRadius="12" Padding="18,14" Margin="0,0,0,10"

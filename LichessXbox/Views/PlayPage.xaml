@@ -22,7 +22,7 @@
         <!-- ============ LOBBY ============ -->
         <ScrollViewer x:Name="LobbyPanel" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
             <StackPanel Spacing="22" Padding="0,0,12,24">
-                <TextBlock Text="New game" FontSize="40" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                <TextBlock Text="New game" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
                 <!-- Quick pairing -->
                 <TextBlock Text="Quick pairing" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
@@ -33,7 +33,7 @@
                         <DataTemplate>
                             <Border Width="240" Height="140" CornerRadius="16" Margin="8"
                                     Background="{StaticResource AppSurfaceHighBrush}"
-                                    BorderBrush="#33FFFFFF" BorderThickness="1">
+                                    BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                 <StackPanel Margin="20" VerticalAlignment="Center" Spacing="6">
                                     <TextBlock Text="{Binding Glyph}" FontSize="36" />
                                     <TextBlock Text="{Binding Label}" FontSize="22" FontWeight="SemiBold"
@@ -54,8 +54,8 @@
                 <GridView x:Name="LevelGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Ai_ItemClick">
                     <GridView.ItemTemplate>
                         <DataTemplate>
-                            <Border Width="110" Height="100" CornerRadius="14" Margin="6"
-                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="#33FFFFFF" BorderThickness="1">
+                            <Border Width="110" Height="100" CornerRadius="16" Margin="6"
+                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                 <StackPanel VerticalAlignment="Center">
                                     <TextBlock Text="🤖" FontSize="26" HorizontalAlignment="Center" />
                                     <TextBlock Text="{Binding Label}" FontSize="17" FontWeight="SemiBold"
@@ -70,8 +70,9 @@
                 <TextBlock Text="Challenge a player" FontSize="22" FontWeight="SemiBold"
                            Foreground="{StaticResource AccentGreenLightBrush}" Margin="0,8,0,0" />
                 <StackPanel Orientation="Horizontal" Spacing="14">
-                    <TextBox x:Name="FriendBox" PlaceholderText="Lichess username" Width="360" Height="56"
-                             FontSize="18" VerticalContentAlignment="Center" />
+                    <TextBox x:Name="FriendBox" PlaceholderText="Lichess username" Width="300" Height="56"
+                             FontSize="18" VerticalContentAlignment="Center"
+                             FocusVisualPrimaryBrush="{StaticResource AccentGreenLightBrush}" />
                     <Button x:Name="ChallengeButton" Style="{StaticResource PrimaryButton}" Click="Challenge_Click"
                             Content="Challenge" MinWidth="180" />
                 </StackPanel>
@@ -81,8 +82,8 @@
                 <GridView x:Name="VariantGrid" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Variant_ItemClick">
                     <GridView.ItemTemplate>
                         <DataTemplate>
-                            <Border Width="132" Height="78" CornerRadius="12" Margin="5"
-                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="#33FFFFFF" BorderThickness="1">
+                            <Border Width="132" Height="78" CornerRadius="16" Margin="5"
+                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                 <StackPanel VerticalAlignment="Center" Spacing="2">
                                     <TextBlock Text="{Binding Glyph}" FontSize="20" HorizontalAlignment="Center" />
                                     <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold" TextAlignment="Center"
@@ -104,8 +105,8 @@
                 <ItemsControl x:Name="ChallengesList">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border CornerRadius="14" Margin="0,0,0,10" Padding="20,14"
-                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="#33FFFFFF" BorderThickness="1">
+                            <Border CornerRadius="16" Margin="0,0,0,10" Padding="20,14"
+                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                 <Grid>
                                     <StackPanel VerticalAlignment="Center">
                                         <TextBlock Text="{Binding ChallengerName}" FontSize="20" FontWeight="SemiBold"
@@ -141,14 +142,14 @@
         <Grid x:Name="GamePanel" Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="420" />
+                <ColumnDefinition Width="320" />
             </Grid.ColumnDefinitions>
 
             <Viewbox Grid.Column="0" Stretch="Uniform">
                 <controls:ChessBoardControl x:Name="Board" Interactive="True" Width="760" Height="760" />
             </Viewbox>
 
-            <StackPanel Grid.Column="1" Margin="32,0,0,0" Spacing="16">
+            <StackPanel Grid.Column="1" Margin="20,0,0,0" Spacing="16">
                 <!-- Opponent (top) -->
                 <Border Style="{StaticResource CardBorder}" Padding="20">
                     <Grid>
@@ -169,8 +170,10 @@
                     <StackPanel Spacing="6">
                         <TextBlock x:Name="StatusBanner" Text="Your move" FontSize="22" FontWeight="SemiBold"
                                    Foreground="{StaticResource AccentGreenLightBrush}" />
-                        <TextBlock x:Name="MoveList" Text="" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}"
-                                   TextWrapping="Wrap" MaxHeight="180" />
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="180" HorizontalScrollMode="Disabled">
+                            <TextBlock x:Name="MoveList" Text="" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}"
+                                       TextWrapping="Wrap" />
+                        </ScrollViewer>
                     </StackPanel>
                 </Border>
 

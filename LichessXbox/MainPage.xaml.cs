@@ -1,6 +1,9 @@
 using LichessXbox.Views;
+using System.Linq;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 
 namespace LichessXbox
 {
@@ -49,6 +52,31 @@ namespace LichessXbox
                 case "editor": ContentFrame.Navigate(typeof(BoardEditorPage)); break;
                 case "coords": ContentFrame.Navigate(typeof(CoordinatesPage)); break;
                 case "settings": ContentFrame.Navigate(typeof(SettingsPage)); break;
+            }
+
+            HighlightNav(tag);
+        }
+
+        /// <summary>Marks the active nav button green and resets the rest.</summary>
+        void HighlightNav(string tag)
+        {
+            var activeBg = (Brush)Application.Current.Resources["AccentGreenBrush"];
+            var activeFg = new SolidColorBrush(Color.FromArgb(0xFF, 0x0E, 0x12, 0x07));
+            var inactiveBg = (Brush)Application.Current.Resources["AppSurfaceHighBrush"];
+            var inactiveFg = (Brush)Application.Current.Resources["TextPrimaryBrush"];
+
+            foreach (var b in NavItems.Children.OfType<Button>())
+            {
+                if ((b.Tag as string) == tag)
+                {
+                    b.Background = activeBg;
+                    b.Foreground = activeFg;
+                }
+                else
+                {
+                    b.Background = inactiveBg;
+                    b.Foreground = inactiveFg;
+                }
             }
         }
     }

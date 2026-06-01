@@ -26,6 +26,7 @@ namespace LichessXbox.Views
             BuildGrid();
             _timer.Interval = TimeSpan.FromSeconds(1);
             _timer.Tick += Tick;
+            StartButton.Focus(FocusState.Programmatic);
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e) => _timer.Stop();
@@ -52,6 +53,8 @@ namespace LichessXbox.Views
                         VerticalAlignment = VerticalAlignment.Stretch,
                         Tag = sq,
                     };
+                    btn.UseSystemFocusVisuals = false;
+                    btn.FocusVisualPrimaryBrush = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F));
                     btn.Click += Cell_Click;
                     Grid.SetRow(btn, row);
                     Grid.SetColumn(btn, col);
@@ -113,7 +116,7 @@ namespace LichessXbox.Views
             {
                 _timer.Stop();
                 _playing = false;
-                TargetText.Text = _score.ToString();
+                TargetText.Text = "—";
                 StartButton.Content = "Play again";
             }
         }

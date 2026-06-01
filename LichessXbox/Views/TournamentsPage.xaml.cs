@@ -19,8 +19,26 @@ namespace LichessXbox.Views
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             Busy.IsActive = true;
-            try { TournamentList.ItemsSource = await AppState.Current.Api.GetTournamentsAsync(); }
-            catch { }
+            try
+            {
+                var tournaments = await AppState.Current.Api.GetTournamentsAsync();
+                TournamentList.ItemsSource = tournaments;
+                TournamentList.Focus(FocusState.Programmatic);
+                if (tournaments == null || tournaments.Count == 0)
+                {
+                    ListStatus.Text = "No tournaments right now.";
+                    ListStatus.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    ListStatus.Visibility = Visibility.Collapsed;
+                }
+            }
+            catch
+            {
+                ListStatus.Text = "Couldn't load tournaments.";
+                ListStatus.Visibility = Visibility.Visible;
+            }
             finally { Busy.IsActive = false; }
         }
 
@@ -33,13 +51,21 @@ namespace LichessXbox.Views
                 ? Visibility.Visible : Visibility.Collapsed;
             StandingsList.ItemsSource = null;
 
+            DetailStatus.Text = "Loading standings…";
+            DetailStatus.Visibility = Visibility.Visible;
             try
             {
                 var (title, players) = await AppState.Current.Api.GetTournamentStandingsAsync(t.Id);
                 if (!string.IsNullOrEmpty(title)) DetailTitle.Text = title;
                 StandingsList.ItemsSource = players;
+                DetailStatus.Text = "";
+                DetailStatus.Visibility = Visibility.Collapsed;
             }
-            catch { }
+            catch
+            {
+                DetailStatus.Text = "Standings unavailable.";
+                DetailStatus.Visibility = Visibility.Visible;
+            }
         }
 
         async void Join_Click(object sender, RoutedEventArgs e)

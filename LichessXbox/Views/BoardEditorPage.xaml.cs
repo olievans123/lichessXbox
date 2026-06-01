@@ -23,7 +23,11 @@ namespace LichessXbox.Views
             BuildGrid();
             BuildPalette();
             SetStartingPosition();
-            this.Loaded += (s, e) => UpdateFen();
+            this.Loaded += (s, e) =>
+            {
+                UpdateFen();
+                (WhitePalette.Children.Count > 0 ? WhitePalette.Children[0] as Button : null)?.Focus(FocusState.Programmatic);
+            };
         }
 
         void BuildGrid()
@@ -56,6 +60,8 @@ namespace LichessXbox.Views
                         },
                         Tag = sq,
                     };
+                    btn.UseSystemFocusVisuals = false;
+                    btn.FocusVisualPrimaryBrush = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F));
                     btn.Click += Cell_Click;
                     Grid.SetRow(btn, row);
                     Grid.SetColumn(btn, col);
@@ -91,6 +97,8 @@ namespace LichessXbox.Views
                 },
                 Tag = piece,
             };
+            btn.UseSystemFocusVisuals = false;
+            btn.FocusVisualPrimaryBrush = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F));
             btn.Click += Palette_Click;
             return btn;
         }

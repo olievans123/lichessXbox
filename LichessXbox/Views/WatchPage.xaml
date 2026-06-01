@@ -8,7 +8,7 @@
     <Grid Padding="32,24">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="440" />
+            <ColumnDefinition Width="330" />
         </Grid.ColumnDefinitions>
 
         <!-- Board + players -->
@@ -24,7 +24,7 @@
                     <TextBlock x:Name="TopName" Text="—" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
                     <TextBlock x:Name="TopRating" Text="" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
                 </StackPanel>
-                <Border HorizontalAlignment="Right" Background="#22000000" CornerRadius="10" Padding="14,6">
+                <Border HorizontalAlignment="Right" Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="14,6">
                     <TextBlock x:Name="TopClock" Text="--:--" FontSize="26" FontFamily="Consolas" Foreground="{StaticResource TextPrimaryBrush}" />
                 </Border>
             </Grid>
@@ -38,7 +38,7 @@
                     <TextBlock x:Name="BottomName" Text="—" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
                     <TextBlock x:Name="BottomRating" Text="" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
                 </StackPanel>
-                <Border HorizontalAlignment="Right" Background="#22000000" CornerRadius="10" Padding="14,6">
+                <Border HorizontalAlignment="Right" Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="14,6">
                     <TextBlock x:Name="BottomClock" Text="--:--" FontSize="26" FontFamily="Consolas" Foreground="{StaticResource TextPrimaryBrush}" />
                 </Border>
             </Grid>
@@ -48,11 +48,11 @@
         <ScrollViewer Grid.Column="1" Margin="28,0,0,0" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
             <StackPanel Spacing="16" Padding="0,0,10,16">
                 <StackPanel Orientation="Horizontal" Spacing="10">
-                    <Border Width="14" Height="14" CornerRadius="7" Background="#E0463A" VerticalAlignment="Center" />
+                    <Border Width="14" Height="14" CornerRadius="7" Background="{StaticResource LiveBrush}" VerticalAlignment="Center" />
                     <TextBlock x:Name="HeaderText" Text="Lichess TV" FontSize="30" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
                 </StackPanel>
 
-                <TextBlock Text="Channels" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                <TextBlock Text="Channels" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
                 <ListView x:Name="ChannelList" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Channel_ItemClick" MaxHeight="360">
                     <ListView.ItemTemplate>
                         <DataTemplate>
@@ -71,7 +71,7 @@
                     </ListView.ItemTemplate>
                 </ListView>
 
-                <TextBlock Text="Live streamers" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                <TextBlock Text="Live streamers" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
                 <ItemsControl x:Name="StreamerList">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
@@ -86,7 +86,7 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <TextBlock Text="Simuls" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                <TextBlock Text="Simuls" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
                 <ItemsControl x:Name="SimulList">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
@@ -101,7 +101,7 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <TextBlock Text="Broadcasts" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                <TextBlock Text="Broadcasts" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
                 <ItemsControl x:Name="BroadcastList">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>

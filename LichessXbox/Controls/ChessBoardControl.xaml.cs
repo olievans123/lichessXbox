@@ -401,19 +401,19 @@ namespace LichessXbox.Controls
                 case VirtualKey.Up:
                 case VirtualKey.GamepadDPadUp:
                 case VirtualKey.GamepadLeftThumbstickUp:
-                    MoveCursor(-1, 0); e.Handled = true; break;
+                    e.Handled = MoveCursor(-1, 0); break;
                 case VirtualKey.Down:
                 case VirtualKey.GamepadDPadDown:
                 case VirtualKey.GamepadLeftThumbstickDown:
-                    MoveCursor(1, 0); e.Handled = true; break;
+                    e.Handled = MoveCursor(1, 0); break;
                 case VirtualKey.Left:
                 case VirtualKey.GamepadDPadLeft:
                 case VirtualKey.GamepadLeftThumbstickLeft:
-                    MoveCursor(0, -1); e.Handled = true; break;
+                    e.Handled = MoveCursor(0, -1); break;
                 case VirtualKey.Right:
                 case VirtualKey.GamepadDPadRight:
                 case VirtualKey.GamepadLeftThumbstickRight:
-                    MoveCursor(0, 1); e.Handled = true; break;
+                    e.Handled = MoveCursor(0, 1); break;
                 case VirtualKey.Enter:
                 case VirtualKey.Space:
                 case VirtualKey.GamepadA:
@@ -424,12 +424,26 @@ namespace LichessXbox.Controls
             }
         }
 
-        void MoveCursor(int dRow, int dCol)
+        // Returns true if the cursor actually moved. At a board edge it returns false and
+        // leaves the key unhandled, so gamepad XY-focus can leave the board for side-panel
+        // buttons (Resign, nav, etc.) instead of being trapped on the board.
+        bool MoveCursor(int dRow, int dCol)
         {
             ShowCursor();
-            _cursorRow = Clamp(_cursorRow + dRow);
-            _cursorCol = Clamp(_cursorCol + dCol);
+            int nr = Clamp(_cursorRow + dRow), nc = Clamp(_cursorCol + dCol);
+            if (nr == _cursorRow && nc == _cursorCol) return false;
+            _cursorRow = nr; _cursorCol = nc;
             PositionCursor();
+            return true;
+        }
+
+        /// <summary>Give the board gamepad focus (deferred so it works right after the board becomes visible).</summary>
+        public void FocusBoard()
+        {
+            _ = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            {
+                if (Interactive) { Focus(FocusState.Programmatic); ShowCursor(); }
+            });
         }
 
         static int Clamp(int v) => v < 0 ? 0 : (v > 7 ? 7 : v);
@@ -519,6 +533,9 @@ namespace LichessXbox.Controls
                     BorderBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F)),
                     BorderThickness = new Thickness(2),
                     CornerRadius = new CornerRadius(12),
+                    UseSystemFocusVisuals = false,
+                    FocusVisualPrimaryBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F)),
+                    FocusVisualSecondaryBrush = new SolidColorBrush(Color.FromArgb(0x99, 0x00, 0x00, 0x00)),
                     Content = new TextBlock
                     {
                         Text = Glyph(p),

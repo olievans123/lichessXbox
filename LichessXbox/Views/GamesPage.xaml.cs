@@ -36,7 +36,14 @@ namespace LichessXbox.Views
             Busy.IsActive = true;
             try
             {
-                GamesList.ItemsSource = await AppState.Current.Api.GetUserGamesAsync(account.Username, 25);
+                var games = await AppState.Current.Api.GetUserGamesAsync(account.Username, 25);
+                GamesList.ItemsSource = games;
+                NoGames.Visibility = (games == null || games.Count == 0) ? Visibility.Visible : Visibility.Collapsed;
+                GamesList.Focus(FocusState.Programmatic);
+            }
+            catch
+            {
+                NoGames.Visibility = Visibility.Visible;
             }
             finally { Busy.IsActive = false; }
 
@@ -51,7 +58,7 @@ namespace LichessXbox.Views
                 var points = await AppState.Current.Api.GetRatingHistoryAsync(username, "Blitz");
                 DrawGraph(points);
             }
-            catch { }
+            catch { RatingRange.Text = "No rating history yet."; }
         }
 
         async System.Threading.Tasks.Task LoadFollowingAsync()
@@ -68,7 +75,7 @@ namespace LichessXbox.Views
         void DrawGraph(List<(int x, int y)> points)
         {
             GraphCanvas.Children.Clear();
-            if (points == null || points.Count < 2) return;
+            if (points == null || points.Count < 2) { RatingRange.Text = "No rating history yet."; return; }
 
             double w = 320, h = 150, pad = 10;
             // Lay out after the canvas has a size; fall back to fixed dims.

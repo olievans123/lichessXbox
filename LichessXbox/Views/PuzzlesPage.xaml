@@ -8,26 +8,26 @@
     <Grid Padding="40,28">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="400" />
+            <ColumnDefinition Width="320" />
         </Grid.ColumnDefinitions>
 
         <Viewbox Grid.Column="0" Stretch="Uniform">
             <controls:ChessBoardControl x:Name="Board" Interactive="True" Width="760" Height="760" />
         </Viewbox>
 
-        <StackPanel Grid.Column="1" Margin="32,0,0,0" Spacing="16" VerticalAlignment="Center">
-            <TextBlock Text="Puzzles" FontSize="40" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+        <StackPanel Grid.Column="1" Margin="24,0,0,0" Spacing="12" VerticalAlignment="Top">
+            <TextBlock Text="Puzzles" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
             <StackPanel Orientation="Horizontal" Spacing="10">
                 <Button x:Name="ModeTraining" Style="{StaticResource TileButton}" Tag="training" Click="Mode_Click"
-                        Content="Training" HorizontalContentAlignment="Center" MinWidth="130" />
+                        Content="Training" HorizontalContentAlignment="Center" MinWidth="96" />
                 <Button x:Name="ModeStreak" Style="{StaticResource TileButton}" Tag="streak" Click="Mode_Click"
-                        Content="Streak" HorizontalContentAlignment="Center" MinWidth="120" />
+                        Content="Streak" HorizontalContentAlignment="Center" MinWidth="96" />
                 <Button x:Name="ModeThemed" Style="{StaticResource TileButton}" Tag="themed" Click="Mode_Click"
-                        Content="Themed" HorizontalContentAlignment="Center" MinWidth="120" />
+                        Content="Themed" HorizontalContentAlignment="Center" MinWidth="96" />
             </StackPanel>
 
-            <ComboBox x:Name="ThemeBox" Visibility="Collapsed" Width="280" FontSize="16"
+            <ComboBox x:Name="ThemeBox" Visibility="Collapsed" HorizontalAlignment="Stretch" Style="{StaticResource ThemedComboBox}" FontSize="16"
                       Header="Theme" SelectionChanged="ThemeBox_SelectionChanged" />
 
             <Border x:Name="StreakCard" Visibility="Collapsed" Style="{StaticResource CardBorder}" Padding="20,14">

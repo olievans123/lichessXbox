@@ -7,7 +7,7 @@
     <Grid Padding="32,24">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="420" />
+            <ColumnDefinition Width="320" />
         </Grid.ColumnDefinitions>
 
         <Viewbox Grid.Column="0" Stretch="Uniform">
@@ -17,7 +17,7 @@
         </Viewbox>
 
         <StackPanel Grid.Column="1" Margin="28,0,0,0" Spacing="16">
-            <TextBlock Text="Board editor" FontSize="34" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+            <TextBlock Text="Board editor" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
             <TextBlock Text="Pick a piece, then place it on the board. Eraser clears a square." FontSize="15"
                        Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
 
@@ -36,7 +36,7 @@
                               IsOn="True" Toggled="Side_Toggled" />
             </Grid>
 
-            <TextBox x:Name="FenBox" IsReadOnly="True" FontSize="13" Height="64" TextWrapping="Wrap"
+            <TextBox x:Name="FenBox" IsReadOnly="True" FontSize="16" Height="64" TextWrapping="Wrap"
                      Header="FEN" />
 
             <StackPanel Orientation="Horizontal" Spacing="10">
