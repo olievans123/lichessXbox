@@ -228,26 +228,26 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <Button Grid.Column="0" Style="{StaticResource PrimaryButton}" Content="Accept"
+                            <Button Grid.Column="0" Style="{StaticResource PrimaryButton}" Padding="16,10" Content="Accept"
                                     HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Click="AcceptDraw_Click" />
-                            <Button Grid.Column="1" Style="{StaticResource TileButton}" Content="Decline"
+                            <Button Grid.Column="1" Style="{StaticResource TileButton}" Padding="16,10" Content="Decline"
                                     HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Click="DeclineDraw_Click" />
                         </Grid>
                     </StackPanel>
                 </Border>
 
-                <StackPanel Spacing="8" Margin="0,4,0,0">
-                    <Button x:Name="ResignButton" Style="{StaticResource TileButton}" Click="Resign_Click"
+                <StackPanel Spacing="6" Margin="0,2,0,0">
+                    <Button x:Name="ResignButton" Style="{StaticResource TileButton}" Padding="16,10" Click="Resign_Click"
                             Content="Resign" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                    <Button x:Name="DrawButton" Style="{StaticResource TileButton}" Click="OfferDraw_Click"
+                    <Button x:Name="DrawButton" Style="{StaticResource TileButton}" Padding="16,10" Click="OfferDraw_Click"
                             Content="Offer draw" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                    <Button x:Name="TakebackButton" Style="{StaticResource TileButton}" Click="Takeback_Click"
+                    <Button x:Name="TakebackButton" Style="{StaticResource TileButton}" Padding="16,10" Click="Takeback_Click"
                             Content="Takeback" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
                 </StackPanel>
-                <StackPanel Spacing="8">
-                    <Button x:Name="RematchButton" Style="{StaticResource PrimaryButton}" Click="Rematch_Click"
+                <StackPanel Spacing="6">
+                    <Button x:Name="RematchButton" Style="{StaticResource PrimaryButton}" Padding="16,10" Click="Rematch_Click"
                             Content="Rematch" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Visibility="Collapsed" />
-                    <Button x:Name="NewGameButton" Style="{StaticResource TileButton}" Click="NewGame_Click"
+                    <Button x:Name="NewGameButton" Style="{StaticResource TileButton}" Padding="16,10" Click="NewGame_Click"
                             Content="New game" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Visibility="Collapsed" />
                 </StackPanel>
             </StackPanel>

@@ -36,6 +36,9 @@ namespace LichessXbox.Controls
         readonly TextBlock[] _pieceFill = new TextBlock[64];
         readonly TextBlock[] _pieceOutline = new TextBlock[64];
         readonly Image[] _pieceImg = new Image[64];   // SVG piece set (lichess); hidden unless a set is active
+        // Decoded SVG sources, cached by URI so a piece is decoded once and reused across
+        // squares and re-renders (re-creating SvgImageSource every move would flicker the board).
+        readonly Dictionary<string, SvgImageSource> _svgCache = new Dictionary<string, SvgImageSource>();
 
         ChessPosition _position = ChessPosition.Starting();
         readonly List<ChessMove> _legalFromSelected = new List<ChessMove>();
@@ -329,7 +332,12 @@ namespace LichessXbox.Controls
                     var src = PieceSets.SourceFor(BoardTheme.PieceSet, piece);   // null → use the Unicode glyph
                     if (src != null)
                     {
-                        _pieceImg[sq].Source = new SvgImageSource(src);
+                        if (!_svgCache.TryGetValue(src.AbsoluteUri, out var img))
+                        {
+                            img = new SvgImageSource(src);
+                            _svgCache[src.AbsoluteUri] = img;
+                        }
+                        if (!ReferenceEquals(_pieceImg[sq].Source, img)) _pieceImg[sq].Source = img;   // avoid needless reload
                         _pieceImg[sq].Visibility = Visibility.Visible;
                         _pieceHost[sq].Visibility = Visibility.Collapsed;
                     }
