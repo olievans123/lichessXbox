@@ -4,9 +4,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Background="Transparent">
 
-    <Grid Padding="40,28">
+    <Grid Padding="32,24">
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-        <StackPanel Spacing="18" MaxWidth="620" HorizontalAlignment="Left">
+        <StackPanel Spacing="18" MaxWidth="720" HorizontalAlignment="Left">
             <TextBlock Text="Studies" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
             <TextBlock Text="Browse any Lichess member's public studies and open them on the analysis board."
                        FontSize="{StaticResource BodySize}" Foreground="{StaticResource TextSecondaryBrush}" />

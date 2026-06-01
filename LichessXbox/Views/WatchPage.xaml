@@ -61,7 +61,7 @@
                 </StackPanel>
 
                 <TextBlock Text="Channels" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                <ListView x:Name="ChannelList" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Channel_ItemClick">
+                <ListView x:Name="ChannelList" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Channel_ItemClick" ScrollViewer.VerticalScrollMode="Disabled">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid Padding="4,8">
@@ -81,7 +81,7 @@
                 <TextBlock x:Name="ChannelsEmpty" Text="Couldn't load channels right now" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" Visibility="Collapsed" />
 
                 <TextBlock Text="Live streamers" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                <ListView x:Name="StreamerList" SelectionMode="None" IsItemClickEnabled="True">
+                <ListView x:Name="StreamerList" SelectionMode="None" IsItemClickEnabled="True" ScrollViewer.VerticalScrollMode="Disabled">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Border CornerRadius="12" Padding="14,10"
@@ -97,7 +97,7 @@
                 <TextBlock x:Name="StreamersEmpty" Text="No live streamers right now" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" Visibility="Collapsed" />
 
                 <TextBlock Text="Simuls" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                <ListView x:Name="SimulList" SelectionMode="None" IsItemClickEnabled="True">
+                <ListView x:Name="SimulList" SelectionMode="None" IsItemClickEnabled="True" ScrollViewer.VerticalScrollMode="Disabled">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Border CornerRadius="12" Padding="14,10"
@@ -113,7 +113,7 @@
                 <TextBlock x:Name="SimulsEmpty" Text="No simuls right now" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" Visibility="Collapsed" />
 
                 <TextBlock Text="Broadcasts" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                <ListView x:Name="BroadcastList" SelectionMode="None" IsItemClickEnabled="True">
+                <ListView x:Name="BroadcastList" SelectionMode="None" IsItemClickEnabled="True" ScrollViewer.VerticalScrollMode="Disabled">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Border CornerRadius="12" Padding="14,10"

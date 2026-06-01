@@ -112,7 +112,14 @@ namespace LichessXbox.Views
                         SetEvalBar(0);
                     }
                 }
-                catch { /* offline / not found */ }
+                catch
+                {
+                    if (cts.IsCancellationRequested) return;
+                    EvalText.Text = "—";
+                    DepthText.Text = "";
+                    BestLineText.Text = "Engine unavailable offline.";
+                    SetEvalBar(0);
+                }
             }
 
             // Opening explorer

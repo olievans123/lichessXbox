@@ -59,7 +59,7 @@ namespace LichessXbox.Views
                         },
                         Tag = sq,
                     };
-                    btn.UseSystemFocusVisuals = false;
+                    btn.UseSystemFocusVisuals = true;
                     btn.FocusVisualPrimaryBrush = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F));
                     btn.Click += Cell_Click;
                     Grid.SetRow(btn, row);
@@ -96,7 +96,7 @@ namespace LichessXbox.Views
                 },
                 Tag = piece,
             };
-            btn.UseSystemFocusVisuals = false;
+            btn.UseSystemFocusVisuals = true;
             btn.FocusVisualPrimaryBrush = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F));
             btn.Click += Palette_Click;
             return btn;

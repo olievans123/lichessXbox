@@ -32,9 +32,9 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" Margin="0,0,12,0">
                                     <TextBlock Text="{Binding Name}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
-                                    <TextBlock Text="{Binding Info}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                                    <TextBlock Text="{Binding Info}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
                                 </StackPanel>
-                                <Border Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Background="#33FFFFFF" CornerRadius="8" Padding="10,4">
+                                <Border Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Background="{StaticResource HairlineBrush}" CornerRadius="8" Padding="10,4">
                                     <TextBlock Text="{Binding Group}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource AccentGreenLightBrush}" />
                                 </Border>
                             </Grid>

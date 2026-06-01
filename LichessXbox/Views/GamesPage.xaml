@@ -42,7 +42,7 @@
                                         <TextBlock Text="{Binding ResultText}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                                     </StackPanel>
                                     <TextBlock Grid.Column="1" Text="▶ Replay" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource AccentGreenLightBrush}"
-                                               HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                               HorizontalAlignment="Right" VerticalAlignment="Center" Margin="12,0,0,0" />
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>

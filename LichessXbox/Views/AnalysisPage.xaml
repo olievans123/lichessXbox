@@ -5,15 +5,15 @@
     xmlns:controls="using:LichessXbox.Controls"
     Background="Transparent">
 
-    <Grid Padding="32,24">
+    <Grid Padding="24,24">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="330" />
+            <ColumnDefinition Width="320" />
         </Grid.ColumnDefinitions>
 
         <!-- Eval bar -->
-        <Border Grid.Column="0" Width="22" Margin="0,4,18,4" CornerRadius="11" Background="#161310">
+        <Border Grid.Column="0" Width="22" Margin="0,4,12,4" CornerRadius="11" Background="#161310">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition x:Name="BlackShare" Height="1*" />

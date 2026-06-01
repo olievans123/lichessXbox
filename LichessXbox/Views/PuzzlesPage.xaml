@@ -16,7 +16,7 @@
         </Viewbox>
 
         <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-        <StackPanel Margin="24,0,0,0" Spacing="8" VerticalAlignment="Top">
+        <StackPanel Margin="24,0,0,0" Padding="0,0,10,16" Spacing="16" VerticalAlignment="Top">
             <TextBlock Text="Puzzles" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
             <Grid ColumnSpacing="8">
@@ -63,16 +63,10 @@
                 <TextBlock x:Name="ResultText" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
             </Border>
 
-            <Grid ColumnSpacing="12">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Button x:Name="NextButton" Grid.Column="0" Style="{StaticResource PrimaryButton}" Click="Next_Click"
-                        Content="Next puzzle" HorizontalAlignment="Stretch" />
-                <Button x:Name="RetryButton" Grid.Column="1" Style="{StaticResource TileButton}" Click="Retry_Click"
-                        Content="Retry" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Visibility="Collapsed" />
-            </Grid>
+            <Button x:Name="NextButton" Style="{StaticResource PrimaryButton}" Click="Next_Click"
+                    Content="Next puzzle" HorizontalAlignment="Stretch" />
+            <Button x:Name="RetryButton" Style="{StaticResource TileButton}" Click="Retry_Click"
+                    Content="Retry" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Visibility="Collapsed" />
 
             <ProgressRing x:Name="Busy" IsActive="False" Width="36" Height="36"
                           Foreground="{StaticResource AccentGreenLightBrush}" HorizontalAlignment="Left" />

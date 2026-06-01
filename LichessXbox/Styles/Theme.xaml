@@ -177,7 +177,55 @@
                             <Border.Background><SolidColorBrush Color="#FFFFFF" Opacity="0.10" /></Border.Background>
                         </Border>
                         <!-- crisp inset green ring on gamepad/keyboard focus -->
-                        <Border x:Name="Ring" IsHitTestVisible="False" Opacity="0" BorderThickness="3" CornerRadius="2">
+                        <Border x:Name="Ring" IsHitTestVisible="False" Opacity="0" BorderThickness="3" CornerRadius="4" Margin="2">
+                            <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
+                        </Border>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="Sheen" Storyboard.TargetProperty="Opacity" To="0.6" Duration="0:0:0.10" /></Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="Sheen" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.05" /></Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Disabled" />
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="FocusStates">
+                                <VisualState x:Name="Focused">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="Ring" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.10" /></Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Unfocused" />
+                                <VisualState x:Name="PointerFocused" />
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Round/compact icon button (e.g. the nav hamburger). No default-button gray:
+         constant fill, a white sheen on press, and the green focus ring. CornerRadius
+         is honoured so it can be a circle. -->
+    <Style x:Key="IconButton" TargetType="Button">
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" />
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+                        <Border x:Name="Sheen" CornerRadius="{TemplateBinding CornerRadius}" IsHitTestVisible="False" Opacity="0">
+                            <Border.Background><SolidColorBrush Color="#FFFFFF" Opacity="0.12" /></Border.Background>
+                        </Border>
+                        <Border x:Name="Ring" CornerRadius="{TemplateBinding CornerRadius}" BorderThickness="2.5" IsHitTestVisible="False" Opacity="0">
                             <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
                         </Border>
                         <VisualStateManager.VisualStateGroups>
