@@ -1,18 +1,12 @@
 using System;
 using System.Collections.Generic;
 using LichessXbox.Chess;
-using LichessXbox.Helpers;
 using LichessXbox.Services;
-using Windows.System;
 using Windows.UI;
-using Windows.Gaming.Input;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Shapes;
 
 namespace LichessXbox.Controls
@@ -20,30 +14,28 @@ namespace LichessXbox.Controls
     /// <summary>
     /// A self-contained, gamepad-first chess board.
     ///
-    /// • Renders any <see cref="ChessPosition"/> with last-move, check, selection and
-    ///   legal-target highlights.
-    /// • D-pad / left-stick / arrows move a focus cursor; A (or Enter) picks up and
-    ///   drops a piece. B / Esc cancels a selection.
-    /// • Raises <see cref="MoveRequested"/> when the human completes a legal move.
+    /// Each of the 64 squares is a focusable <see cref="Button"/> (exactly like the
+    /// board editor, which works perfectly): the gamepad's native XY-focus moves
+    /// between squares, the green focus visual shows the current square, and pressing
+    /// A clicks it — pick up a piece, then click a target to move. No custom cursor.
     ///
-    /// Set <see cref="Interactive"/> = false for watch-only screens (TV / replays).
+    /// Squares are focusable/clickable only while <see cref="Interactive"/> is true, so
+    /// watch-only boards (TV / replays / the home preview) stay inert.
     /// </summary>
     public sealed partial class ChessBoardControl : UserControl
     {
         // Per-square visuals, indexed 0..63 (a1 = 0).
-        readonly Border[] _squareBg = new Border[64];
+        readonly Button[] _cells = new Button[64];
         readonly Border[] _highlight = new Border[64];
         readonly Ellipse[] _legalDot = new Ellipse[64];
         readonly Border[] _captureRing = new Border[64];
         readonly Viewbox[] _pieceHost = new Viewbox[64];
         readonly TextBlock[] _pieceFill = new TextBlock[64];
         readonly TextBlock[] _pieceOutline = new TextBlock[64];
-        readonly Border _cursor;
 
         ChessPosition _position = ChessPosition.Starting();
         readonly List<ChessMove> _legalFromSelected = new List<ChessMove>();
         int _selected = -1;
-        int _cursorRow = 4, _cursorCol = 4;
         ChessMove _pendingPromotion;
 
         // Sound bookkeeping: play a sound whenever the highlighted last move changes.
@@ -51,33 +43,21 @@ namespace LichessXbox.Controls
         int _lastPieceCount = -1;
         bool _soundReady;
 
+        static readonly SolidColorBrush GreenFocus = new SolidColorBrush(Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F));
+        static readonly SolidColorBrush FocusBacking = new SolidColorBrush(Color.FromArgb(0x99, 0x00, 0x00, 0x00));
+
         public event EventHandler<ChessMove> MoveRequested;
 
         public ChessBoardControl()
         {
             this.InitializeComponent();
             BuildBoard();
-
-            _cursor = new Border
-            {
-                BorderBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F)),
-                BorderThickness = new Thickness(5),
-                CornerRadius = new CornerRadius(4),
-                IsHitTestVisible = false,
-                Visibility = Visibility.Collapsed
-            };
-            BoardGrid.Children.Add(_cursor);
-
-            this.KeyDown += OnKeyDown;
-            this.GotFocus += (s, e) => { if (Interactive) ShowCursor(); };
-            this.LostFocus += (s, e) => _cursor.Visibility = Visibility.Collapsed;
-            PrimeGamepadSubsystem();
-            _padTimer.Tick += OnGamepadTick;
-            this.Loaded += (s, e) => { Render(); _padTimer.Start(); };
+            ApplyInteractivity();
+            this.Loaded += (s, e) => Render();
 
             Action reTheme = () => ReTheme();
             BoardTheme.Changed += reTheme;
-            this.Unloaded += (s, e) => { BoardTheme.Changed -= reTheme; _padTimer.Stop(); };
+            this.Unloaded += (s, e) => BoardTheme.Changed -= reTheme;
         }
 
         #region public properties
@@ -99,7 +79,7 @@ namespace LichessXbox.Controls
 
         public static readonly DependencyProperty InteractiveProperty =
             DependencyProperty.Register(nameof(Interactive), typeof(bool), typeof(ChessBoardControl),
-                new PropertyMetadata(false));
+                new PropertyMetadata(false, (d, e) => ((ChessBoardControl)d).ApplyInteractivity()));
         public bool Interactive
         {
             get => (bool)GetValue(InteractiveProperty);
@@ -131,14 +111,6 @@ namespace LichessXbox.Controls
             else { row = rank; col = 7 - file; }
         }
 
-        int VisualToSquare(int row, int col)
-        {
-            int file, rank;
-            if (WhiteAtBottom) { rank = 7 - row; file = col; }
-            else { rank = row; file = 7 - col; }
-            return rank * 8 + file;
-        }
-
         #endregion
 
         #region build + render
@@ -153,14 +125,10 @@ namespace LichessXbox.Controls
                 int file = ChessMove.FileOf(sq), rank = ChessMove.RankOf(sq);
                 bool isLight = (file + rank) % 2 == 1;
 
-                var cell = new Grid();
-
-                var bg = new Border { Background = new SolidColorBrush(isLight ? light : dark) };
-                cell.Children.Add(bg);
-                _squareBg[sq] = bg;
+                var content = new Grid();
 
                 var hl = new Border { Background = new SolidColorBrush(Color.FromArgb(0x88, 0xF2, 0xD2, 0x6B)), Visibility = Visibility.Collapsed };
-                cell.Children.Add(hl);
+                content.Children.Add(hl);
                 _highlight[sq] = hl;
 
                 var ring = new Border
@@ -171,7 +139,7 @@ namespace LichessXbox.Controls
                     Margin = new Thickness(4),
                     Visibility = Visibility.Collapsed
                 };
-                cell.Children.Add(ring);
+                content.Children.Add(ring);
                 _captureRing[sq] = ring;
 
                 var dot = new Ellipse
@@ -182,17 +150,17 @@ namespace LichessXbox.Controls
                     VerticalAlignment = VerticalAlignment.Center,
                     Visibility = Visibility.Collapsed
                 };
-                cell.Children.Add(dot);
+                content.Children.Add(dot);
                 _legalDot[sq] = dot;
 
                 // Piece = outline glyph behind a fill glyph for crisp readability on any square.
-                var outline = MakeGlyph(scale: 1.0);
-                var fill = MakeGlyph(scale: 1.0);
+                var outline = MakeGlyph();
+                var fill = MakeGlyph();
                 var pieceGrid = new Grid();
                 pieceGrid.Children.Add(outline);
                 pieceGrid.Children.Add(fill);
                 var host = new Viewbox { Child = pieceGrid, Stretch = Stretch.Uniform, Margin = new Thickness(8) };
-                cell.Children.Add(host);
+                content.Children.Add(host);
                 _pieceHost[sq] = host;
                 _pieceFill[sq] = fill;
                 _pieceOutline[sq] = outline;
@@ -207,23 +175,43 @@ namespace LichessXbox.Controls
                         Foreground = new SolidColorBrush(isLight ? dark : light),
                         Opacity = 0.85,
                         Margin = new Thickness(4, 2, 4, 2),
+                        IsHitTestVisible = false,
                     };
                     coord.Text = rank == 0 ? ((char)('a' + file)).ToString() : (rank + 1).ToString();
                     coord.HorizontalAlignment = rank == 0 ? HorizontalAlignment.Right : HorizontalAlignment.Left;
                     coord.VerticalAlignment = rank == 0 ? VerticalAlignment.Bottom : VerticalAlignment.Top;
-                    cell.Children.Add(coord);
+                    content.Children.Add(coord);
                 }
 
-                Grid.SetRow(cell, 0); Grid.SetColumn(cell, 0); // positioned in Render()
-                cell.Tag = sq;
-                _cellHost[sq] = cell;
+                // The square itself is a focusable button — native gamepad nav + green focus.
+                var cell = new Button
+                {
+                    Background = new SolidColorBrush(isLight ? light : dark),
+                    BorderThickness = new Thickness(0),
+                    CornerRadius = new CornerRadius(0),
+                    Padding = new Thickness(0),
+                    MinWidth = 0,
+                    MinHeight = 0,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Stretch,
+                    HorizontalContentAlignment = HorizontalAlignment.Stretch,
+                    VerticalContentAlignment = VerticalAlignment.Stretch,
+                    UseSystemFocusVisuals = true,
+                    FocusVisualPrimaryBrush = GreenFocus,
+                    FocusVisualSecondaryBrush = FocusBacking,
+                    FocusVisualMargin = new Thickness(-3),
+                    Content = content,
+                    Tag = sq,
+                };
+                cell.Click += Cell_Click;
+                Grid.SetRow(cell, 0);
+                Grid.SetColumn(cell, 0); // positioned in Render()
+                _cells[sq] = cell;
                 BoardGrid.Children.Add(cell);
             }
         }
 
-        readonly Grid[] _cellHost = new Grid[64];
-
-        static TextBlock MakeGlyph(double scale)
+        static TextBlock MakeGlyph()
         {
             return new TextBlock
             {
@@ -232,6 +220,7 @@ namespace LichessXbox.Controls
                 TextAlignment = TextAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
+                IsHitTestVisible = false,
             };
         }
 
@@ -268,24 +257,37 @@ namespace LichessXbox.Controls
             return Glyph(piece);
         }
 
+        /// <summary>Squares are focusable/clickable only while interactive.</summary>
+        void ApplyInteractivity()
+        {
+            bool on = Interactive;
+            for (int sq = 0; sq < 64; sq++)
+            {
+                var cell = _cells[sq];
+                if (cell == null) continue;
+                cell.IsTabStop = on;
+                cell.IsHitTestVisible = on;
+            }
+        }
+
         /// <summary>Re-colour the squares when the user changes the board theme.</summary>
         void ReTheme()
         {
-            if (_squareBg[0] == null) return;
+            if (_cells[0] == null) return;
             for (int sq = 0; sq < 64; sq++)
             {
                 int file = ChessMove.FileOf(sq), rank = ChessMove.RankOf(sq);
                 bool isLight = (file + rank) % 2 == 1;
                 var color = isLight ? BoardTheme.Light : BoardTheme.Dark;
-                if (_squareBg[sq].Background is SolidColorBrush b) b.Color = color;
-                else _squareBg[sq].Background = new SolidColorBrush(color);
+                if (_cells[sq].Background is SolidColorBrush b) b.Color = color;
+                else _cells[sq].Background = new SolidColorBrush(color);
             }
             Render();
         }
 
         void Render()
         {
-            if (_squareBg[0] == null) return;
+            if (_cells[0] == null) return;
 
             int checkSquare = -1;
             if (_position.IsInCheck(_position.WhiteToMove))
@@ -298,10 +300,10 @@ namespace LichessXbox.Controls
 
             for (int sq = 0; sq < 64; sq++)
             {
-                // Position the cell in the grid per orientation.
+                // Position the square in the grid per orientation.
                 SquareToVisual(sq, out int row, out int col);
-                Grid.SetRow(_cellHost[sq], row);
-                Grid.SetColumn(_cellHost[sq], col);
+                Grid.SetRow(_cells[sq], row);
+                Grid.SetColumn(_cells[sq], col);
 
                 char piece = _position.PieceAt(sq);
                 bool empty = piece == '.';
@@ -352,7 +354,6 @@ namespace LichessXbox.Controls
             }
 
             MaybePlayMoveSound();
-            PositionCursor();
         }
 
         void MaybePlayMoveSound()
@@ -382,222 +383,12 @@ namespace LichessXbox.Controls
 
         bool IsHumanTurn => Interactive && _position.WhiteToMove == PlayerIsWhite;
 
-        void ShowCursor()
-        {
-            if (PromotionOverlay.Visibility == Visibility.Visible) return;
-            _cursor.Visibility = Visibility.Visible;
-            PositionCursor();
-        }
-
-        void PositionCursor()
-        {
-            Grid.SetRow(_cursor, _cursorRow);
-            Grid.SetColumn(_cursor, _cursorCol);
-        }
-
-        // Routed key path: fires when the board UserControl itself holds focus.
-        void OnKeyDown(object sender, KeyRoutedEventArgs e)
-        {
-            if (PromotionOverlay.Visibility == Visibility.Visible) return; // buttons handle it
-            if (!Interactive) return;
-            e.Handled = HandleKey(e.Key);
-        }
-
-        // ---- Hardware gamepad fallback --------------------------------------------
-        // The routed KeyDown above only fires while the board UserControl holds XAML
-        // focus, and on Xbox that focus can silently fail to land on first show — the
-        // "doesn't focus / can't make any moves" symptom. So we ALSO read the physical
-        // controller directly (Windows.Gaming.Input, focus-independent) on a timer and
-        // drive the board when no other control owns input. NOTE: CoreWindow.KeyDown does
-        // NOT reliably deliver gamepad buttons on Xbox, which is why earlier fallbacks via
-        // key events did not help — reading the Gamepad directly does.
-        readonly DispatcherTimer _padTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(50) };
-        GamepadButtons _prevButtons;
-        double _prevLX, _prevLY;
-        bool _padPrimed;
-        int _heldRow, _heldCol, _holdTicks;   // for direction auto-repeat
-
-        /// <summary>Temporary: show a tiny input-state readout on interactive boards. Set false to hide.</summary>
-        public static bool InputDebug = true;
-
-        // Subscribing once ensures the gamepad subsystem starts tracking controllers,
-        // so Gamepad.Gamepads is reliably populated when we poll it.
-        static bool _gamepadPrimed;
-        static void PrimeGamepadSubsystem()
-        {
-            if (_gamepadPrimed) return;
-            _gamepadPrimed = true;
-            Gamepad.GamepadAdded += (s, g) => { };
-            Gamepad.GamepadRemoved += (s, g) => { };
-        }
-
-        void OnGamepadTick(object sender, object e)
-        {
-            if (InputDebug) UpdateDiag();
-
-            if (!Interactive || ActualWidth <= 0 || ActualHeight <= 0 ||
-                PromotionOverlay.Visibility == Visibility.Visible) { _padPrimed = false; return; }
-
-            var pads = Gamepad.Gamepads;
-            if (pads.Count == 0) { _padPrimed = false; return; }
-
-            // If XAML focus is already on the board, the routed handler runs.
-            var focused = FocusManager.GetFocusedElement();
-            if (ReferenceEquals(focused, this)) { _padPrimed = false; return; }
-            // Only a GENUINELY interactive control should block the board's pad input
-            // (Resign/nav buttons, a list, the FEN box, a toggle). A ScrollViewer / Page /
-            // container grabbing focus must NOT block it — that was the bug: focus landed
-            // on a page ScrollViewer, so the board never moved.
-            if (focused is ButtonBase || focused is Selector || focused is SelectorItem ||
-                focused is TextBox || focused is ComboBox || focused is ToggleSwitch || focused is RangeBase)
-            { _padPrimed = false; return; }
-
-            GamepadReading r;
-            try { r = pads[0].GetCurrentReading(); } catch { return; }
-            var b = r.Buttons;
-            double lx = r.LeftThumbstickX, ly = r.LeftThumbstickY;
-
-            // First active frame: record a baseline so a held button doesn't auto-fire.
-            if (!_padPrimed) { _prevButtons = b; _prevLX = lx; _prevLY = ly; _padPrimed = true; ShowCursor(); return; }
-
-            const double T = 0.5;
-            ShowCursor();
-            bool acted = false;
-
-            // Current held direction (D-pad or left stick), single axis at a time.
-            int dRow = 0, dCol = 0;
-            if (((b & GamepadButtons.DPadUp) != 0) || ly > T) dRow = -1;
-            else if (((b & GamepadButtons.DPadDown) != 0) || ly < -T) dRow = 1;
-            else if (((b & GamepadButtons.DPadLeft) != 0) || lx < -T) dCol = -1;
-            else if (((b & GamepadButtons.DPadRight) != 0) || lx > T) dCol = 1;
-
-            // Press-then-auto-repeat: step once on a new direction, then repeat while held
-            // (~300 ms before the first repeat, then every ~100 ms) so a held D-pad/stick
-            // tracks across the board instead of needing one tap per square.
-            if (dRow != 0 || dCol != 0)
-            {
-                if (dRow != _heldRow || dCol != _heldCol)
-                {
-                    MoveCursor(dRow, dCol); acted = true;
-                    _heldRow = dRow; _heldCol = dCol; _holdTicks = 0;
-                }
-                else if (++_holdTicks >= 6 && (_holdTicks - 6) % 2 == 0)
-                {
-                    MoveCursor(dRow, dCol); acted = true;
-                }
-            }
-            else { _heldRow = 0; _heldCol = 0; _holdTicks = 0; }
-
-            // A / B are edge-triggered (no repeat).
-            GamepadButtons pressed = b & ~_prevButtons;
-            if ((pressed & GamepadButtons.A) != 0)      { Activate(); acted = true; }
-            else if ((pressed & GamepadButtons.B) != 0) { if (_selected >= 0) { ClearSelection(); Render(); } acted = true; }
-
-            _prevButtons = b; _prevLX = lx; _prevLY = ly;
-
-            // Once we've handled something, try to claim real focus so the normal routed
-            // path (and edge-to-side-panel navigation) take over from here.
-            if (acted) Focus(FocusState.Programmatic);
-        }
-
-        // Tiny on-board readout so an input failure can be diagnosed from a screenshot:
-        // pad = controllers seen, int = Interactive, w = laid-out width, foc = focused
-        // element type, sel = selected square. Hidden unless the board is interactive.
-        void UpdateDiag()
-        {
-            if (DiagPanel == null) return;
-            if (!Interactive) { DiagPanel.Visibility = Visibility.Collapsed; return; }
-            object f = FocusManager.GetFocusedElement();
-            string fn = f == null ? "null" : f.GetType().Name;
-            int pads = Gamepad.Gamepads.Count;
-            DiagText.Text = $"pad:{pads} int:1 w:{(int)ActualWidth} foc:{fn} sel:{_selected}";
-            DiagPanel.Visibility = Visibility.Visible;
-        }
-
-        // Shared key logic. Returns true if the press was consumed; false lets the key
-        // bubble so gamepad XY-focus can leave the board at its edges.
-        bool HandleKey(VirtualKey key)
-        {
-            switch (key)
-            {
-                case VirtualKey.Up:
-                case VirtualKey.GamepadDPadUp:
-                case VirtualKey.GamepadLeftThumbstickUp:
-                    return MoveCursor(-1, 0);
-                case VirtualKey.Down:
-                case VirtualKey.GamepadDPadDown:
-                case VirtualKey.GamepadLeftThumbstickDown:
-                    return MoveCursor(1, 0);
-                case VirtualKey.Left:
-                case VirtualKey.GamepadDPadLeft:
-                case VirtualKey.GamepadLeftThumbstickLeft:
-                    return MoveCursor(0, -1);
-                case VirtualKey.Right:
-                case VirtualKey.GamepadDPadRight:
-                case VirtualKey.GamepadLeftThumbstickRight:
-                    return MoveCursor(0, 1);
-                case VirtualKey.Enter:
-                case VirtualKey.Space:
-                case VirtualKey.GamepadA:
-                    Activate(); return true;
-                case VirtualKey.Escape:
-                case VirtualKey.GamepadB:
-                    if (_selected >= 0) { ClearSelection(); Render(); return true; }
-                    return false;
-                default:
-                    return false;
-            }
-        }
-
-        // Returns true if the cursor actually moved. At a board edge it returns false and
-        // leaves the key unhandled, so gamepad XY-focus can leave the board for side-panel
-        // buttons (Resign, nav, etc.) instead of being trapped on the board.
-        bool MoveCursor(int dRow, int dCol)
-        {
-            ShowCursor();
-            int nr = Clamp(_cursorRow + dRow), nc = Clamp(_cursorCol + dCol);
-            if (nr == _cursorRow && nc == _cursorCol) return false;
-            _cursorRow = nr; _cursorCol = nc;
-            PositionCursor();
-            return true;
-        }
-
-        int _focusTries;
-
-        /// <summary>
-        /// Give the board gamepad focus. Focus() can silently fail if the board has just
-        /// become visible and isn't laid out yet, so retry on the next layout passes until
-        /// it sticks (the symptom otherwise: no move-cursor and you can't make moves).
-        /// </summary>
-        public void FocusBoard()
-        {
-            _focusTries = 0;
-            if (TryFocus()) return;
-            EventHandler<object> h = null;
-            h = (s, e) =>
-            {
-                if (TryFocus() || ++_focusTries > 20) LayoutUpdated -= h;
-            };
-            LayoutUpdated += h;
-        }
-
-        bool TryFocus()
-        {
-            // Not displayed yet (collapsed parent / pre-layout) — wait for the next pass.
-            if (Visibility != Visibility.Visible || ActualWidth <= 0) return false;
-            bool ok = Focus(FocusState.Programmatic);
-            // Show the move cursor the moment we're live, even if Focus() didn't take —
-            // the window-level key fallback still drives moves in that case.
-            if (Interactive) ShowCursor();
-            return ok;
-        }
-
-        static int Clamp(int v) => v < 0 ? 0 : (v > 7 ? 7 : v);
-
-        void Activate()
+        // Clicking a square (gamepad A, Enter, or tap) — pick up a piece, then drop it.
+        void Cell_Click(object sender, RoutedEventArgs e)
         {
             if (!IsHumanTurn) return;
-            int sq = VisualToSquare(_cursorRow, _cursorCol);
+            int sq = (int)((Button)sender).Tag;
+
             char piece = _position.PieceAt(sq);
             bool ownPiece = piece != '.' && (char.IsUpper(piece) == PlayerIsWhite);
 
@@ -607,7 +398,7 @@ namespace LichessXbox.Controls
                 return;
             }
 
-            // Trying to complete a move onto the cursor square?
+            // Trying to complete a move onto this square?
             ChessMove? chosen = null;
             bool needsPromotion = false;
             foreach (var m in _legalFromSelected)
@@ -630,6 +421,38 @@ namespace LichessXbox.Controls
             // Otherwise re-select (or deselect).
             if (ownPiece) Select(sq);
             else { ClearSelection(); Render(); }
+        }
+
+        /// <summary>
+        /// Move gamepad focus onto the board. Focusing a real Button is reliable, but the
+        /// board may not be laid out the instant it becomes visible, so retry across the
+        /// next few layout passes until it sticks.
+        /// </summary>
+        public void FocusBoard()
+        {
+            if (!Interactive) return;
+            if (TryFocusCell()) return;
+            int tries = 0;
+            EventHandler<object> h = null;
+            h = (s, e) => { if (TryFocusCell() || ++tries > 30) LayoutUpdated -= h; };
+            LayoutUpdated += h;
+        }
+
+        bool TryFocusCell()
+        {
+            if (!Interactive || Visibility != Visibility.Visible || ActualWidth <= 0) return false;
+            int sq = _selected >= 0 ? _selected : DefaultFocusSquare();
+            var cell = _cells[sq] ?? _cells[DefaultFocusSquare()];
+            return cell != null && cell.Focus(FocusState.Programmatic);
+        }
+
+        // A sensible square to land on: the side-to-move's king (always present), else a
+        // central pawn square.
+        int DefaultFocusSquare()
+        {
+            int k = _position.FindKing(PlayerIsWhite);
+            if (k >= 0) return k;
+            return PlayerIsWhite ? 12 : 52; // e2 / e7
         }
 
         void Select(int sq)
@@ -679,7 +502,7 @@ namespace LichessXbox.Controls
                     BorderBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F)),
                     BorderThickness = new Thickness(2),
                     CornerRadius = new CornerRadius(12),
-                    UseSystemFocusVisuals = false,
+                    UseSystemFocusVisuals = true,
                     FocusVisualPrimaryBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F)),
                     FocusVisualSecondaryBrush = new SolidColorBrush(Color.FromArgb(0x99, 0x00, 0x00, 0x00)),
                     Content = new TextBlock
@@ -696,7 +519,7 @@ namespace LichessXbox.Controls
                 {
                     PromotionOverlay.Visibility = Visibility.Collapsed;
                     CommitMove(new ChessMove(_pendingPromotion.From, _pendingPromotion.To, promo));
-                    this.Focus(FocusState.Programmatic);
+                    FocusBoard();
                 };
                 PromotionButtons.Children.Add(btn);
             }

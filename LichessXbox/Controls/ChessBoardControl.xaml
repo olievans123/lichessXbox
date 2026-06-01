@@ -29,13 +29,6 @@
                     <StackPanel x:Name="PromotionButtons" Orientation="Horizontal" Spacing="14" />
                 </StackPanel>
             </Border>
-
-            <!-- Temporary input diagnostic (toggled by ChessBoardControl.InputDebug) -->
-            <Border x:Name="DiagPanel" Visibility="Collapsed" IsHitTestVisible="False"
-                    HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10"
-                    Background="#A0000000" CornerRadius="6" Padding="8,4">
-                <TextBlock x:Name="DiagText" FontSize="16" FontFamily="Consolas" Foreground="#FFE34A" />
-            </Border>
         </Grid>
     </Viewbox>
 </UserControl>
