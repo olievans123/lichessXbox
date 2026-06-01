@@ -65,8 +65,9 @@ jobs:
                     Where-Object { $_ -match '^10\.0\.' } |
                     Sort-Object { [version]$_ } -Descending
           }
+          $vers = @($vers)   # force array — a single match would otherwise unwrap to a string
           Write-Host "Usable UWP platform SDKs: $($vers -join ', ')"
-          if (-not $vers) { Write-Error "No usable UWP platform SDK found on runner"; exit 1 }
+          if ($vers.Count -eq 0) { Write-Error "No usable UWP platform SDK found on runner"; exit 1 }
           $tpv = $vers[0]
           Write-Host "Using TargetPlatformVersion = $tpv"
           echo "TPV=$tpv" >> $env:GITHUB_ENV
