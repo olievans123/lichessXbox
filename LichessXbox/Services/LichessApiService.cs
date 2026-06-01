@@ -80,9 +80,12 @@ namespace LichessXbox.Services
                 using (var stream = await resp.Content.ReadAsStreamAsync())
                 using (var reader = new StreamReader(stream))
                 {
-                    while (!reader.EndOfStream && !ct.IsCancellationRequested)
+                    // NOTE: never touch reader.EndOfStream here — its getter does a *synchronous*
+                    // blocking read, which freezes the UI thread on an idle long-lived stream.
+                    // ReadLineAsync() is genuinely async and returns null at end of stream.
+                    string line;
+                    while (!ct.IsCancellationRequested && (line = await reader.ReadLineAsync()) != null)
                     {
-                        string line = await reader.ReadLineAsync();
                         if (string.IsNullOrWhiteSpace(line)) continue;
                         JObject obj = null;
                         try { obj = JObject.Parse(line); }
@@ -170,9 +173,9 @@ namespace LichessXbox.Services
                     using (var stream = await resp.Content.ReadAsStreamAsync())
                     using (var reader = new StreamReader(stream))
                     {
-                        // Drain until matched or cancelled.
-                        while (!reader.EndOfStream && !ct.IsCancellationRequested)
-                            await reader.ReadLineAsync();
+                        // Drain until matched or cancelled. Use async ReadLineAsync only —
+                        // reader.EndOfStream blocks the UI thread synchronously.
+                        while (!ct.IsCancellationRequested && await reader.ReadLineAsync() != null) { }
                     }
                 }
                 catch (OperationCanceledException) { /* withdrawn */ }
