@@ -31,7 +31,7 @@
                 <GridView x:Name="PresetGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Preset_ItemClick">
                     <GridView.ItemTemplate>
                         <DataTemplate>
-                            <Border Width="240" Height="140" CornerRadius="16" Margin="8"
+                            <Border Width="240" Height="140" CornerRadius="16"
                                     Background="{StaticResource AppSurfaceHighBrush}"
                                     BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                 <StackPanel Margin="20" VerticalAlignment="Center" Spacing="6">
@@ -54,7 +54,7 @@
                 <GridView x:Name="LevelGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Ai_ItemClick">
                     <GridView.ItemTemplate>
                         <DataTemplate>
-                            <Border Width="110" Height="100" CornerRadius="16" Margin="6"
+                            <Border Width="110" Height="100" CornerRadius="16"
                                     Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                 <StackPanel VerticalAlignment="Center">
                                     <TextBlock Text="🤖" FontSize="26" HorizontalAlignment="Center" />
@@ -84,7 +84,7 @@
                 <GridView x:Name="VariantGrid" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Variant_ItemClick">
                     <GridView.ItemTemplate>
                         <DataTemplate>
-                            <Border Width="132" Height="88" CornerRadius="16" Margin="5"
+                            <Border Width="132" Height="88" CornerRadius="16"
                                     Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                 <StackPanel VerticalAlignment="Center" Spacing="2">
                                     <TextBlock Text="{Binding Glyph}" FontSize="20" HorizontalAlignment="Center" />

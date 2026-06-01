@@ -91,7 +91,7 @@
             <GridView x:Name="RatingsGrid" SelectionMode="None" IsItemClickEnabled="False">
                 <GridView.ItemTemplate>
                     <DataTemplate>
-                        <Border Width="150" Height="100" CornerRadius="16" Margin="6"
+                        <Border Width="150" Height="100" CornerRadius="16"
                                 Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                             <StackPanel Margin="20" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding Mode}" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" />

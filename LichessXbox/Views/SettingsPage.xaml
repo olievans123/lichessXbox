@@ -12,7 +12,7 @@
             <GridView x:Name="ThemeGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Theme_ItemClick">
                 <GridView.ItemTemplate>
                     <DataTemplate>
-                        <Border Width="160" Height="120" CornerRadius="14" Margin="6"
+                        <Border Width="160" Height="120" CornerRadius="16"
                                 Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                             <StackPanel Margin="14" Spacing="8">
                                 <Grid Height="48" CornerRadius="8">

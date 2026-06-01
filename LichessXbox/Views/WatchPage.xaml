@@ -84,7 +84,7 @@
                 <ListView x:Name="StreamerList" SelectionMode="None" IsItemClickEnabled="True">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <Border CornerRadius="10" Padding="14,10" Margin="0,0,0,8"
+                            <Border CornerRadius="12" Padding="14,10"
                                     Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                 <StackPanel>
                                     <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
@@ -100,7 +100,7 @@
                 <ListView x:Name="SimulList" SelectionMode="None" IsItemClickEnabled="True">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <Border CornerRadius="10" Padding="14,10" Margin="0,0,0,8"
+                            <Border CornerRadius="12" Padding="14,10"
                                     Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                 <StackPanel>
                                     <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
@@ -116,7 +116,7 @@
                 <ListView x:Name="BroadcastList" SelectionMode="None" IsItemClickEnabled="True">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <Border CornerRadius="10" Padding="14,10" Margin="0,0,0,8"
+                            <Border CornerRadius="12" Padding="14,10"
                                     Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                 <StackPanel>
                                     <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />

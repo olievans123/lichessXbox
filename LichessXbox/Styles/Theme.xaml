@@ -158,17 +158,124 @@
         <Setter Property="FocusVisualSecondaryBrush" Value="#99000000" />
     </Style>
 
-    <!-- List/grid item focus tint — replaced by full green-ring item templates in a
-         follow-up; kept as the green system reveal for now. -->
-    <Style TargetType="GridViewItem">
-        <Setter Property="FocusVisualPrimaryBrush" Value="{StaticResource AccentGreenLightBrush}" />
-        <Setter Property="FocusVisualSecondaryBrush" Value="#99000000" />
-        <Setter Property="FocusVisualMargin" Value="-3" />
-    </Style>
+    <!-- List/grid item containers get the SAME rounded green focus ring as the tiles
+         and nav buttons (not the thin system reveal rect). The container owns the
+         spacing margin so the ring hugs each row/tile; item DataTemplates with their
+         own background Border therefore drop their outer Margin. Implicit = app-wide. -->
     <Style TargetType="ListViewItem">
-        <Setter Property="FocusVisualPrimaryBrush" Value="{StaticResource AccentGreenLightBrush}" />
-        <Setter Property="FocusVisualSecondaryBrush" Value="#99000000" />
-        <Setter Property="FocusVisualMargin" Value="-3" />
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="0,0,0,8" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListViewItem">
+                    <Grid Background="Transparent">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}" />
+                        <Border x:Name="Tint" CornerRadius="12" IsHitTestVisible="False" Opacity="0">
+                            <Border.Background><SolidColorBrush Color="#FFFFFF" Opacity="0.08" /></Border.Background>
+                        </Border>
+                        <Border x:Name="FocusRing" CornerRadius="12" BorderThickness="3" IsHitTestVisible="False" Opacity="0">
+                            <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
+                        </Border>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="Tint" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.12" /></Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="Tint" Storyboard.TargetProperty="Opacity" To="1" Duration="0" /></Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="SelectionStates">
+                                <VisualState x:Name="Unselected" />
+                                <VisualState x:Name="Selected">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="FocusRing" Storyboard.TargetProperty="Opacity" To="1" Duration="0" /></Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="SelectedUnfocused">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="FocusRing" Storyboard.TargetProperty="Opacity" To="1" Duration="0" /></Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="SelectedPointerOver">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="FocusRing" Storyboard.TargetProperty="Opacity" To="1" Duration="0" /></Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="FocusStates">
+                                <VisualState x:Name="Focused">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="FocusRing" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.12" /></Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Unfocused" />
+                                <VisualState x:Name="PointerFocused" />
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="GridViewItem">
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="6" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="GridViewItem">
+                    <Grid Background="Transparent">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}" />
+                        <Border x:Name="Tint" CornerRadius="16" IsHitTestVisible="False" Opacity="0">
+                            <Border.Background><SolidColorBrush Color="#FFFFFF" Opacity="0.08" /></Border.Background>
+                        </Border>
+                        <Border x:Name="FocusRing" CornerRadius="16" BorderThickness="3" IsHitTestVisible="False" Opacity="0">
+                            <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
+                        </Border>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="Tint" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.12" /></Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="Tint" Storyboard.TargetProperty="Opacity" To="1" Duration="0" /></Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="SelectionStates">
+                                <VisualState x:Name="Unselected" />
+                                <VisualState x:Name="Selected">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="FocusRing" Storyboard.TargetProperty="Opacity" To="1" Duration="0" /></Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="SelectedUnfocused">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="FocusRing" Storyboard.TargetProperty="Opacity" To="1" Duration="0" /></Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="SelectedPointerOver">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="FocusRing" Storyboard.TargetProperty="Opacity" To="1" Duration="0" /></Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="FocusStates">
+                                <VisualState x:Name="Focused">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="FocusRing" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.12" /></Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Unfocused" />
+                                <VisualState x:Name="PointerFocused" />
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
 </ResourceDictionary>
