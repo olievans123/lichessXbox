@@ -18,30 +18,34 @@
 
         <StackPanel Grid.Column="1" Margin="28,0,0,0" Spacing="20" VerticalAlignment="Center">
             <TextBlock Text="Coordinate trainer" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
-            <TextBlock Text="Find the named square as fast as you can. 30 seconds." FontSize="16"
+            <TextBlock Text="Find the named square as fast as you can. 30 seconds." FontSize="{StaticResource CaptionSize}"
                        Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
 
             <Border Style="{StaticResource CardBorder}" Padding="24" HorizontalAlignment="Stretch">
                 <StackPanel HorizontalAlignment="Center" Spacing="6">
-                    <TextBlock Text="Find" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" />
+                    <TextBlock Text="Find" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" />
                     <TextBlock x:Name="TargetText" Text="—" FontSize="72" FontWeight="Bold"
                                Foreground="{StaticResource AccentGreenLightBrush}" HorizontalAlignment="Center" />
                 </StackPanel>
             </Border>
 
             <Grid>
-                <StackPanel>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
                     <TextBlock Text="Score" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                    <TextBlock x:Name="ScoreText" Text="0" FontSize="34" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                    <TextBlock x:Name="ScoreText" Text="0" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
                 </StackPanel>
-                <StackPanel HorizontalAlignment="Right">
+                <StackPanel Grid.Column="1" HorizontalAlignment="Right">
                     <TextBlock Text="Time" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                    <TextBlock x:Name="TimeText" Text="30" FontSize="34" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                    <TextBlock x:Name="TimeText" Text="30" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
                 </StackPanel>
             </Grid>
 
             <Button x:Name="StartButton" Style="{StaticResource PrimaryButton}" Click="Start_Click"
-                    Content="Start" MinWidth="200" HorizontalAlignment="Stretch" />
+                    Content="Start" HorizontalAlignment="Stretch" />
         </StackPanel>
     </Grid>
 </Page>

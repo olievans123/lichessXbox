@@ -26,9 +26,9 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0">
                     <TextBlock x:Name="TopName" Text="—" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
-                    <TextBlock x:Name="TopRating" Text="" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
+                    <TextBlock x:Name="TopRating" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                 </StackPanel>
-                <Border Grid.Column="1" Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="14,6">
+                <Border Grid.Column="1" Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="14,6" MinWidth="96">
                     <TextBlock x:Name="TopClock" Text="--:--" FontSize="26" FontFamily="Consolas" Foreground="{StaticResource TextPrimaryBrush}" />
                 </Border>
             </Grid>
@@ -44,9 +44,9 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0">
                     <TextBlock x:Name="BottomName" Text="—" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
-                    <TextBlock x:Name="BottomRating" Text="" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
+                    <TextBlock x:Name="BottomRating" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                 </StackPanel>
-                <Border Grid.Column="1" Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="14,6">
+                <Border Grid.Column="1" Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="14,6" MinWidth="96">
                     <TextBlock x:Name="BottomClock" Text="--:--" FontSize="26" FontFamily="Consolas" Foreground="{StaticResource TextPrimaryBrush}" />
                 </Border>
             </Grid>
@@ -60,8 +60,8 @@
                     <TextBlock x:Name="HeaderText" Text="Lichess TV" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
                 </StackPanel>
 
-                <TextBlock Text="Channels" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                <ListView x:Name="ChannelList" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Channel_ItemClick" MaxHeight="360">
+                <TextBlock Text="Channels" FontSize="{StaticResource SubtitleSize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                <ListView x:Name="ChannelList" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Channel_ItemClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid Padding="4,8">
@@ -71,58 +71,62 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="{Binding Glyph}" FontSize="24" VerticalAlignment="Center" />
                                 <StackPanel Grid.Column="1">
-                                    <TextBlock Text="{Binding Name}" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
-                                    <TextBlock Text="{Binding Featured}" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" />
+                                    <TextBlock Text="{Binding Name}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                                    <TextBlock Text="{Binding Featured}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                                 </StackPanel>
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
+                <TextBlock x:Name="ChannelsEmpty" Text="Couldn't load channels right now" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" Visibility="Collapsed" />
 
-                <TextBlock Text="Live streamers" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                <ListView x:Name="StreamerList" SelectionMode="None" IsItemClickEnabled="False">
+                <TextBlock Text="Live streamers" FontSize="{StaticResource SubtitleSize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                <ListView x:Name="StreamerList" SelectionMode="None" IsItemClickEnabled="True">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Border CornerRadius="10" Padding="14,10" Margin="0,0,0,8"
                                     Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                 <StackPanel>
                                     <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
-                                    <TextBlock Text="{Binding Status}" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
+                                    <TextBlock Text="{Binding Status}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
+                <TextBlock x:Name="StreamersEmpty" Text="No live streamers right now" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" Visibility="Collapsed" />
 
-                <TextBlock Text="Simuls" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                <ListView x:Name="SimulList" SelectionMode="None" IsItemClickEnabled="False">
+                <TextBlock Text="Simuls" FontSize="{StaticResource SubtitleSize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                <ListView x:Name="SimulList" SelectionMode="None" IsItemClickEnabled="True">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Border CornerRadius="10" Padding="14,10" Margin="0,0,0,8"
                                     Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                 <StackPanel>
                                     <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
-                                    <TextBlock Text="{Binding Info}" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" />
+                                    <TextBlock Text="{Binding Info}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
+                <TextBlock x:Name="SimulsEmpty" Text="No simuls right now" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" Visibility="Collapsed" />
 
-                <TextBlock Text="Broadcasts" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                <ListView x:Name="BroadcastList" SelectionMode="None" IsItemClickEnabled="False">
+                <TextBlock Text="Broadcasts" FontSize="{StaticResource SubtitleSize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                <ListView x:Name="BroadcastList" SelectionMode="None" IsItemClickEnabled="True">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Border CornerRadius="10" Padding="14,10" Margin="0,0,0,8"
                                     Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                 <StackPanel>
                                     <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
-                                    <TextBlock Text="{Binding Description}" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" MaxLines="2" />
+                                    <TextBlock Text="{Binding Description}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" MaxLines="2" />
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
+                <TextBlock x:Name="BroadcastsEmpty" Text="No broadcasts right now" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" Visibility="Collapsed" />
             </StackPanel>
         </ScrollViewer>
     </Grid>

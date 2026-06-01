@@ -73,7 +73,7 @@ namespace LichessXbox.Views
         {
             if (string.IsNullOrEmpty(_selectedId)) return;
             bool ok = await AppState.Current.Api.JoinTournamentAsync(_selectedId);
-            JoinButton.Content = ok ? "Joined — open Play to be paired" : "Join failed";
+            JoinButton.Content = ok ? "Joined ✓" : "Join failed";
             JoinButton.IsEnabled = !ok;
         }
     }

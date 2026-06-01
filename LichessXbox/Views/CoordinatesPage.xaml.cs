@@ -53,7 +53,7 @@ namespace LichessXbox.Views
                         VerticalAlignment = VerticalAlignment.Stretch,
                         Tag = sq,
                     };
-                    btn.UseSystemFocusVisuals = false;
+                    btn.UseSystemFocusVisuals = true;
                     btn.FocusVisualPrimaryBrush = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F));
                     btn.Click += Cell_Click;
                     Grid.SetRow(btn, row);
@@ -116,8 +116,9 @@ namespace LichessXbox.Views
             {
                 _timer.Stop();
                 _playing = false;
-                TargetText.Text = "—";
+                TargetText.Text = "Done";
                 StartButton.Content = "Play again";
+                StartButton.Focus(FocusState.Programmatic);
             }
         }
     }

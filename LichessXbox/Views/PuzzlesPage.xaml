@@ -12,23 +12,28 @@
         </Grid.ColumnDefinitions>
 
         <Viewbox Grid.Column="0" Stretch="Uniform">
-            <controls:ChessBoardControl x:Name="Board" Interactive="True" Width="760" Height="760" />
+            <controls:ChessBoardControl x:Name="Board" Interactive="True" />
         </Viewbox>
 
         <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
         <StackPanel Margin="24,0,0,0" Spacing="8" VerticalAlignment="Top">
             <TextBlock Text="Puzzles" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
-            <StackPanel Orientation="Horizontal" Spacing="10">
-                <Button x:Name="ModeTraining" Style="{StaticResource TileButton}" Tag="training" Click="Mode_Click"
-                        Content="Training" HorizontalContentAlignment="Center" MinWidth="96" />
-                <Button x:Name="ModeStreak" Style="{StaticResource TileButton}" Tag="streak" Click="Mode_Click"
-                        Content="Streak" HorizontalContentAlignment="Center" MinWidth="96" />
-                <Button x:Name="ModeThemed" Style="{StaticResource TileButton}" Tag="themed" Click="Mode_Click"
-                        Content="Themed" HorizontalContentAlignment="Center" MinWidth="96" />
-            </StackPanel>
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button x:Name="ModeTraining" Grid.Column="0" Style="{StaticResource NavButton}" Tag="training" Click="Mode_Click"
+                        Content="Training" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                <Button x:Name="ModeStreak" Grid.Column="1" Style="{StaticResource NavButton}" Tag="streak" Click="Mode_Click"
+                        Content="Streak" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                <Button x:Name="ModeThemed" Grid.Column="2" Style="{StaticResource NavButton}" Tag="themed" Click="Mode_Click"
+                        Content="Themed" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+            </Grid>
 
-            <ComboBox x:Name="ThemeBox" Visibility="Collapsed" HorizontalAlignment="Stretch" Style="{StaticResource ThemedComboBox}" FontSize="16"
+            <ComboBox x:Name="ThemeBox" Visibility="Collapsed" HorizontalAlignment="Stretch" Style="{StaticResource ThemedComboBox}" FontSize="{StaticResource CaptionSize}"
                       Header="Theme" SelectionChanged="ThemeBox_SelectionChanged" />
 
             <Border x:Name="StreakCard" Visibility="Collapsed" Style="{StaticResource CardBorder}" Padding="16,10">
@@ -58,12 +63,16 @@
                 <TextBlock x:Name="ResultText" FontSize="26" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
             </Border>
 
-            <StackPanel Orientation="Horizontal" Spacing="12">
-                <Button x:Name="NextButton" Style="{StaticResource PrimaryButton}" Click="Next_Click"
-                        Content="Next puzzle" MinWidth="190" />
-                <Button x:Name="RetryButton" Style="{StaticResource TileButton}" Click="Retry_Click"
-                        Content="Retry" MinWidth="140" HorizontalContentAlignment="Center" Visibility="Collapsed" />
-            </StackPanel>
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button x:Name="NextButton" Grid.Column="0" Style="{StaticResource PrimaryButton}" Click="Next_Click"
+                        Content="Next puzzle" HorizontalAlignment="Stretch" />
+                <Button x:Name="RetryButton" Grid.Column="1" Style="{StaticResource TileButton}" Click="Retry_Click"
+                        Content="Retry" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Visibility="Collapsed" />
+            </Grid>
 
             <ProgressRing x:Name="Busy" IsActive="False" Width="36" Height="36"
                           Foreground="{StaticResource AccentGreenLightBrush}" HorizontalAlignment="Left" />

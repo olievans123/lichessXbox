@@ -39,12 +39,18 @@ namespace LichessXbox.Views
             {
                 var games = await AppState.Current.Api.GetUserGamesAsync(account.Username, 25);
                 GamesList.ItemsSource = games;
+                NoGames.Text = "No games yet.";
                 NoGames.Visibility = (games == null || games.Count == 0) ? Visibility.Visible : Visibility.Collapsed;
-                GamesList.Focus(FocusState.Programmatic);
+                if (games != null && games.Count > 0)
+                    GamesList.Focus(FocusState.Programmatic);
+                else
+                    GamesContent.Focus(FocusState.Programmatic);
             }
             catch
             {
+                NoGames.Text = "Couldn't load your games. Try again.";
                 NoGames.Visibility = Visibility.Visible;
+                GamesContent.Focus(FocusState.Programmatic);
             }
             finally { Busy.IsActive = false; }
 
@@ -68,9 +74,14 @@ namespace LichessXbox.Views
             {
                 var following = await AppState.Current.Api.GetFollowingAsync();
                 FollowingList.ItemsSource = following;
+                NoFollowing.Text = "Not following anyone yet.";
                 NoFollowing.Visibility = following.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
             }
-            catch { }
+            catch
+            {
+                NoFollowing.Text = "Couldn't load who you follow. Try again.";
+                NoFollowing.Visibility = Visibility.Visible;
+            }
         }
 
         void DrawGraph(List<(int x, int y)> points)

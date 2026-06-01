@@ -26,11 +26,15 @@
                         <Border CornerRadius="12" Padding="18,14" Margin="0,0,0,10"
                                 Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="#22FFFFFF" BorderThickness="1">
                             <Grid>
-                                <StackPanel>
-                                    <TextBlock Text="{Binding Name}" FontSize="19" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
-                                    <TextBlock Text="{Binding Info}" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                                    <TextBlock Text="{Binding Name}" FontSize="19" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding Info}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                                 </StackPanel>
-                                <Border HorizontalAlignment="Right" VerticalAlignment="Top" Background="#33FFFFFF" CornerRadius="8" Padding="10,4">
+                                <Border Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Background="#33FFFFFF" CornerRadius="8" Padding="10,4">
                                     <TextBlock Text="{Binding Group}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource AccentGreenLightBrush}" />
                                 </Border>
                             </Grid>
@@ -40,7 +44,7 @@
             </ListView>
             <ProgressRing Grid.Row="1" x:Name="Busy" IsActive="False" Width="40" Height="40"
                           Foreground="{StaticResource AccentGreenLightBrush}" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,40,0,0" />
-            <TextBlock Grid.Row="1" x:Name="ListStatus" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,40,0,0" />
+            <TextBlock Grid.Row="1" x:Name="ListStatus" FontSize="{StaticResource BodySize}" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,40,0,0" />
         </Grid>
 
         <!-- Detail -->
@@ -55,7 +59,7 @@
                            Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
                 <Button Grid.Row="1" x:Name="JoinButton" Style="{StaticResource PrimaryButton}" Click="Join_Click"
                         Content="Join" MinWidth="160" Margin="0,14" Visibility="Collapsed" HorizontalAlignment="Left" />
-                <TextBlock Grid.Row="1" x:Name="DetailStatus" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" VerticalAlignment="Center" Margin="0,14" />
+                <TextBlock Grid.Row="1" x:Name="DetailStatus" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" VerticalAlignment="Center" Margin="0,14" />
                 <ListView Grid.Row="2" x:Name="StandingsList" SelectionMode="None">
                     <ListView.ItemTemplate>
                         <DataTemplate>
@@ -67,7 +71,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="{Binding RankText}" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
                                 <StackPanel Grid.Column="1">
-                                    <TextBlock Text="{Binding Name}" FontSize="17" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                                    <TextBlock Text="{Binding Name}" FontSize="17" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
                                     <TextBlock Text="{Binding RatingText}" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" />
                                 </StackPanel>
                                 <TextBlock Grid.Column="2" Text="{Binding ScoreText}" FontSize="17" Foreground="{StaticResource AccentGreenLightBrush}" VerticalAlignment="Center" />

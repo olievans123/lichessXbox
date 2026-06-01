@@ -29,8 +29,8 @@ namespace LichessXbox.Views
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             StartChannel(_currentChannel, "Lichess TV");
+            ChannelList.Focus(Windows.UI.Xaml.FocusState.Programmatic);
             await LoadListsAsync();
-            if (ChannelList.Items.Count > 0) ChannelList.Focus(Windows.UI.Xaml.FocusState.Programmatic);
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e) => _streamCts?.Cancel();
@@ -41,12 +41,22 @@ namespace LichessXbox.Views
             {
                 var channels = await AppState.Current.Api.GetTvChannelsAsync();
                 ChannelList.ItemsSource = channels;
+                SetEmptyState(ChannelList, ChannelsEmpty);
             }
-            catch { }
-            try { StreamerList.ItemsSource = await AppState.Current.Api.GetLiveStreamersAsync(); } catch { }
-            try { SimulList.ItemsSource = await AppState.Current.Api.GetSimulsAsync(); } catch { }
-            try { BroadcastList.ItemsSource = await AppState.Current.Api.GetBroadcastsAsync(); } catch { }
+            catch { ShowEmptyState(ChannelsEmpty); }
+            try { StreamerList.ItemsSource = await AppState.Current.Api.GetLiveStreamersAsync(); SetEmptyState(StreamerList, StreamersEmpty); } catch { ShowEmptyState(StreamersEmpty); }
+            try { SimulList.ItemsSource = await AppState.Current.Api.GetSimulsAsync(); SetEmptyState(SimulList, SimulsEmpty); } catch { ShowEmptyState(SimulsEmpty); }
+            try { BroadcastList.ItemsSource = await AppState.Current.Api.GetBroadcastsAsync(); SetEmptyState(BroadcastList, BroadcastsEmpty); } catch { ShowEmptyState(BroadcastsEmpty); }
         }
+
+        static void SetEmptyState(ListView list, TextBlock empty)
+        {
+            empty.Visibility = list.Items.Count == 0
+                ? Windows.UI.Xaml.Visibility.Visible
+                : Windows.UI.Xaml.Visibility.Collapsed;
+        }
+
+        static void ShowEmptyState(TextBlock empty) => empty.Visibility = Windows.UI.Xaml.Visibility.Visible;
 
         void Channel_ItemClick(object sender, ItemClickEventArgs e)
         {

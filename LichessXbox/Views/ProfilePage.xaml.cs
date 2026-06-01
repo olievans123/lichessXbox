@@ -164,14 +164,20 @@ namespace LichessXbox.Views
 
             Busy.IsActive = true;
             SignInButton.IsEnabled = false;
+            bool failed = false;
             try
             {
                 bool ok = await AppState.Current.SignInWithTokenAsync(token);
                 if (ok) await RefreshAsync();
-                else ShowAuthError("That token didn't work. Make sure you copied it fully and it has the board:play scope.");
+                else { ShowAuthError("That token didn't work. Make sure you copied it fully and it has the board:play scope."); failed = true; }
             }
-            catch (Exception ex) { ShowAuthError("Something went wrong: " + ex.Message); }
-            finally { Busy.IsActive = false; SignInButton.IsEnabled = true; }
+            catch (Exception ex) { ShowAuthError("Something went wrong: " + ex.Message); failed = true; }
+            finally
+            {
+                Busy.IsActive = false;
+                SignInButton.IsEnabled = true;
+                if (failed) SignInButton.Focus(FocusState.Programmatic);
+            }
         }
 
         void ShowAuthError(string message)

@@ -90,7 +90,7 @@ namespace LichessXbox.Views
                 {
                     Text = piece == '.' ? "⌫" : PieceGlyph(piece),
                     FontFamily = new FontFamily("Segoe UI Symbol"),
-                    FontSize = piece == '.' ? 20 : 26,
+                    FontSize = piece == '.' ? 24 : 26,
                     Foreground = new SolidColorBrush(char.IsUpper(piece) ? Colors.White : Color.FromArgb(0xFF, 0x9A, 0x94, 0x88)),
                     HorizontalAlignment = HorizontalAlignment.Center,
                 },

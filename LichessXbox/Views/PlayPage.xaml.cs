@@ -181,6 +181,7 @@ namespace LichessXbox.Views
             if (string.IsNullOrEmpty(user)) return;
             // Default to a Blitz 5+3 challenge.
             var clock = new TimeControlPreset("Blitz 5+3", 300, 3, "⚡");
+            ChallengeErrorText.Visibility = Visibility.Collapsed;
             SeekingText.Text = $"Waiting for {user} to accept…";
             ShowOnly(SeekingPanel);
             _seekCts = new CancellationTokenSource();
@@ -189,7 +190,13 @@ namespace LichessXbox.Views
             {
                 SeekingText.Text = $"Could not challenge {user}.";
                 await Task.Delay(1500);
-                if (!_gameActive) ShowOnly(LobbyPanel);
+                if (!_gameActive)
+                {
+                    // Leave a persistent error on the lobby so the failure isn't missed.
+                    ChallengeErrorText.Text = $"Could not challenge {user}. Check the username and try again.";
+                    ChallengeErrorText.Visibility = Visibility.Visible;
+                    ShowOnly(LobbyPanel);
+                }
             }
         }
 

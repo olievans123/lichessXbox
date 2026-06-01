@@ -42,33 +42,44 @@
                 <Border Style="{StaticResource CardBorder}" Padding="20">
                     <StackPanel Spacing="8">
                         <Grid>
-                            <StackPanel Orientation="Horizontal" Spacing="14">
-                                <TextBlock x:Name="EvalText" Text="—" FontSize="40" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
-                                <TextBlock x:Name="DepthText" Text="" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Bottom" Margin="0,0,0,8" />
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="14">
+                                <TextBlock x:Name="EvalText" Text="—" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                                <TextBlock x:Name="DepthText" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Bottom" Margin="0,0,0,8" />
                             </StackPanel>
-                            <ToggleSwitch x:Name="LocalEngineToggle" HorizontalAlignment="Right" VerticalAlignment="Top"
+                            <ToggleSwitch x:Name="LocalEngineToggle" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top"
                                           OffContent="Cloud" OnContent="Local" Toggled="LocalEngine_Toggled" />
                         </Grid>
-                        <TextBlock x:Name="BestLineText" Text="Cloud evaluation" FontSize="16"
+                        <TextBlock x:Name="BestLineText" Text="Cloud evaluation" FontSize="{StaticResource CaptionSize}"
                                    Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
                     </StackPanel>
                 </Border>
 
                 <!-- Navigation -->
-                <StackPanel Orientation="Horizontal" Spacing="10">
-                    <Button Style="{StaticResource TileButton}" Click="First_Click" Content="⏮" MinWidth="70" HorizontalContentAlignment="Center" />
-                    <Button x:Name="BackButton" Style="{StaticResource TileButton}" Click="Back_Click" Content="◀" MinWidth="70" HorizontalContentAlignment="Center" />
-                    <Button Style="{StaticResource TileButton}" Click="Forward_Click" Content="▶" MinWidth="70" HorizontalContentAlignment="Center" />
-                    <Button Style="{StaticResource TileButton}" Click="Last_Click" Content="⏭" MinWidth="70" HorizontalContentAlignment="Center" />
-                    <Button Style="{StaticResource TileButton}" Click="Flip_Click" Content="⇅ Flip" MinWidth="110" HorizontalContentAlignment="Center" />
-                </StackPanel>
+                <Grid ColumnSpacing="6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Style="{StaticResource TileButton}" Click="First_Click" Content="⏮" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                    <Button Grid.Column="1" x:Name="BackButton" Style="{StaticResource TileButton}" Click="Back_Click" Content="◀" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                    <Button Grid.Column="2" Style="{StaticResource TileButton}" Click="Forward_Click" Content="▶" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                    <Button Grid.Column="3" Style="{StaticResource TileButton}" Click="Last_Click" Content="⏭" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                    <Button Grid.Column="4" Style="{StaticResource TileButton}" Click="Flip_Click" Content="⇅" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                </Grid>
 
                 <!-- Opening explorer -->
                 <Border Style="{StaticResource CardBorder}" Padding="20">
                     <StackPanel Spacing="10">
-                        <TextBlock x:Name="OpeningText" Text="Opening explorer" FontSize="20" FontWeight="SemiBold"
+                        <TextBlock x:Name="OpeningText" Text="Opening explorer" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                    Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
-                        <TextBlock x:Name="ExplorerEmpty" Text="No opening data for this position." FontSize="14"
+                        <TextBlock x:Name="ExplorerEmpty" Text="No opening data for this position." FontSize="{StaticResource CaptionSize}"
                                    Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
                         <ListView x:Name="ExplorerList" SelectionMode="None" IsItemClickEnabled="True"
                                   ItemClick="Explorer_ItemClick" MaxHeight="240">
@@ -79,10 +90,10 @@
                                             <ColumnDefinition Width="70" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="{Binding San}" FontSize="18" FontWeight="SemiBold"
+                                        <TextBlock Grid.Column="0" Text="{Binding San}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                                    Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
                                         <StackPanel Grid.Column="1" Spacing="4">
-                                            <TextBlock Text="{Binding Stats}" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" />
+                                            <TextBlock Text="{Binding Stats}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                                             <StackPanel Orientation="Horizontal" Height="14">
                                                 <Border Width="{Binding BarWhite}" Background="#EFEADF" CornerRadius="3,0,0,3" />
                                                 <Border Width="{Binding BarDraw}" Background="#8A8470" />
@@ -99,15 +110,19 @@
                 <!-- Tablebase -->
                 <Border x:Name="TablebaseCard" Style="{StaticResource CardBorder}" Padding="20" Visibility="Collapsed">
                     <StackPanel Spacing="10">
-                        <TextBlock x:Name="TablebaseSummary" Text="Tablebase" FontSize="20" FontWeight="SemiBold"
+                        <TextBlock x:Name="TablebaseSummary" Text="Tablebase" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                    Foreground="{StaticResource AccentGreenLightBrush}" />
                         <ListView x:Name="TablebaseList" SelectionMode="None" IsItemClickEnabled="True"
                                   ItemClick="Tablebase_ItemClick" MaxHeight="160">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Padding="4,6">
-                                        <TextBlock Text="{Binding San}" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
-                                        <TextBlock Text="{Binding Outcome}" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Right" />
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding San}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Outcome}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextAlignment="Right" TextTrimming="CharacterEllipsis" />
                                     </Grid>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
@@ -118,12 +133,12 @@
                 <!-- FEN import -->
                 <Border Style="{StaticResource CardBorder}" Padding="20">
                     <StackPanel Spacing="10">
-                        <TextBlock Text="Load position (FEN)" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" />
-                        <TextBox x:Name="FenBox" FontSize="15" Height="52" VerticalContentAlignment="Center"
+                        <TextBlock Text="Load position (FEN)" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBox x:Name="FenBox" FontSize="{StaticResource CaptionSize}" Height="52" VerticalContentAlignment="Center"
                                  PlaceholderText="Paste a FEN…" />
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <Button Style="{StaticResource PrimaryButton}" Click="LoadFen_Click" Content="Load" MinWidth="120" />
-                            <Button Style="{StaticResource TileButton}" Click="StartPos_Click" Content="Start position" HorizontalContentAlignment="Center" MinWidth="180" />
+                        <StackPanel Spacing="10">
+                            <Button Style="{StaticResource PrimaryButton}" Click="LoadFen_Click" Content="Load" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                            <Button Style="{StaticResource TileButton}" Click="StartPos_Click" Content="Start position" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
                         </StackPanel>
                     </StackPanel>
                 </Border>

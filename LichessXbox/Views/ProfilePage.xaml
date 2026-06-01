@@ -37,7 +37,7 @@
                                                Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
                                 </StackPanel>
                                 <Button x:Name="ManualToggleButton" Style="{StaticResource TileButton}" Click="ShowManual_Click"
-                                        Content="Enter a token manually instead" HorizontalContentAlignment="Center" MinWidth="280" />
+                                        Content="Enter a token manually instead" HorizontalContentAlignment="Center" />
                             </StackPanel>
                         </Grid>
                     </StackPanel>
@@ -46,18 +46,22 @@
                     <StackPanel x:Name="ManualPanel" Spacing="12" Visibility="Collapsed">
                         <TextBlock TextWrapping="Wrap" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
                                    Text="On your phone or computer, open this link, create a token (chess scopes pre-selected), then paste it here:" />
-                        <Border Background="#22000000" CornerRadius="8" Padding="14,10">
+                        <Border Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="14,10">
                             <TextBlock Text="lichess.org/account/oauth/token/create?scopes[]=board:play&amp;scopes[]=challenge:write&amp;scopes[]=puzzle:read&amp;description=Lichess+for+Xbox"
                                        FontSize="{StaticResource CaptionSize}" FontFamily="Consolas" Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
                         </Border>
                         <TextBox x:Name="TokenBox" PlaceholderText="lip_xxxxxxxxxxxxxxxx" FontSize="16"
                                  Height="52" VerticalContentAlignment="Center" />
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <Button x:Name="SignInButton" Style="{StaticResource PrimaryButton}" Click="SignIn_Click"
-                                    Content="Sign in" MinWidth="160" />
-                            <Button Style="{StaticResource TileButton}" Click="ShowQr_Click"
-                                    Content="Use QR code" HorizontalContentAlignment="Center" MinWidth="160" />
-                        </StackPanel>
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="SignInButton" Grid.Column="0" Style="{StaticResource PrimaryButton}" Click="SignIn_Click"
+                                    Content="Sign in" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                            <Button Grid.Column="1" Style="{StaticResource TileButton}" Click="ShowQr_Click"
+                                    Content="Use QR code" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                        </Grid>
                     </StackPanel>
 
                     <ProgressRing x:Name="Busy" IsActive="False" Width="30" Height="30"
@@ -76,9 +80,9 @@
                     <TextBlock x:Name="AvatarInitial" Text="?" FontSize="36" FontWeight="Bold" Foreground="#0E1207"
                                HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Border>
-                <StackPanel VerticalAlignment="Center">
-                    <TextBlock x:Name="UsernameText" Text="" FontSize="32" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
-                    <TextBlock x:Name="SubtitleText" Text="Lichess member" FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" />
+                <StackPanel VerticalAlignment="Center" MaxWidth="540">
+                    <TextBlock x:Name="UsernameText" Text="" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                    <TextBlock x:Name="SubtitleText" Text="Lichess member" FontSize="{StaticResource BodySize}" Foreground="{StaticResource TextSecondaryBrush}" />
                 </StackPanel>
             </StackPanel>
 
@@ -87,11 +91,11 @@
             <GridView x:Name="RatingsGrid" SelectionMode="None" IsItemClickEnabled="False">
                 <GridView.ItemTemplate>
                     <DataTemplate>
-                        <Border Width="150" Height="84" CornerRadius="16" Margin="6"
-                                Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="#33FFFFFF" BorderThickness="1">
+                        <Border Width="150" Height="100" CornerRadius="16" Margin="6"
+                                Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                             <StackPanel Margin="20" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding Mode}" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" />
-                                <TextBlock Text="{Binding Value}" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                                <TextBlock Text="{Binding Value}" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
                             </StackPanel>
                         </Border>
                     </DataTemplate>
@@ -99,7 +103,7 @@
             </GridView>
 
             <Button x:Name="SignOutButton" Style="{StaticResource TileButton}" Click="SignOut_Click"
-                    Content="Sign out" MinWidth="200" HorizontalContentAlignment="Center" HorizontalAlignment="Left" />
+                    Content="Sign out" MinWidth="160" HorizontalContentAlignment="Center" HorizontalAlignment="Left" />
         </StackPanel>
         </ScrollViewer>
     </Grid>

@@ -12,11 +12,11 @@
             <TextBlock Text="Sign in to see your games" FontSize="36" FontWeight="Bold"
                        Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" TextAlignment="Center" />
             <TextBlock Text="Your game history, ratings, and friends live on your Lichess account."
-                       FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" TextAlignment="Center" TextWrapping="Wrap" />
-            <Button x:Name="GoSignInButton" Style="{StaticResource PrimaryButton}" Click="GoSignIn_Click" HorizontalAlignment="Center" MinWidth="240" Content="Sign in with Lichess" />
+                       FontSize="{StaticResource BodySize}" Foreground="{StaticResource TextSecondaryBrush}" TextAlignment="Center" TextWrapping="Wrap" />
+            <Button x:Name="GoSignInButton" Style="{StaticResource PrimaryButton}" Click="GoSignIn_Click" HorizontalAlignment="Center" Content="Sign in with Lichess" />
         </StackPanel>
 
-        <ScrollViewer x:Name="GamesContent" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" Visibility="Collapsed">
+        <ScrollViewer x:Name="GamesContent" IsTabStop="True" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" Visibility="Collapsed">
             <Grid Padding="0,0,12,24">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -33,11 +33,15 @@
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Padding="6,12">
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding Headline}" FontSize="19" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
-                                        <TextBlock Text="{Binding ResultText}" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" />
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{Binding Headline}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="{Binding ResultText}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                                     </StackPanel>
-                                    <TextBlock Text="▶ Replay" FontSize="14" Foreground="{StaticResource AccentGreenLightBrush}"
+                                    <TextBlock Grid.Column="1" Text="▶ Replay" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource AccentGreenLightBrush}"
                                                HorizontalAlignment="Right" VerticalAlignment="Center" />
                                 </Grid>
                             </DataTemplate>
@@ -49,7 +53,7 @@
                 <StackPanel Grid.Column="1" Spacing="16">
                     <Border Style="{StaticResource CardBorder}" Padding="20">
                         <StackPanel Spacing="10">
-                            <TextBlock x:Name="RatingTitle" Text="Blitz rating" FontSize="20" FontWeight="SemiBold"
+                            <TextBlock x:Name="RatingTitle" Text="Blitz rating" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                        Foreground="{StaticResource AccentGreenLightBrush}" />
                             <Border Height="170" CornerRadius="10" Background="#16130F">
                                 <Canvas x:Name="GraphCanvas" />
@@ -60,13 +64,13 @@
 
                     <Border Style="{StaticResource CardBorder}" Padding="20">
                         <StackPanel Spacing="10">
-                            <TextBlock Text="Following" FontSize="20" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                            <TextBlock x:Name="NoFollowing" Text="Not following anyone yet." FontSize="14"
+                            <TextBlock Text="Following" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                            <TextBlock x:Name="NoFollowing" Text="Not following anyone yet." FontSize="{StaticResource CaptionSize}"
                                        Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
                             <ItemsControl x:Name="FollowingList">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding}" FontSize="17" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,4" />
+                                        <TextBlock Text="{Binding}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,4" />
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>

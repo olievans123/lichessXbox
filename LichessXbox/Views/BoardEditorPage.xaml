@@ -24,7 +24,7 @@
 
             <Border Style="{StaticResource CardBorder}" Padding="16">
                 <StackPanel Spacing="10">
-                    <TextBlock Text="Palette" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" />
+                    <TextBlock Text="Palette" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                     <StackPanel x:Name="WhitePalette" Orientation="Horizontal" Spacing="4" />
                     <StackPanel x:Name="BlackPalette" Orientation="Horizontal" Spacing="4" />
                     <StackPanel x:Name="ToolPalette" Orientation="Horizontal" Spacing="4" />
@@ -32,7 +32,7 @@
             </Border>
 
             <Grid>
-                <TextBlock Text="Side to move" FontSize="18" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                <TextBlock Text="Side to move" FontSize="{StaticResource BodySize}" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
                 <ToggleSwitch x:Name="SideToggle" HorizontalAlignment="Right" OnContent="White" OffContent="Black"
                               IsOn="True" Toggled="Side_Toggled" />
             </Grid>
@@ -40,10 +40,10 @@
             <TextBox x:Name="FenBox" IsReadOnly="True" FontSize="16" MinHeight="64" TextWrapping="Wrap"
                      Header="FEN" />
 
-            <StackPanel Orientation="Horizontal" Spacing="10">
-                <Button Style="{StaticResource PrimaryButton}" Click="Analyze_Click" Content="Analyze" MinWidth="120" />
-                <Button Style="{StaticResource TileButton}" Click="Start_Click" Content="Start pos" HorizontalContentAlignment="Center" MinWidth="110" />
-                <Button Style="{StaticResource TileButton}" Click="Clear_Click" Content="Clear" HorizontalContentAlignment="Center" MinWidth="90" />
+            <StackPanel Orientation="Vertical" Spacing="10">
+                <Button Style="{StaticResource PrimaryButton}" Click="Analyze_Click" Content="Analyze" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                <Button Style="{StaticResource TileButton}" Click="Start_Click" Content="Start pos" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                <Button Style="{StaticResource TileButton}" Click="Clear_Click" Content="Clear" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
             </StackPanel>
         </StackPanel>
         </ScrollViewer>
