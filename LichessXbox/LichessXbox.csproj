@@ -225,6 +225,7 @@
     <Compile Include="Services\AppState.cs" />
     <Compile Include="Services\SoundService.cs" />
     <Compile Include="Services\LocalEngine.cs" />
+    <Compile Include="Services\LanCallbackServer.cs" />
     <Compile Include="Services\LichessAuthService.cs" />
     <Compile Include="Services\LichessApiService.cs" />
     <Compile Include="Services\Pkce.cs" />

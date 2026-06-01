@@ -93,8 +93,8 @@ namespace LichessXbox.Services
             return await ExchangeCodeAsync(code, verifier, redirect);
         }
 
-        /// <summary>Build the authorize URL + PKCE verifier + state for an in-app login WebView.</summary>
-        public (string url, string verifier, string state) BuildAuthorization()
+        /// <summary>Build the authorize URL + PKCE verifier + state for the given redirect URI.</summary>
+        public (string url, string verifier, string state) BuildAuthorization(string redirectUri)
         {
             string verifier = Pkce.GenerateCodeVerifier();
             string challenge = Pkce.Challenge(verifier);
@@ -102,16 +102,16 @@ namespace LichessXbox.Services
             string url = Authorize +
                 "?response_type=code" +
                 "&client_id=" + Uri.EscapeDataString(ClientId) +
-                "&redirect_uri=" + Uri.EscapeDataString(RedirectUri) +
+                "&redirect_uri=" + Uri.EscapeDataString(redirectUri) +
                 "&code_challenge_method=S256&code_challenge=" + Uri.EscapeDataString(challenge) +
                 "&scope=" + Uri.EscapeDataString(Scopes) +
                 "&state=" + Uri.EscapeDataString(state);
             return (url, verifier, state);
         }
 
-        /// <summary>Exchange the authorization code captured from the WebView redirect for a token.</summary>
-        public Task<bool> CompleteAuthAsync(string code, string verifier) =>
-            ExchangeCodeAsync(code, verifier, RedirectUri);
+        /// <summary>Exchange the authorization code (from the LAN callback) for a token. Must use the same redirect URI.</summary>
+        public Task<bool> CompleteAuthAsync(string code, string verifier, string redirectUri) =>
+            ExchangeCodeAsync(code, verifier, redirectUri);
 
         async Task<bool> ExchangeCodeAsync(string code, string verifier, string redirect)
         {

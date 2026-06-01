@@ -6,26 +6,61 @@
 
     <Grid Padding="48,36">
 
-        <!-- Signed out: personal-token sign-in (reliable on Xbox; no WebView/broker) -->
+        <!-- Signed out: scan-to-pair by default (token returns to the console automatically) -->
         <ScrollViewer x:Name="SignedOutCard" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
                       Visibility="Collapsed">
-            <Border MaxWidth="640" VerticalAlignment="Center" HorizontalAlignment="Center"
+            <Border MaxWidth="760" VerticalAlignment="Center" HorizontalAlignment="Center"
                     Style="{StaticResource CardBorder}" Padding="32">
                 <StackPanel Spacing="14">
                     <TextBlock Text="Sign in to Lichess" FontSize="26" FontWeight="Bold"
                                Foreground="{StaticResource TextPrimaryBrush}" />
-                    <TextBlock TextWrapping="Wrap" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}"
-                               Text="On your phone or computer, open the link below, create a token (the chess scopes are pre-selected), then enter it here." />
-                    <Border Background="#22000000" CornerRadius="8" Padding="14,10">
-                        <TextBlock Text="lichess.org/account/oauth/token/create?scopes[]=board:play&amp;scopes[]=puzzle:read&amp;description=Lichess+for+Xbox"
-                                   FontSize="14" FontFamily="Consolas" Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
-                    </Border>
-                    <TextBlock Text="Paste your token:" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
-                    <TextBox x:Name="TokenBox" PlaceholderText="lip_xxxxxxxxxxxxxxxx" FontSize="16"
-                             Height="52" VerticalContentAlignment="Center" />
-                    <Button x:Name="SignInButton" Style="{StaticResource PrimaryButton}" Click="SignIn_Click"
-                            MinWidth="220" HorizontalAlignment="Left" Content="Sign in" />
-                    <ProgressRing x:Name="Busy" IsActive="False" Width="32" Height="32"
+
+                    <!-- QR device pairing (default) -->
+                    <StackPanel x:Name="QrPanel" Spacing="14">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="10" VerticalAlignment="Top">
+                                <Image x:Name="QrImage" Width="220" Height="220" />
+                            </Border>
+                            <StackPanel Grid.Column="1" Margin="22,0,0,0" VerticalAlignment="Center" Spacing="10">
+                                <TextBlock Text="Scan with your phone" FontSize="20" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimaryBrush}" />
+                                <TextBlock TextWrapping="Wrap" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}"
+                                           Text="Log in to Lichess on your phone and approve — your Xbox signs in automatically, no typing. (Phone must be on the same Wi-Fi.)" />
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <ProgressRing x:Name="QrBusy" IsActive="True" Width="22" Height="22"
+                                                  Foreground="{StaticResource AccentGreenLightBrush}" />
+                                    <TextBlock x:Name="QrStatus" Text="Preparing…" FontSize="14"
+                                               Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <Button Style="{StaticResource TileButton}" Click="ShowManual_Click"
+                                        Content="Enter a token manually instead" HorizontalContentAlignment="Center" MinWidth="280" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Manual token paste (only if selected) -->
+                    <StackPanel x:Name="ManualPanel" Spacing="12" Visibility="Collapsed">
+                        <TextBlock TextWrapping="Wrap" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}"
+                                   Text="On your phone or computer, open this link, create a token (chess scopes pre-selected), then paste it here:" />
+                        <Border Background="#22000000" CornerRadius="8" Padding="14,10">
+                            <TextBlock Text="lichess.org/account/oauth/token/create?scopes[]=board:play&amp;scopes[]=puzzle:read&amp;description=Lichess+for+Xbox"
+                                       FontSize="14" FontFamily="Consolas" Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
+                        </Border>
+                        <TextBox x:Name="TokenBox" PlaceholderText="lip_xxxxxxxxxxxxxxxx" FontSize="16"
+                                 Height="52" VerticalContentAlignment="Center" />
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Button x:Name="SignInButton" Style="{StaticResource PrimaryButton}" Click="SignIn_Click"
+                                    Content="Sign in" MinWidth="160" />
+                            <Button Style="{StaticResource TileButton}" Click="ShowQr_Click"
+                                    Content="Use QR code" HorizontalContentAlignment="Center" MinWidth="160" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <ProgressRing x:Name="Busy" IsActive="False" Width="30" Height="30"
                                   Foreground="{StaticResource AccentGreenLightBrush}" HorizontalAlignment="Left" />
                     <TextBlock x:Name="StatusText" Foreground="#E0A0A0" FontSize="15"
                                Visibility="Collapsed" TextWrapping="Wrap" />
