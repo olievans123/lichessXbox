@@ -170,6 +170,10 @@
                                        TextTrimming="CharacterEllipsis"
                                        Foreground="{StaticResource TextPrimaryBrush}" />
                             <TextBlock x:Name="TopRating" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,2,0,0">
+                                <TextBlock x:Name="TopCaptured" FontFamily="Segoe UI Symbol" FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                <TextBlock x:Name="TopAdvantage" FontSize="{StaticResource CaptionSize}" FontWeight="Bold" Foreground="{StaticResource AccentGreenLightBrush}" VerticalAlignment="Center" />
+                            </StackPanel>
                         </StackPanel>
                         <Border Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
                                 Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="16,8">
@@ -202,6 +206,10 @@
                                        TextTrimming="CharacterEllipsis"
                                        Foreground="{StaticResource TextPrimaryBrush}" />
                             <TextBlock x:Name="BottomRating" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,2,0,0">
+                                <TextBlock x:Name="BottomCaptured" FontFamily="Segoe UI Symbol" FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                <TextBlock x:Name="BottomAdvantage" FontSize="{StaticResource CaptionSize}" FontWeight="Bold" Foreground="{StaticResource AccentGreenLightBrush}" VerticalAlignment="Center" />
+                            </StackPanel>
                         </StackPanel>
                         <Border Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
                                 Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="16,8">

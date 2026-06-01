@@ -277,6 +277,8 @@ namespace LichessXbox.Views
             BottomName.Text = "";
             TopRating.Text = "";
             BottomRating.Text = "";
+            TopCaptured.Text = ""; BottomCaptured.Text = "";
+            TopAdvantage.Text = ""; BottomAdvantage.Text = "";
 
             _ = RunStreamAsync(() => AppState.Current.Api.StreamBoardGameAsync(gameId, OnGameState, ct), ct);
         }
@@ -361,6 +363,7 @@ namespace LichessXbox.Views
             Board.LastMove = last.From >= 0 ? (ChessMove?)last : null;
             Board.Position = pos;
             _whiteToMove = pos.WhiteToMove;
+            UpdateCaptured(pos);
 
             _whiteMs = state.Value<long?>("wtime") ?? _whiteMs;
             _blackMs = state.Value<long?>("btime") ?? _blackMs;
@@ -395,6 +398,48 @@ namespace LichessXbox.Views
                     : (myTurn ? "Your move" : "Waiting for opponent…");
                 if (!_clockTimer.IsEnabled) _clockTimer.Start();
             }
+        }
+
+        // ----------------------------------------------------- captured pieces
+        static readonly char[] CapGlyph = { '♟', '♞', '♝', '♜', '♛' }; // P N B R Q
+        static readonly int[] CapValue = { 1, 3, 3, 5, 9 };
+        static readonly int[] CapStart = { 8, 2, 2, 2, 1 };
+
+        // Show each player's taken pieces and a "+N" material lead.
+        void UpdateCaptured(ChessPosition pos)
+        {
+            int[] w = new int[5], b = new int[5];   // P N B R Q (king ignored)
+            for (int i = 0; i < 64; i++)
+            {
+                char p = pos.PieceAt(i);
+                if (p == '.') continue;
+                int idx = "PNBRQ".IndexOf(char.ToUpperInvariant(p));
+                if (idx < 0) continue;
+                if (char.IsUpper(p)) w[idx]++; else b[idx]++;
+            }
+            int adv = 0;
+            for (int i = 0; i < 5; i++) adv += CapValue[i] * (w[i] - b[i]); // White minus Black
+
+            string blackTaken = TakenGlyphs(b);   // Black pieces White has captured
+            string whiteTaken = TakenGlyphs(w);   // White pieces Black has captured
+
+            // Bottom = the local player, top = the opponent.
+            SetCaptured(BottomCaptured, BottomAdvantage, _playerIsWhite ? blackTaken : whiteTaken, _playerIsWhite ? adv : -adv);
+            SetCaptured(TopCaptured, TopAdvantage, _playerIsWhite ? whiteTaken : blackTaken, _playerIsWhite ? -adv : adv);
+        }
+
+        static string TakenGlyphs(int[] onboard)
+        {
+            var sb = new System.Text.StringBuilder();
+            for (int i = 0; i < 5; i++)
+                for (int n = 0; n < CapStart[i] - onboard[i]; n++) sb.Append(CapGlyph[i]);
+            return sb.ToString();
+        }
+
+        static void SetCaptured(TextBlock glyphs, TextBlock advantage, string taken, int lead)
+        {
+            glyphs.Text = taken;
+            advantage.Text = lead > 0 ? "+" + lead : "";
         }
 
         string ResultText(string status, string winner)
