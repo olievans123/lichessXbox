@@ -46,11 +46,30 @@ jobs:
           Export-Certificate  -Cert $cert -FilePath "$env:GITHUB_WORKSPACE\LichessXbox.cer" | Out-Null
           echo "PFX_THUMBPRINT=$($cert.Thumbprint)" >> $env:GITHUB_ENV
 
+      # Pick a UWP SDK version that's actually installed on the runner. Pinning a
+      # TargetPlatformVersion whose UnionMetadata\<ver>\Windows.winmd is missing makes
+      # MSBuild silently resolve zero Windows.* references (hundreds of phantom errors).
+      - name: Detect installed Windows SDK
+        shell: pwsh
+        run: |
+          $root = "C:\Program Files (x86)\Windows Kits\10\UnionMetadata"
+          $vers = Get-ChildItem $root -Directory -ErrorAction SilentlyContinue |
+                  Where-Object { Test-Path (Join-Path $_.FullName 'Windows.winmd') } |
+                  ForEach-Object { $_.Name } |
+                  Where-Object { $_ -match '^10\.0\.' } |
+                  Sort-Object { [version]$_ } -Descending
+          if (-not $vers) { Write-Error "No UWP UnionMetadata SDK found on runner"; exit 1 }
+          $tpv = $vers[0]
+          Write-Host "Installed UWP SDKs: $($vers -join ', ')"
+          Write-Host "Using TargetPlatformVersion = $tpv"
+          echo "TPV=$tpv" >> $env:GITHUB_ENV
+
       - name: Build sideload package
         run: >
           msbuild $env:Solution
           /p:Configuration=$env:Configuration
           /p:Platform=$env:Platform
+          /p:TargetPlatformVersion=$env:TPV
           /p:AppxBundle=Always
           /p:AppxBundlePlatforms="x64"
           /p:UapAppxPackageBuildMode=SideloadOnly
