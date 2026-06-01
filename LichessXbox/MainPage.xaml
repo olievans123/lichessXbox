@@ -15,7 +15,7 @@
         <!-- Navigation pane: one full-height scroller so every item is reachable
              (compact buttons; scrolls if the list is taller than the pane). -->
         <ScrollViewer Grid.Column="0" Background="#2A000000"
-                      VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+                      VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
             <StackPanel x:Name="NavItems" Padding="12,16,12,16" Spacing="3">
                 <StackPanel Orientation="Horizontal" Spacing="12" Margin="6,2,6,6">
                     <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource AccentGradientBrush}">

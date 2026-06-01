@@ -118,12 +118,13 @@
                             </VisualStateGroup>
                             <!-- Gamepad / keyboard focus = the moment that has to feel great on a TV -->
                             <VisualStateGroup x:Name="FocusStates">
+                                <!-- Focus = the green ring + hover tint only. No scale: scaling the
+                                     focused button made the initially-focused button (nav Home / first
+                                     tile) look wider than its peers until focus moved elsewhere. -->
                                 <VisualState x:Name="Focused">
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="FocusRing" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.12" />
                                         <DoubleAnimation Storyboard.TargetName="HoverTint" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.12" />
-                                        <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleX" To="1.04" Duration="0:0:0.12" />
-                                        <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleY" To="1.04" Duration="0:0:0.12" />
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Unfocused" />
@@ -157,8 +158,8 @@
         <Setter Property="FocusVisualSecondaryBrush" Value="#99000000" />
     </Style>
 
-    <!-- Tint the gamepad focus rectangle green to match the rest of the app
-         (default is a teal/system reveal). Implicit = applies to all grid/list items. -->
+    <!-- List/grid item focus tint — replaced by full green-ring item templates in a
+         follow-up; kept as the green system reveal for now. -->
     <Style TargetType="GridViewItem">
         <Setter Property="FocusVisualPrimaryBrush" Value="{StaticResource AccentGreenLightBrush}" />
         <Setter Property="FocusVisualSecondaryBrush" Value="#99000000" />

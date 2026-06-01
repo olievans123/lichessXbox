@@ -9,6 +9,7 @@ using Windows.Gaming.Input;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
@@ -439,10 +440,16 @@ namespace LichessXbox.Controls
             var pads = Gamepad.Gamepads;
             if (pads.Count == 0) { _padPrimed = false; return; }
 
-            // If XAML focus is already on the board, the routed handler runs; if it's on
-            // another real control (Resign, a list, nav), let that control own the input.
+            // If XAML focus is already on the board, the routed handler runs.
             var focused = FocusManager.GetFocusedElement();
-            if (ReferenceEquals(focused, this) || focused is Control) { _padPrimed = false; return; }
+            if (ReferenceEquals(focused, this)) { _padPrimed = false; return; }
+            // Only a GENUINELY interactive control should block the board's pad input
+            // (Resign/nav buttons, a list, the FEN box, a toggle). A ScrollViewer / Page /
+            // container grabbing focus must NOT block it — that was the bug: focus landed
+            // on a page ScrollViewer, so the board never moved.
+            if (focused is ButtonBase || focused is Selector || focused is SelectorItem ||
+                focused is TextBox || focused is ComboBox || focused is ToggleSwitch || focused is RangeBase)
+            { _padPrimed = false; return; }
 
             GamepadReading r;
             try { r = pads[0].GetCurrentReading(); } catch { return; }
