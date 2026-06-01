@@ -20,7 +20,18 @@ namespace LichessXbox
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
-            this.UnhandledException += (s, e) => System.Diagnostics.Debug.WriteLine("Unhandled: " + e.Message);
+            // Surface any unhandled exception on screen (Debug output is stripped in Release).
+            this.UnhandledException += async (s, e) =>
+            {
+                e.Handled = true;
+                try
+                {
+                    var msg = e.Exception != null ? e.Exception.ToString() : e.Message;
+                    if (msg != null && msg.Length > 1200) msg = msg.Substring(0, 1200);
+                    await new Windows.UI.Popups.MessageDialog(msg, "Unexpected error").ShowAsync();
+                }
+                catch { /* dialog itself failed — nothing more we can do */ }
+            };
         }
 
         protected override void OnLaunched(LaunchActivatedEventArgs e)
@@ -28,9 +39,8 @@ namespace LichessXbox
             // Restore the user's saved board theme before any board is built.
             LichessXbox.Helpers.BoardTheme.Load();
 
-            // Draw into the title bar / full TV-safe area and opt into the
-            // Xbox "core window" bounds so we own the whole screen.
-            ApplicationView.GetForCurrentView().SetDesiredBoundsMode(ApplicationViewBoundsMode.UseCoreWindow);
+            // Keep content inside the TV title-safe area (the default). NOTE: opting into
+            // UseCoreWindow draws into the overscan region and gets clipped on many TVs.
 
             Frame rootFrame = Window.Current.Content as Frame;
             if (rootFrame == null)

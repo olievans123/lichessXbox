@@ -25,6 +25,28 @@ namespace LichessXbox.Views
         {
             var account = await AppState.Current.EnsureAccountAsync();
             GreetingText.Text = account != null ? $"Welcome back, {account.Username}" : "Welcome";
+            await TestNetworkAsync();
+        }
+
+        // On-screen diagnostic: can the app actually reach lichess.org? This tells us
+        // whether "everything blank" is a connectivity problem vs. a UI/rendering one.
+        async System.Threading.Tasks.Task TestNetworkAsync()
+        {
+            try
+            {
+                using (var http = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromSeconds(12) })
+                {
+                    http.DefaultRequestHeaders.UserAgent.ParseAdd("LichessXbox/1.0");
+                    var resp = await http.GetAsync("https://lichess.org/api/tv/channels");
+                    NetStatus.Text = resp.IsSuccessStatusCode
+                        ? "Network: OK — lichess.org reachable"
+                        : $"Network: reached server but HTTP {(int)resp.StatusCode}";
+                }
+            }
+            catch (Exception ex)
+            {
+                NetStatus.Text = "Network ERROR: " + ex.GetType().Name + " — " + ex.Message;
+            }
         }
 
         MainPage Shell => (Window.Current.Content as Frame)?.Content as MainPage;

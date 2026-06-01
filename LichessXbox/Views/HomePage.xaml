@@ -20,6 +20,8 @@
                            Foreground="{StaticResource TextPrimaryBrush}" LineHeight="68" />
                 <TextBlock Text="Free chess on your TV. No ads, no nonsense — powered by lichess.org."
                            FontSize="20" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0" />
+                <TextBlock x:Name="NetStatus" Text="Network: checking…" FontSize="15"
+                           Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" TextWrapping="Wrap" />
             </StackPanel>
 
             <StackPanel Spacing="14" MaxWidth="560">
