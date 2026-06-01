@@ -52,15 +52,22 @@ jobs:
       - name: Detect installed Windows SDK
         shell: pwsh
         run: |
-          $root = "C:\Program Files (x86)\Windows Kits\10\UnionMetadata"
-          $vers = Get-ChildItem $root -Directory -ErrorAction SilentlyContinue |
-                  Where-Object { Test-Path (Join-Path $_.FullName 'Windows.winmd') } |
-                  ForEach-Object { $_.Name } |
-                  Where-Object { $_ -match '^10\.0\.' } |
-                  Sort-Object { [version]$_ } -Descending
-          if (-not $vers) { Write-Error "No UWP UnionMetadata SDK found on runner"; exit 1 }
+          # The authoritative marker for a usable UWP SDK is Platforms\UAP\<ver>\Platform.xml.
+          # (UnionMetadata alone isn't enough — without the platform SDK, MSBuild resolves
+          # zero Windows.* references and you get hundreds of phantom errors.)
+          $root = "C:\Program Files (x86)\Windows Kits\10\Platforms\UAP"
+          Write-Host "Scanning $root"
+          $vers = @()
+          if (Test-Path $root) {
+            $vers = Get-ChildItem $root -Directory |
+                    Where-Object { Test-Path (Join-Path $_.FullName 'Platform.xml') } |
+                    ForEach-Object { $_.Name } |
+                    Where-Object { $_ -match '^10\.0\.' } |
+                    Sort-Object { [version]$_ } -Descending
+          }
+          Write-Host "Usable UWP platform SDKs: $($vers -join ', ')"
+          if (-not $vers) { Write-Error "No usable UWP platform SDK found on runner"; exit 1 }
           $tpv = $vers[0]
-          Write-Host "Installed UWP SDKs: $($vers -join ', ')"
           Write-Host "Using TargetPlatformVersion = $tpv"
           echo "TPV=$tpv" >> $env:GITHUB_ENV
 
