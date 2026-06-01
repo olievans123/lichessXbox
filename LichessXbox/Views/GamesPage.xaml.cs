@@ -30,7 +30,13 @@ namespace LichessXbox.Views
             }
             SignInPrompt.Visibility = Visibility.Collapsed;
             GamesContent.Visibility = Visibility.Visible;
+            await ReloadAsync();
+        }
 
+        async void Retry_Click(object sender, RoutedEventArgs e) => await ReloadAsync();
+
+        async System.Threading.Tasks.Task ReloadAsync()
+        {
             var account = await AppState.Current.EnsureAccountAsync();
             if (account == null) return;
 
@@ -39,18 +45,19 @@ namespace LichessXbox.Views
             {
                 var games = await AppState.Current.Api.GetUserGamesAsync(account.Username, 25);
                 GamesList.ItemsSource = games;
+                bool any = games != null && games.Count > 0;
                 NoGames.Text = "No games yet.";
-                NoGames.Visibility = (games == null || games.Count == 0) ? Visibility.Visible : Visibility.Collapsed;
-                if (games != null && games.Count > 0)
-                    GamesList.Focus(FocusState.Programmatic);
-                else
-                    GamesContent.Focus(FocusState.Programmatic);
+                NoGames.Visibility = any ? Visibility.Collapsed : Visibility.Visible;
+                RetryGamesButton.Visibility = any ? Visibility.Collapsed : Visibility.Visible;
+                if (any) GamesList.Focus(FocusState.Programmatic);
+                else RetryGamesButton.Focus(FocusState.Programmatic);
             }
             catch
             {
-                NoGames.Text = "Couldn't load your games. Try again.";
+                NoGames.Text = "Couldn't load your games.";
                 NoGames.Visibility = Visibility.Visible;
-                GamesContent.Focus(FocusState.Programmatic);
+                RetryGamesButton.Visibility = Visibility.Visible;
+                RetryGamesButton.Focus(FocusState.Programmatic);
             }
             finally { Busy.IsActive = false; }
 

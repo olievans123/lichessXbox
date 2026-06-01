@@ -9,7 +9,7 @@
             <TextBlock Text="Settings" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
             <TextBlock Text="Board theme" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-            <GridView x:Name="ThemeGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Theme_ItemClick">
+            <GridView x:Name="ThemeGrid" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Theme_ItemClick">
                 <GridView.ItemTemplate>
                     <DataTemplate>
                         <Border Width="160" Height="120" CornerRadius="16"

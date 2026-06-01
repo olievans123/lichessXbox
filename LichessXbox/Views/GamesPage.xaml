@@ -27,6 +27,8 @@
                 <StackPanel Grid.Column="0" Spacing="14" Margin="0,0,20,0">
                     <TextBlock Text="Your games" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
                     <TextBlock x:Name="NoGames" Text="No games yet." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
+                    <Button x:Name="RetryGamesButton" Style="{StaticResource TileButton}" Click="Retry_Click"
+                            Content="Refresh" HorizontalAlignment="Left" HorizontalContentAlignment="Center" MinWidth="160" Visibility="Collapsed" />
                     <ProgressRing x:Name="Busy" IsActive="False" Width="34" Height="34" HorizontalAlignment="Left"
                                   Foreground="{StaticResource AccentGreenLightBrush}" />
                     <ListView x:Name="GamesList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Game_ItemClick">

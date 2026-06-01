@@ -12,6 +12,7 @@ namespace LichessXbox.Views
         {
             this.InitializeComponent();
             ThemeGrid.ItemsSource = BoardTheme.Presets;
+            ThemeGrid.SelectedItem = BoardTheme.Presets.Find(p => p.Name == BoardTheme.CurrentName);
             OutlineToggle.IsOn = BoardTheme.OutlinePieces;
             SoundToggle.IsOn = ElementSoundPlayer.State == ElementSoundPlayerState.On;
             MoveSoundToggle.IsOn = BoardTheme.MoveSounds;

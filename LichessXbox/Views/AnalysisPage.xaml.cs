@@ -136,7 +136,7 @@ namespace LichessXbox.Views
                     foreach (var m in exp.Moves) _explorer.Add(m);
                 }
             }
-            catch { ExplorerEmpty.Visibility = Visibility.Visible; }
+            catch { _explorer.Clear(); ExplorerEmpty.Visibility = Visibility.Visible; }
 
             // Tablebase (only for <= 7 pieces)
             try

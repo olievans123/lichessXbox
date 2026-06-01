@@ -26,7 +26,7 @@
                                 <Image x:Name="QrImage" Width="220" Height="220" />
                             </Border>
                             <StackPanel Grid.Column="1" Margin="22,0,0,0" VerticalAlignment="Center" Spacing="10">
-                                <TextBlock Text="Scan with your phone" FontSize="20" FontWeight="SemiBold"
+                                <TextBlock Text="Scan with your phone" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimaryBrush}" />
                                 <TextBlock TextWrapping="Wrap" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
                                            Text="Log in to Lichess on your phone and approve — your Xbox signs in automatically, no typing. (Phone must be on the same Wi-Fi.)" />
@@ -36,6 +36,8 @@
                                     <TextBlock x:Name="QrStatus" Text="Preparing…" FontSize="{StaticResource CaptionSize}"
                                                Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
                                 </StackPanel>
+                                <Button x:Name="RefreshQrButton" Style="{StaticResource TileButton}" Click="ShowQr_Click"
+                                        Content="↻ New code" HorizontalContentAlignment="Center" />
                                 <Button x:Name="ManualToggleButton" Style="{StaticResource TileButton}" Click="ShowManual_Click"
                                         Content="Enter a token manually instead" HorizontalContentAlignment="Center" />
                             </StackPanel>

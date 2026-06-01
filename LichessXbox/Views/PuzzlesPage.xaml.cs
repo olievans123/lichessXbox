@@ -50,20 +50,33 @@ namespace LichessXbox.Views
             foreach (var t in Themes)
                 ThemeBox.Items.Add(new ComboBoxItem { Content = t.Name, Tag = t.Key });
             ThemeBox.SelectedIndex = 0;
-            ModeTraining.BorderBrush = (Windows.UI.Xaml.Media.Brush)Application.Current.Resources["AccentGreenLightBrush"];
+            SetActiveMode(ModeTraining);
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e) => await LoadCurrentAsync();
 
         // ------------------------------------------------------------- modes
 
+        // Active mode = filled green (like the nav active state) so it's clearly distinct
+        // from the green focus ring; inactive = the normal surface fill.
+        void SetActiveMode(Button active)
+        {
+            var activeBg = (Brush)Application.Current.Resources["AccentGreenBrush"];
+            var activeFg = new SolidColorBrush(Color.FromArgb(0xFF, 0x0E, 0x12, 0x07));
+            var idleBg = (Brush)Application.Current.Resources["AppSurfaceHighBrush"];
+            var idleFg = (Brush)Application.Current.Resources["TextPrimaryBrush"];
+            foreach (var b in new[] { ModeTraining, ModeStreak, ModeThemed })
+            {
+                bool on = b == active;
+                b.Background = on ? activeBg : idleBg;
+                b.Foreground = on ? activeFg : idleFg;
+            }
+        }
+
         void Mode_Click(object sender, RoutedEventArgs e)
         {
             _mode = (sender as FrameworkElement)?.Tag as string ?? "training";
-            foreach (var b in new[] { ModeTraining, ModeStreak, ModeThemed })
-                b.BorderBrush = (b == sender)
-                    ? (Brush)Application.Current.Resources["AccentGreenLightBrush"]
-                    : new SolidColorBrush(Colors.Transparent);
+            SetActiveMode(sender as Button);
             ThemeBox.Visibility = _mode == "themed" ? Visibility.Visible : Visibility.Collapsed;
             StreakCard.Visibility = _mode == "streak" ? Visibility.Visible : Visibility.Collapsed;
             _streak = 0;

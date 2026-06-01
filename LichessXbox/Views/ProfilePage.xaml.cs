@@ -16,10 +16,17 @@ namespace LichessXbox.Views
         LanCallbackServer _server;
         string _verifier, _state;
         int _pairAttempt;   // guards against stale callbacks when restarting/cancelling
+        readonly DispatcherTimer _qrExpiry = new DispatcherTimer { Interval = TimeSpan.FromSeconds(90) };
 
         public ProfilePage()
         {
             this.InitializeComponent();
+            _qrExpiry.Tick += (s, e) =>
+            {
+                _qrExpiry.Stop();
+                QrBusy.IsActive = false;
+                QrStatus.Text = "This code expired — press “New code” for a fresh one.";
+            };
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e) => await RefreshAsync();
@@ -76,7 +83,7 @@ namespace LichessXbox.Views
             QrPanel.Visibility = Visibility.Visible;
             ManualPanel.Visibility = Visibility.Collapsed;
             StatusText.Visibility = Visibility.Collapsed;
-            _ = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => ManualToggleButton.Focus(FocusState.Programmatic));
+            _ = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => RefreshQrButton.Focus(FocusState.Programmatic));
             _ = StartPairingAsync();
         }
 
@@ -119,11 +126,13 @@ namespace LichessXbox.Views
                            + Uri.EscapeDataString(auth.url);
             QrImage.Source = new BitmapImage(new Uri(qrUrl));
             QrStatus.Text = "Scan, sign in on your phone, and approve…";
+            _qrExpiry.Start();
 
             try
             {
                 Dictionary<string, string> result = await server.WaitForCallbackAsync();
                 if (attempt != _pairAttempt) return;   // superseded (toggled/navigated)
+                _qrExpiry.Stop();
 
                 if (result.TryGetValue("state", out var st) && st != _state)
                 {
@@ -150,6 +159,7 @@ namespace LichessXbox.Views
         void StopPairing()
         {
             _pairAttempt++;            // invalidate any in-flight await
+            _qrExpiry.Stop();
             try { _server?.Dispose(); } catch { }
             _server = null;
         }
