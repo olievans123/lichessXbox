@@ -152,4 +152,17 @@
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
+    <!-- Tint the gamepad focus rectangle green to match the rest of the app
+         (default is a teal/system reveal). Implicit = applies to all grid/list items. -->
+    <Style TargetType="GridViewItem">
+        <Setter Property="FocusVisualPrimaryBrush" Value="{StaticResource AccentGreenLightBrush}" />
+        <Setter Property="FocusVisualSecondaryBrush" Value="#99000000" />
+        <Setter Property="FocusVisualMargin" Value="-3" />
+    </Style>
+    <Style TargetType="ListViewItem">
+        <Setter Property="FocusVisualPrimaryBrush" Value="{StaticResource AccentGreenLightBrush}" />
+        <Setter Property="FocusVisualSecondaryBrush" Value="#99000000" />
+        <Setter Property="FocusVisualMargin" Value="-3" />
+    </Style>
+
 </ResourceDictionary>

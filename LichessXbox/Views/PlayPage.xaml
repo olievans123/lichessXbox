@@ -24,28 +24,10 @@
             <StackPanel Spacing="22" Padding="0,0,12,24">
                 <TextBlock Text="New game" FontSize="40" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
-                <!-- Variant -->
-                <TextBlock Text="Variant" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                <GridView x:Name="VariantGrid" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Variant_ItemClick">
-                    <GridView.ItemTemplate>
-                        <DataTemplate>
-                            <Border Width="150" Height="86" CornerRadius="14" Margin="6"
-                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="#33FFFFFF" BorderThickness="1">
-                                <StackPanel VerticalAlignment="Center" Spacing="2">
-                                    <TextBlock Text="{Binding Glyph}" FontSize="22" HorizontalAlignment="Center" />
-                                    <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold" TextAlignment="Center"
-                                               Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
-                                </StackPanel>
-                            </Border>
-                        </DataTemplate>
-                    </GridView.ItemTemplate>
-                </GridView>
-                <TextBlock x:Name="VariantNote" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}"
-                           Visibility="Collapsed" TextWrapping="Wrap"
-                           Text="Variant games are played with server-validated moves; some inputs (Crazyhouse drops, Chess960 castling) aren't fully supported on the board yet." />
-
                 <!-- Quick pairing -->
                 <TextBlock Text="Quick pairing" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                <TextBlock Text="Find a human opponent online (this searches until someone is matched)." FontSize="14"
+                           Foreground="{StaticResource TextSecondaryBrush}" />
                 <GridView x:Name="PresetGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Preset_ItemClick">
                     <GridView.ItemTemplate>
                         <DataTemplate>
@@ -93,6 +75,26 @@
                     <Button x:Name="ChallengeButton" Style="{StaticResource PrimaryButton}" Click="Challenge_Click"
                             Content="Challenge" MinWidth="180" />
                 </StackPanel>
+
+                <!-- Variant (Standard by default; choose before pairing) -->
+                <TextBlock Text="Variant" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" Margin="0,8,0,0" />
+                <GridView x:Name="VariantGrid" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Variant_ItemClick">
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Width="132" Height="78" CornerRadius="12" Margin="5"
+                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="#33FFFFFF" BorderThickness="1">
+                                <StackPanel VerticalAlignment="Center" Spacing="2">
+                                    <TextBlock Text="{Binding Glyph}" FontSize="20" HorizontalAlignment="Center" />
+                                    <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold" TextAlignment="Center"
+                                               Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+                <TextBlock x:Name="VariantNote" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}"
+                           Visibility="Collapsed" TextWrapping="Wrap"
+                           Text="Variant games are played with server-validated moves; some inputs (Crazyhouse drops, Chess960 castling) aren't fully supported on the board yet." />
 
                 <!-- Incoming challenges -->
                 <TextBlock Text="Challenges" FontSize="22" FontWeight="SemiBold"

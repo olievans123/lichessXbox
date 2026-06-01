@@ -47,7 +47,7 @@
                         <TextBlock TextWrapping="Wrap" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}"
                                    Text="On your phone or computer, open this link, create a token (chess scopes pre-selected), then paste it here:" />
                         <Border Background="#22000000" CornerRadius="8" Padding="14,10">
-                            <TextBlock Text="lichess.org/account/oauth/token/create?scopes[]=board:play&amp;scopes[]=puzzle:read&amp;description=Lichess+for+Xbox"
+                            <TextBlock Text="lichess.org/account/oauth/token/create?scopes[]=board:play&amp;scopes[]=challenge:write&amp;scopes[]=puzzle:read&amp;description=Lichess+for+Xbox"
                                        FontSize="14" FontFamily="Consolas" Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
                         </Border>
                         <TextBox x:Name="TokenBox" PlaceholderText="lip_xxxxxxxxxxxxxxxx" FontSize="16"

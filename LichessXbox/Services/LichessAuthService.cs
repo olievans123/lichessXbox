@@ -23,7 +23,7 @@ namespace LichessXbox.Services
         public const string ClientId = "lichess-xbox-app";
         const string Authorize = "https://lichess.org/oauth";
         const string TokenEndpoint = "https://lichess.org/api/token";
-        const string Scopes = "board:play puzzle:read preference:read";
+        const string Scopes = "board:play challenge:write puzzle:read preference:read";
         // Loopback redirect (Lichess accepts it; custom schemes get HTTP 400). The login
         // WebView intercepts the redirect here without actually loading it.
         public const string RedirectUri = "http://localhost/lichess-xbox-auth";
