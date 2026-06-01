@@ -250,6 +250,7 @@ namespace LichessXbox.Views
             {
                 ResultText.Text = "Solved! ✓";
                 ResultCard.Visibility = Visibility.Visible;
+                NextButton.Focus(FocusState.Programmatic);
             }
         }
 
@@ -262,6 +263,7 @@ namespace LichessXbox.Views
             HintText.Text = "Wrong move — streak over.";
             _streak = 0;
             StreakText.Text = "0";
+            NextButton.Focus(FocusState.Programmatic);
         }
 
         static bool MovesEqual(ChessMove user, string expectedUci)

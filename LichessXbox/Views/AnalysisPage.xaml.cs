@@ -75,6 +75,9 @@ namespace LichessXbox.Views
             EvalText.Text = "…";
             DepthText.Text = "";
             BestLineText.Text = "Evaluating…";
+            _explorer.Clear();
+            OpeningText.Text = "Opening explorer";
+            ExplorerEmpty.Visibility = Visibility.Collapsed;
             _ = RefreshAnalysisAsync(cur);
         }
 
@@ -246,7 +249,8 @@ namespace LichessXbox.Views
         {
             string fen = FenBox.Text?.Trim();
             if (string.IsNullOrEmpty(fen)) return;
-            ResetTo(ChessPosition.FromFen(fen));
+            try { ResetTo(ChessPosition.FromFen(fen)); }
+            catch { BestLineText.Text = "That FEN could not be read."; }
         }
 
         void StartPos_Click(object sender, RoutedEventArgs e) => ResetTo(ChessPosition.Starting());

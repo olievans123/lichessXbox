@@ -80,7 +80,7 @@ namespace LichessXbox.Views
         {
             var btn = new Button
             {
-                Width = 40, Height = 40,
+                Width = 36, Height = 36,
                 Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x2A, 0x25, 0x1D)),
                 BorderBrush = new SolidColorBrush(piece == _selected ? Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F) : Color.FromArgb(0x33, 0xFF, 0xFF, 0xFF)),
                 BorderThickness = new Thickness(2),

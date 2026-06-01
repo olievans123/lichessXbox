@@ -7,7 +7,7 @@
     <Grid Padding="32,24">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="320" />
+            <ColumnDefinition Width="300" />
         </Grid.ColumnDefinitions>
 
         <Viewbox Grid.Column="0" Stretch="Uniform" MaxWidth="560" MaxHeight="560" HorizontalAlignment="Center">
@@ -17,27 +17,31 @@
         </Viewbox>
 
         <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-        <StackPanel Margin="28,0,0,0" Spacing="12">
-            <TextBlock Text="Board editor" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+        <StackPanel Margin="20,0,0,0" Padding="0,0,10,16" Spacing="12">
+            <TextBlock Text="Board editor" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
             <TextBlock Text="Pick a piece, then place it on the board. Eraser clears a square." FontSize="{StaticResource CaptionSize}"
                        Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
 
             <Border Style="{StaticResource CardBorder}" Padding="16">
                 <StackPanel Spacing="10">
                     <TextBlock Text="Palette" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                    <StackPanel x:Name="WhitePalette" Orientation="Horizontal" Spacing="4" />
-                    <StackPanel x:Name="BlackPalette" Orientation="Horizontal" Spacing="4" />
-                    <StackPanel x:Name="ToolPalette" Orientation="Horizontal" Spacing="4" />
+                    <StackPanel x:Name="WhitePalette" Orientation="Horizontal" Spacing="2" />
+                    <StackPanel x:Name="BlackPalette" Orientation="Horizontal" Spacing="2" />
+                    <StackPanel x:Name="ToolPalette" Orientation="Horizontal" Spacing="2" />
                 </StackPanel>
             </Border>
 
             <Grid>
-                <TextBlock Text="Side to move" FontSize="{StaticResource BodySize}" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
-                <ToggleSwitch x:Name="SideToggle" HorizontalAlignment="Right" OnContent="White" OffContent="Black"
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Side to move" FontSize="{StaticResource BodySize}" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                <ToggleSwitch x:Name="SideToggle" Grid.Column="1" OnContent="White" OffContent="Black"
                               IsOn="True" Toggled="Side_Toggled" />
             </Grid>
 
-            <TextBox x:Name="FenBox" IsReadOnly="True" FontSize="16" MinHeight="64" TextWrapping="Wrap"
+            <TextBox x:Name="FenBox" IsReadOnly="True" FontSize="{StaticResource CaptionSize}" MinHeight="64" TextWrapping="Wrap"
                      Header="FEN" />
 
             <StackPanel Orientation="Vertical" Spacing="10">

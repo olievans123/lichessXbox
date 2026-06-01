@@ -17,6 +17,13 @@ namespace LichessXbox.Views
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
+            await ReloadAsync();
+        }
+
+        async void Retry_Click(object sender, RoutedEventArgs e) => await ReloadAsync();
+
+        async System.Threading.Tasks.Task ReloadAsync()
+        {
             Busy.IsActive = true;
             try
             {
@@ -26,10 +33,13 @@ namespace LichessXbox.Views
                 {
                     ListStatus.Text = "No tournaments right now.";
                     ListStatus.Visibility = Visibility.Visible;
+                    RetryButton.Visibility = Visibility.Visible;
+                    RetryButton.Focus(FocusState.Programmatic);
                 }
                 else
                 {
                     ListStatus.Visibility = Visibility.Collapsed;
+                    RetryButton.Visibility = Visibility.Collapsed;
                     TournamentList.Focus(FocusState.Programmatic);
                 }
             }
@@ -37,6 +47,8 @@ namespace LichessXbox.Views
             {
                 ListStatus.Text = "Couldn't load tournaments.";
                 ListStatus.Visibility = Visibility.Visible;
+                RetryButton.Visibility = Visibility.Visible;
+                RetryButton.Focus(FocusState.Programmatic);
             }
             finally { Busy.IsActive = false; }
         }

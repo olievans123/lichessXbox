@@ -145,10 +145,10 @@ namespace LichessXbox.Models
         public double DrawPct { get; set; }
         public double BlackPct { get; set; }
 
-        // Pixel widths for a 220px stacked result bar (UWP {Binding} can't do math).
-        public double BarWhite => WhitePct * 2.2;
-        public double BarDraw => DrawPct * 2.2;
-        public double BarBlack => BlackPct * 2.2;
+        // Pixel widths for a 160px stacked result bar (UWP {Binding} can't do math).
+        public double BarWhite => WhitePct * 1.6;
+        public double BarDraw => DrawPct * 1.6;
+        public double BarBlack => BlackPct * 1.6;
     }
 
     public class ExplorerResult

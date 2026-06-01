@@ -29,7 +29,7 @@ namespace LichessXbox.Views
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             StartChannel(_currentChannel, "Lichess TV");
-            ChannelList.Focus(Windows.UI.Xaml.FocusState.Programmatic);
+            Board.Focus(Windows.UI.Xaml.FocusState.Programmatic);
             await LoadListsAsync();
         }
 
@@ -37,16 +37,24 @@ namespace LichessXbox.Views
 
         async Task LoadListsAsync()
         {
+            Busy.IsActive = true;
             try
             {
-                var channels = await AppState.Current.Api.GetTvChannelsAsync();
-                ChannelList.ItemsSource = channels;
-                SetEmptyState(ChannelList, ChannelsEmpty);
+                try
+                {
+                    var channels = await AppState.Current.Api.GetTvChannelsAsync();
+                    ChannelList.ItemsSource = channels;
+                    SetEmptyState(ChannelList, ChannelsEmpty);
+                }
+                catch { ShowEmptyState(ChannelsEmpty); }
+                try { StreamerList.ItemsSource = await AppState.Current.Api.GetLiveStreamersAsync(); SetEmptyState(StreamerList, StreamersEmpty); } catch { ShowEmptyState(StreamersEmpty); }
+                try { SimulList.ItemsSource = await AppState.Current.Api.GetSimulsAsync(); SetEmptyState(SimulList, SimulsEmpty); } catch { ShowEmptyState(SimulsEmpty); }
+                try { BroadcastList.ItemsSource = await AppState.Current.Api.GetBroadcastsAsync(); SetEmptyState(BroadcastList, BroadcastsEmpty); } catch { ShowEmptyState(BroadcastsEmpty); }
             }
-            catch { ShowEmptyState(ChannelsEmpty); }
-            try { StreamerList.ItemsSource = await AppState.Current.Api.GetLiveStreamersAsync(); SetEmptyState(StreamerList, StreamersEmpty); } catch { ShowEmptyState(StreamersEmpty); }
-            try { SimulList.ItemsSource = await AppState.Current.Api.GetSimulsAsync(); SetEmptyState(SimulList, SimulsEmpty); } catch { ShowEmptyState(SimulsEmpty); }
-            try { BroadcastList.ItemsSource = await AppState.Current.Api.GetBroadcastsAsync(); SetEmptyState(BroadcastList, BroadcastsEmpty); } catch { ShowEmptyState(BroadcastsEmpty); }
+            finally { Busy.IsActive = false; }
+
+            if (ChannelList.Items.Count > 0)
+                ChannelList.Focus(Windows.UI.Xaml.FocusState.Programmatic);
         }
 
         static void SetEmptyState(ListView list, TextBlock empty)

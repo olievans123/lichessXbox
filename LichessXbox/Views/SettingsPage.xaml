@@ -15,17 +15,19 @@
                         <Border Width="160" Height="120" CornerRadius="16"
                                 Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                             <StackPanel Margin="14" Spacing="8">
-                                <Grid Height="48" CornerRadius="8">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Border Grid.Column="0" Background="{Binding LightBrush}" />
-                                    <Border Grid.Column="1" Background="{Binding DarkBrush}" />
-                                    <Border Grid.Column="2" Background="{Binding LightBrush}" />
-                                    <Border Grid.Column="3" Background="{Binding DarkBrush}" />
-                                </Grid>
-                                <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold"
+                                <Border Height="48" CornerRadius="8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Grid.Column="0" Background="{Binding LightBrush}" />
+                                        <Border Grid.Column="1" Background="{Binding DarkBrush}" />
+                                        <Border Grid.Column="2" Background="{Binding LightBrush}" />
+                                        <Border Grid.Column="3" Background="{Binding DarkBrush}" />
+                                    </Grid>
+                                </Border>
+                                <TextBlock Text="{Binding Name}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimaryBrush}" />
                             </StackPanel>
                         </Border>

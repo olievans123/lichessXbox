@@ -187,10 +187,8 @@
                     <StackPanel Spacing="6">
                         <TextBlock x:Name="StatusBanner" Text="Your move" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                    Foreground="{StaticResource AccentGreenLightBrush}" />
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="180" HorizontalScrollMode="Disabled">
-                            <TextBlock x:Name="MoveList" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
-                                       TextWrapping="Wrap" />
-                        </ScrollViewer>
+                        <TextBlock x:Name="MoveList" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
+                                   TextWrapping="Wrap" />
                     </StackPanel>
                 </Border>
 

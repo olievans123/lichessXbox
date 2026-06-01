@@ -60,7 +60,7 @@
             </Border>
 
             <Border x:Name="ResultCard" Style="{StaticResource CardBorder}" Padding="16" Visibility="Collapsed">
-                <TextBlock x:Name="ResultText" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                <TextBlock x:Name="ResultText" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
             </Border>
 
             <Button x:Name="NextButton" Style="{StaticResource PrimaryButton}" Click="Next_Click"

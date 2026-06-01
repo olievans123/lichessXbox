@@ -26,21 +26,129 @@
                             </StackPanel>
                         </StackPanel>
 
-                        <Button x:Name="HomeNav" Style="{StaticResource NavButton}" Tag="home" Click="Nav_Click" Content="🏠   Home" />
-                        <Button Style="{StaticResource NavButton}" Tag="play" Click="Nav_Click" Content="♟   Play" />
-                        <Button Style="{StaticResource NavButton}" Tag="watch" Click="Nav_Click" Content="📺   Watch" />
-                        <Button Style="{StaticResource NavButton}" Tag="analysis" Click="Nav_Click" Content="🔬   Analysis" />
-                        <Button Style="{StaticResource NavButton}" Tag="puzzles" Click="Nav_Click" Content="🧩   Puzzles" />
-                        <Button Style="{StaticResource NavButton}" Tag="tournaments" Click="Nav_Click" Content="🏆   Tournaments" />
-                        <Button Style="{StaticResource NavButton}" Tag="studies" Click="Nav_Click" Content="📚   Studies" />
-                        <Button Style="{StaticResource NavButton}" Tag="games" Click="Nav_Click" Content="📋   Games" />
-                        <Button Style="{StaticResource NavButton}" Tag="profile" Click="Nav_Click" Content="👤   Profile" />
+                        <Button x:Name="HomeNav" Style="{StaticResource NavButton}" Tag="home" Click="Nav_Click">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="🏠" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Home" Margin="8,0,0,0" />
+                            </Grid>
+                        </Button>
+                        <Button Style="{StaticResource NavButton}" Tag="play" Click="Nav_Click">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="♟" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Play" Margin="8,0,0,0" />
+                            </Grid>
+                        </Button>
+                        <Button Style="{StaticResource NavButton}" Tag="watch" Click="Nav_Click">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="📺" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Watch" Margin="8,0,0,0" />
+                            </Grid>
+                        </Button>
+                        <Button Style="{StaticResource NavButton}" Tag="analysis" Click="Nav_Click">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="🔬" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Analysis" Margin="8,0,0,0" />
+                            </Grid>
+                        </Button>
+                        <Button Style="{StaticResource NavButton}" Tag="puzzles" Click="Nav_Click">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="🧩" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Puzzles" Margin="8,0,0,0" />
+                            </Grid>
+                        </Button>
+                        <Button Style="{StaticResource NavButton}" Tag="tournaments" Click="Nav_Click">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="🏆" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Tournaments" Margin="8,0,0,0" />
+                            </Grid>
+                        </Button>
+                        <Button Style="{StaticResource NavButton}" Tag="studies" Click="Nav_Click">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="📚" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Studies" Margin="8,0,0,0" />
+                            </Grid>
+                        </Button>
+                        <Button Style="{StaticResource NavButton}" Tag="games" Click="Nav_Click">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="📋" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Games" Margin="8,0,0,0" />
+                            </Grid>
+                        </Button>
+                        <Button Style="{StaticResource NavButton}" Tag="profile" Click="Nav_Click">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="👤" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Profile" Margin="8,0,0,0" />
+                            </Grid>
+                        </Button>
 
                         <Border Height="1" Background="{StaticResource HairlineBrush}" Margin="8,8,8,8" />
 
-                        <Button Style="{StaticResource NavButton}" Tag="editor" Click="Nav_Click" Content="✏   Board editor" />
-                        <Button Style="{StaticResource NavButton}" Tag="coords" Click="Nav_Click" Content="🎯   Coordinates" />
-                        <Button Style="{StaticResource NavButton}" Tag="settings" Click="Nav_Click" Content="⚙   Settings" />
+                        <Button Style="{StaticResource NavButton}" Tag="editor" Click="Nav_Click">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="✏" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Board editor" Margin="8,0,0,0" />
+                            </Grid>
+                        </Button>
+                        <Button Style="{StaticResource NavButton}" Tag="coords" Click="Nav_Click">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="🎯" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Coordinates" Margin="8,0,0,0" />
+                            </Grid>
+                        </Button>
+                        <Button Style="{StaticResource NavButton}" Tag="settings" Click="Nav_Click">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="⚙" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Settings" Margin="8,0,0,0" />
+                            </Grid>
+                        </Button>
                     </StackPanel>
                 </ScrollViewer>
             </SplitView.Pane>

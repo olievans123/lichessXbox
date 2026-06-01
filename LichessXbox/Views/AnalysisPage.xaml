@@ -31,7 +31,7 @@
 
         <!-- Hidden host for the local Stockfish engine -->
         <WebView x:Name="EngineWeb" Grid.Column="0" Width="1" Height="1" Opacity="0"
-                 IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                 IsHitTestVisible="False" IsTabStop="False" HorizontalAlignment="Left" VerticalAlignment="Top" />
 
         <!-- Side panel -->
         <ScrollViewer Grid.Column="2" Margin="20,0,0,0" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">

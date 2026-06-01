@@ -37,13 +37,25 @@ namespace LichessXbox.Views
         {
             if (!AppState.Current.IsSignedIn)
             {
+                LoadingPanel.Visibility = Visibility.Collapsed;
+                LoadingRing.IsActive = false;
                 SignedInPanel.Visibility = Visibility.Collapsed;
                 SignedOutCard.Visibility = Visibility.Visible;
                 ShowQr();              // start device pairing by default
                 return;
             }
 
+            // Communicate progress while the account fetch is in flight so the page isn't blank.
+            SignedInPanel.Visibility = Visibility.Collapsed;
+            SignedOutCard.Visibility = Visibility.Collapsed;
+            LoadingRing.IsActive = true;
+            LoadingPanel.Visibility = Visibility.Visible;
+
             var account = await AppState.Current.EnsureAccountAsync();
+
+            LoadingPanel.Visibility = Visibility.Collapsed;
+            LoadingRing.IsActive = false;
+
             if (account == null)
             {
                 await AppState.Current.SignOutAsync();
@@ -59,6 +71,8 @@ namespace LichessXbox.Views
 
         async void ShowAccount(LichessAccount a)
         {
+            LoadingPanel.Visibility = Visibility.Collapsed;
+            LoadingRing.IsActive = false;
             SignedOutCard.Visibility = Visibility.Collapsed;
             SignedInPanel.Visibility = Visibility.Visible;
 

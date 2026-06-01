@@ -9,7 +9,7 @@
         <!-- Signed out -->
         <StackPanel x:Name="SignInPrompt" Visibility="Collapsed"
                     VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="18" MaxWidth="520">
-            <TextBlock Text="Sign in to see your games" FontSize="36" FontWeight="Bold"
+            <TextBlock Text="Sign in to see your games" FontSize="{StaticResource TitleSize}" FontWeight="Bold"
                        Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" TextAlignment="Center" />
             <TextBlock Text="Your game history, ratings, and friends live on your Lichess account."
                        FontSize="{StaticResource BodySize}" Foreground="{StaticResource TextSecondaryBrush}" TextAlignment="Center" TextWrapping="Wrap" />
@@ -29,7 +29,7 @@
                     <TextBlock x:Name="NoGames" Text="No games yet." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
                     <Button x:Name="RetryGamesButton" Style="{StaticResource TileButton}" Click="Retry_Click"
                             Content="Refresh" HorizontalAlignment="Left" HorizontalContentAlignment="Center" MinWidth="160" Visibility="Collapsed" />
-                    <ProgressRing x:Name="Busy" IsActive="False" Width="34" Height="34" HorizontalAlignment="Left"
+                    <ProgressRing x:Name="Busy" IsActive="False" Visibility="Collapsed" Width="34" Height="34" HorizontalAlignment="Left"
                                   Foreground="{StaticResource AccentGreenLightBrush}" />
                     <ListView x:Name="GamesList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Game_ItemClick">
                         <ListView.ItemTemplate>

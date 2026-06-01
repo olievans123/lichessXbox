@@ -491,24 +491,37 @@ namespace LichessXbox.Controls
             bool white = PlayerIsWhite;
             foreach (char p in new[] { 'q', 'r', 'b', 'n' })
             {
+                // Match the rest of the app: no system reveal-focus rectangle. Instead
+                // emulate the shared green inset ring — a subtle dark border at rest that
+                // switches to a crisp, thick green ring when the button gains gamepad focus.
+                var restBorder = new SolidColorBrush(Color.FromArgb(0xFF, 0x4A, 0x42, 0x36));
+                var focusBorder = new SolidColorBrush(Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F));
                 var btn = new Button
                 {
                     Width = 110, Height = 130,
                     Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x2A, 0x25, 0x1D)),
-                    BorderBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F)),
+                    BorderBrush = restBorder,
                     BorderThickness = new Thickness(2),
                     CornerRadius = new CornerRadius(12),
-                    UseSystemFocusVisuals = true,
-                    FocusVisualPrimaryBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F)),
-                    FocusVisualSecondaryBrush = new SolidColorBrush(Color.FromArgb(0x99, 0x00, 0x00, 0x00)),
+                    UseSystemFocusVisuals = false,
                     Content = new TextBlock
                     {
                         Text = Glyph(p),
                         FontFamily = new FontFamily("Segoe UI Symbol"),
                         FontSize = 72,
-                        Foreground = new SolidColorBrush(white ? Colors.White : Color.FromArgb(0xFF, 0x20, 0x20, 0x20)),
+                        Foreground = new SolidColorBrush(white ? Colors.White : Color.FromArgb(0xFF, 0xE8, 0xE4, 0xDC)),
                         HorizontalAlignment = HorizontalAlignment.Center
                     }
+                };
+                btn.GotFocus += (s, e) =>
+                {
+                    btn.BorderBrush = focusBorder;
+                    btn.BorderThickness = new Thickness(4);
+                };
+                btn.LostFocus += (s, e) =>
+                {
+                    btn.BorderBrush = restBorder;
+                    btn.BorderThickness = new Thickness(2);
                 };
                 char promo = p;
                 btn.Click += (s, e) =>

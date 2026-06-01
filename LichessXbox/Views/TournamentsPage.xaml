@@ -45,6 +45,9 @@
             <ProgressRing Grid.Row="1" x:Name="Busy" IsActive="False" Width="40" Height="40"
                           Foreground="{StaticResource AccentGreenLightBrush}" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,40,0,0" />
             <TextBlock Grid.Row="1" x:Name="ListStatus" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,40,0,0" />
+            <Button Grid.Row="1" x:Name="RetryButton" Style="{StaticResource TileButton}" Click="Retry_Click"
+                    Content="Refresh" HorizontalAlignment="Center" HorizontalContentAlignment="Center" MinWidth="160"
+                    VerticalAlignment="Top" Margin="0,80,0,0" Visibility="Collapsed" />
         </Grid>
 
         <!-- Detail -->
@@ -59,8 +62,8 @@
                            Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
                 <Button Grid.Row="1" x:Name="JoinButton" Style="{StaticResource PrimaryButton}" Click="Join_Click"
                         Content="Join" MinWidth="160" Margin="0,14" Visibility="Collapsed" HorizontalAlignment="Left" />
-                <TextBlock Grid.Row="1" x:Name="DetailStatus" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" VerticalAlignment="Center" Margin="0,14" />
-                <ListView Grid.Row="2" x:Name="StandingsList" SelectionMode="None" IsItemClickEnabled="True">
+                <TextBlock Grid.Row="2" x:Name="DetailStatus" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" VerticalAlignment="Top" Margin="0,8,0,0" />
+                <ListView Grid.Row="2" x:Name="StandingsList" SelectionMode="None" IsItemClickEnabled="False">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid Padding="2,8">

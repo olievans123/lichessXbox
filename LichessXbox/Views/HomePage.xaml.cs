@@ -23,8 +23,15 @@ namespace LichessXbox.Views
 
         async void HomePage_Loaded(object sender, RoutedEventArgs e)
         {
-            var account = await AppState.Current.EnsureAccountAsync();
-            GreetingText.Text = account != null ? $"Welcome back, {account.Username}" : "Welcome";
+            try
+            {
+                var account = await AppState.Current.EnsureAccountAsync();
+                GreetingText.Text = account != null ? $"Welcome back, {account.Username}" : "Welcome";
+            }
+            catch
+            {
+                // leave the "Welcome" default; network/auth issues must not crash Home
+            }
         }
 
         MainPage Shell => (Window.Current.Content as Frame)?.Content as MainPage;

@@ -385,6 +385,8 @@ namespace LichessXbox.Views
                 RematchButton.Visibility = string.IsNullOrEmpty(_opponentName) ? Visibility.Collapsed : Visibility.Visible;
                 NewGameButton.Visibility = Visibility.Visible;
                 StatusBanner.Text = ResultText(status, winner);
+                // Move gamepad focus to the primary action; board cells just lost their tab stops.
+                (RematchButton.Visibility == Visibility.Visible ? RematchButton : NewGameButton).Focus(FocusState.Programmatic);
             }
             else
             {

@@ -40,6 +40,7 @@ namespace LichessXbox.Views
             var account = await AppState.Current.EnsureAccountAsync();
             if (account == null) return;
 
+            Busy.Visibility = Visibility.Visible;
             Busy.IsActive = true;
             try
             {
@@ -59,7 +60,7 @@ namespace LichessXbox.Views
                 RetryGamesButton.Visibility = Visibility.Visible;
                 RetryGamesButton.Focus(FocusState.Programmatic);
             }
-            finally { Busy.IsActive = false; }
+            finally { Busy.IsActive = false; Busy.Visibility = Visibility.Collapsed; }
 
             await LoadRatingAsync(account.Username);
             await LoadFollowingAsync();
@@ -72,7 +73,7 @@ namespace LichessXbox.Views
                 var points = await AppState.Current.Api.GetRatingHistoryAsync(username, "Blitz");
                 DrawGraph(points);
             }
-            catch { RatingRange.Text = "No rating history yet."; }
+            catch { RatingRange.Text = "Couldn't load rating history."; }
         }
 
         async System.Threading.Tasks.Task LoadFollowingAsync()

@@ -6,6 +6,16 @@
 
     <Grid Padding="32,24">
 
+        <!-- Top-level loading state (shown while EnsureAccountAsync runs on entry) -->
+        <StackPanel x:Name="LoadingPanel" Orientation="Horizontal" Spacing="14"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Visibility="Collapsed">
+            <ProgressRing x:Name="LoadingRing" IsActive="False" Width="30" Height="30"
+                          Foreground="{StaticResource AccentGreenLightBrush}" />
+            <TextBlock Text="Loading…" FontSize="{StaticResource BodySize}"
+                       Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
+        </StackPanel>
+
         <!-- Signed out: scan-to-pair by default (token returns to the console automatically) -->
         <ScrollViewer x:Name="SignedOutCard" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
                       Visibility="Collapsed">
@@ -88,7 +98,7 @@
                 </StackPanel>
             </StackPanel>
 
-            <TextBlock Text="Ratings" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+            <TextBlock Text="Ratings" FontSize="{StaticResource SubtitleSize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
             <TextBlock x:Name="NoRatings" Text="No rated games yet." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
             <GridView x:Name="RatingsGrid" SelectionMode="None" IsItemClickEnabled="False">
                 <GridView.ItemTemplate>
@@ -96,7 +106,7 @@
                         <Border Width="150" Height="100" CornerRadius="16"
                                 Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                             <StackPanel Margin="20" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding Mode}" FontSize="16" Foreground="{StaticResource TextSecondaryBrush}" />
+                                <TextBlock Text="{Binding Mode}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                                 <TextBlock Text="{Binding Value}" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
                             </StackPanel>
                         </Border>
