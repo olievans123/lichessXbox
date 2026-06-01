@@ -152,6 +152,59 @@
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
+    <!-- Chess-board square. No default-button gray; just a tasteful inset green focus
+         ring + a soft brighten, so moving the cursor across the board feels premium.
+         The square colour comes from the per-cell Background (TemplateBinding). -->
+    <Style x:Key="BoardCellButton" TargetType="Button">
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="MinHeight" Value="0" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Border Background="{TemplateBinding Background}" />
+                        <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                          Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+                        <!-- soft brighten on hover/press -->
+                        <Border x:Name="Sheen" IsHitTestVisible="False" Opacity="0">
+                            <Border.Background><SolidColorBrush Color="#FFFFFF" Opacity="0.10" /></Border.Background>
+                        </Border>
+                        <!-- crisp inset green ring on gamepad/keyboard focus -->
+                        <Border x:Name="Ring" IsHitTestVisible="False" Opacity="0" BorderThickness="3" CornerRadius="2">
+                            <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
+                        </Border>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="Sheen" Storyboard.TargetProperty="Opacity" To="0.6" Duration="0:0:0.10" /></Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="Sheen" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.05" /></Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Disabled" />
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="FocusStates">
+                                <VisualState x:Name="Focused">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="Ring" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.10" /></Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Unfocused" />
+                                <VisualState x:Name="PointerFocused" />
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Combo boxes get the green focus ring to match the rest of the app -->
     <Style x:Key="ThemedComboBox" TargetType="ComboBox">
         <Setter Property="FocusVisualPrimaryBrush" Value="{StaticResource AccentGreenLightBrush}" />

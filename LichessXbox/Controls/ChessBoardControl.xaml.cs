@@ -44,8 +44,15 @@ namespace LichessXbox.Controls
         int _lastPieceCount = -1;
         bool _soundReady;
 
-        static readonly SolidColorBrush GreenFocus = new SolidColorBrush(Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F));
-        static readonly SolidColorBrush FocusBacking = new SolidColorBrush(Color.FromArgb(0x99, 0x00, 0x00, 0x00));
+        // The clean board-cell style (inset green focus ring, no default-button gray)
+        // lives in Theme.xaml; resolve it once from the merged app resources.
+        static Style _cellStyle;
+        static Style CellStyle()
+        {
+            // The app-level indexer traverses the merged Theme.xaml (same pattern MainPage
+            // uses for its brushes), so this resolves the style defined there.
+            return _cellStyle ?? (_cellStyle = Application.Current.Resources["BoardCellButton"] as Style);
+        }
 
         public event EventHandler<ChessMove> MoveRequested;
 
@@ -187,20 +194,8 @@ namespace LichessXbox.Controls
                 // The square itself is a focusable button — native gamepad nav + green focus.
                 var cell = new Button
                 {
+                    Style = CellStyle(),
                     Background = new SolidColorBrush(isLight ? light : dark),
-                    BorderThickness = new Thickness(0),
-                    CornerRadius = new CornerRadius(0),
-                    Padding = new Thickness(0),
-                    MinWidth = 0,
-                    MinHeight = 0,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    VerticalAlignment = VerticalAlignment.Stretch,
-                    HorizontalContentAlignment = HorizontalAlignment.Stretch,
-                    VerticalContentAlignment = VerticalAlignment.Stretch,
-                    UseSystemFocusVisuals = true,
-                    FocusVisualPrimaryBrush = GreenFocus,
-                    FocusVisualSecondaryBrush = FocusBacking,
-                    FocusVisualMargin = new Thickness(-3),
                     Content = content,
                     Tag = sq,
                 };

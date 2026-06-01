@@ -1,8 +1,10 @@
 using LichessXbox.Views;
 using System.Linq;
+using Windows.System;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 
 namespace LichessXbox
@@ -10,30 +12,75 @@ namespace LichessXbox
     public sealed partial class MainPage : Page
     {
         string _pendingAnalysisParam;
+        string _currentTag = "home";
 
         public MainPage()
         {
             this.InitializeComponent();
-            this.Loaded += (s, e) =>
+            this.KeyDown += Page_KeyDown;
+            // Pane stays closed at launch so the content gets full width; the page
+            // focuses its own first control.
+            this.Loaded += (s, e) => GoTo("home");
+        }
+
+        // The gamepad Menu (or View) button toggles the nav from anywhere; B / Esc closes it.
+        void Page_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if (e.Key == VirtualKey.GamepadMenu || e.Key == VirtualKey.GamepadView)
             {
-                GoTo("home");
-                HomeNav.Focus(FocusState.Programmatic);
-            };
+                SetPane(!NavSplit.IsPaneOpen);
+                e.Handled = true;
+            }
+            else if (NavSplit.IsPaneOpen && (e.Key == VirtualKey.GamepadB || e.Key == VirtualKey.Escape))
+            {
+                ClosePane();
+                e.Handled = true;
+            }
+        }
+
+        void ToggleNav_Click(object sender, RoutedEventArgs e) => SetPane(!NavSplit.IsPaneOpen);
+
+        void SetPane(bool open)
+        {
+            NavSplit.IsPaneOpen = open;
+            if (open) FocusActiveNav();
+            else MenuButton.Focus(FocusState.Programmatic);
+        }
+
+        void ClosePane()
+        {
+            NavSplit.IsPaneOpen = false;
+            MenuButton.Focus(FocusState.Programmatic);
+        }
+
+        // When the pane opens, land focus on the current page's nav item.
+        void FocusActiveNav()
+        {
+            var btn = NavItems.Children.OfType<Button>().FirstOrDefault(b => (b.Tag as string) == _currentTag)
+                      ?? NavItems.Children.OfType<Button>().FirstOrDefault();
+            btn?.Focus(FocusState.Programmatic);
         }
 
         void Nav_Click(object sender, RoutedEventArgs e)
         {
             var tag = (sender as FrameworkElement)?.Tag as string;
-            if (tag != null) GoTo(tag);
+            if (tag == null) return;
+            NavSplit.IsPaneOpen = false;   // close first; the destination page focuses its own content
+            GoTo(tag);
         }
 
         /// <summary>Lets pages request navigation (e.g. Home → Play).</summary>
-        public void NavigateTo(string tag) => GoTo(tag);
+        public void NavigateTo(string tag)
+        {
+            NavSplit.IsPaneOpen = false;
+            GoTo(tag);
+        }
 
         /// <summary>Open the analysis board pre-loaded with a game ("initialFen|movesUci").</summary>
         public void OpenAnalysis(string param)
         {
             _pendingAnalysisParam = param;
+            NavSplit.IsPaneOpen = false;
             GoTo("analysis");
         }
 
@@ -58,6 +105,7 @@ namespace LichessXbox
                 case "settings": ContentFrame.Navigate(typeof(SettingsPage)); break;
             }
 
+            _currentTag = tag;
             HighlightNav(tag);
         }
 

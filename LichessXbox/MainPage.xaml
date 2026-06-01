@@ -7,45 +7,63 @@
         <Grid.Background>
             <StaticResource ResourceKey="HeroGradientBrush" />
         </Grid.Background>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="216" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
 
-        <!-- Navigation pane: one full-height scroller so every item is reachable
-             (compact buttons; scrolls if the list is taller than the pane). -->
-        <ScrollViewer Grid.Column="0" Background="#2A000000"
-                      VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
-            <StackPanel x:Name="NavItems" Padding="12,16,12,16" Spacing="3">
-                <StackPanel Orientation="Horizontal" Spacing="12" Margin="6,2,6,6">
-                    <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource AccentGradientBrush}">
-                        <TextBlock Text="♞" FontFamily="Segoe UI Symbol" FontSize="26" Foreground="#0E1207"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="lichess" FontSize="{StaticResource BodySize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
-                        <TextBlock Text="for Xbox" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+        <!-- Collapsible navigation. The pane is hidden by default so the board/content
+             gets the full width; the hamburger (and the gamepad Menu button) reveal it. -->
+        <SplitView x:Name="NavSplit" DisplayMode="Overlay" OpenPaneLength="252"
+                   IsPaneOpen="False" PaneBackground="{StaticResource AppSurfaceBrush}">
+            <SplitView.Pane>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel x:Name="NavItems" Padding="12,16,12,16" Spacing="3">
+                        <StackPanel Orientation="Horizontal" Spacing="12" Margin="6,2,6,6">
+                            <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource AccentGradientBrush}">
+                                <TextBlock Text="♞" FontFamily="Segoe UI Symbol" FontSize="26" Foreground="#0E1207"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="lichess" FontSize="{StaticResource BodySize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                                <TextBlock Text="for Xbox" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <Button x:Name="HomeNav" Style="{StaticResource NavButton}" Tag="home" Click="Nav_Click" Content="🏠   Home" />
+                        <Button Style="{StaticResource NavButton}" Tag="play" Click="Nav_Click" Content="♟   Play" />
+                        <Button Style="{StaticResource NavButton}" Tag="watch" Click="Nav_Click" Content="📺   Watch" />
+                        <Button Style="{StaticResource NavButton}" Tag="analysis" Click="Nav_Click" Content="🔬   Analysis" />
+                        <Button Style="{StaticResource NavButton}" Tag="puzzles" Click="Nav_Click" Content="🧩   Puzzles" />
+                        <Button Style="{StaticResource NavButton}" Tag="tournaments" Click="Nav_Click" Content="🏆   Tournaments" />
+                        <Button Style="{StaticResource NavButton}" Tag="studies" Click="Nav_Click" Content="📚   Studies" />
+                        <Button Style="{StaticResource NavButton}" Tag="games" Click="Nav_Click" Content="📋   Games" />
+                        <Button Style="{StaticResource NavButton}" Tag="profile" Click="Nav_Click" Content="👤   Profile" />
+
+                        <Border Height="1" Background="{StaticResource HairlineBrush}" Margin="8,8,8,8" />
+
+                        <Button Style="{StaticResource NavButton}" Tag="editor" Click="Nav_Click" Content="✏   Board editor" />
+                        <Button Style="{StaticResource NavButton}" Tag="coords" Click="Nav_Click" Content="🎯   Coordinates" />
+                        <Button Style="{StaticResource NavButton}" Tag="settings" Click="Nav_Click" Content="⚙   Settings" />
                     </StackPanel>
-                </StackPanel>
+                </ScrollViewer>
+            </SplitView.Pane>
 
-                <Button x:Name="HomeNav" Style="{StaticResource NavButton}" Tag="home" Click="Nav_Click" Content="🏠   Home" />
-                <Button Style="{StaticResource NavButton}" Tag="play" Click="Nav_Click" Content="♟   Play" />
-                <Button Style="{StaticResource NavButton}" Tag="watch" Click="Nav_Click" Content="📺   Watch" />
-                <Button Style="{StaticResource NavButton}" Tag="analysis" Click="Nav_Click" Content="🔬   Analysis" />
-                <Button Style="{StaticResource NavButton}" Tag="puzzles" Click="Nav_Click" Content="🧩   Puzzles" />
-                <Button Style="{StaticResource NavButton}" Tag="tournaments" Click="Nav_Click" Content="🏆   Tournaments" />
-                <Button Style="{StaticResource NavButton}" Tag="studies" Click="Nav_Click" Content="📚   Studies" />
-                <Button Style="{StaticResource NavButton}" Tag="games" Click="Nav_Click" Content="📋   Games" />
-                <Button Style="{StaticResource NavButton}" Tag="profile" Click="Nav_Click" Content="👤   Profile" />
+            <!-- Content: a slim gutter holds the hamburger so it never overlaps a page title. -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-                <Border Height="1" Background="{StaticResource HairlineBrush}" Margin="8,8,8,8" />
+                <Button x:Name="MenuButton" Grid.Column="0" Click="ToggleNav_Click"
+                        VerticalAlignment="Top" HorizontalAlignment="Center"
+                        Width="44" Height="44" Margin="8,12,8,0" CornerRadius="22" Padding="0"
+                        Background="#59000000" BorderThickness="0"
+                        FontFamily="Segoe UI Symbol" FontSize="20"
+                        Foreground="{StaticResource TextPrimaryBrush}"
+                        UseSystemFocusVisuals="True"
+                        FocusVisualPrimaryBrush="{StaticResource AccentGreenLightBrush}"
+                        Content="☰" ToolTipService.ToolTip="Menu (Menu button)" />
 
-                <Button Style="{StaticResource NavButton}" Tag="editor" Click="Nav_Click" Content="✏   Board editor" />
-                <Button Style="{StaticResource NavButton}" Tag="coords" Click="Nav_Click" Content="🎯   Coordinates" />
-                <Button Style="{StaticResource NavButton}" Tag="settings" Click="Nav_Click" Content="⚙   Settings" />
-            </StackPanel>
-        </ScrollViewer>
-
-        <Frame x:Name="ContentFrame" Grid.Column="1" Margin="12" />
+                <Frame x:Name="ContentFrame" Grid.Column="1" />
+            </Grid>
+        </SplitView>
     </Grid>
 </Page>
