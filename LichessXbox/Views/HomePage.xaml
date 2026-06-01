@@ -25,7 +25,7 @@
                                FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0" TextWrapping="Wrap" />
                 </StackPanel>
 
-                <StackPanel Spacing="12" MaxWidth="560" HorizontalAlignment="Left">
+                <StackPanel Spacing="12" MaxWidth="560" HorizontalAlignment="Stretch">
                     <Button x:Name="PlayButton" Style="{StaticResource TileButton}" Click="Play_Click" HorizontalAlignment="Stretch">
                         <StackPanel Orientation="Horizontal" Spacing="18">
                             <TextBlock Text="♟" FontFamily="Segoe UI Symbol" FontSize="32" Foreground="{StaticResource AccentGreenLightBrush}" />

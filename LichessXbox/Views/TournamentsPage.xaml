@@ -40,7 +40,7 @@
             </ListView>
             <ProgressRing Grid.Row="1" x:Name="Busy" IsActive="False" Width="40" Height="40"
                           Foreground="{StaticResource AccentGreenLightBrush}" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,40,0,0" />
-            <TextBlock Grid.Row="1" x:Name="ListStatus" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" IsTabStop="True" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,40,0,0" />
+            <TextBlock Grid.Row="1" x:Name="ListStatus" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,40,0,0" />
         </Grid>
 
         <!-- Detail -->

@@ -26,7 +26,6 @@ namespace LichessXbox.Views
                 {
                     ListStatus.Text = "No tournaments right now.";
                     ListStatus.Visibility = Visibility.Visible;
-                    ListStatus.Focus(FocusState.Programmatic);
                 }
                 else
                 {
@@ -38,7 +37,6 @@ namespace LichessXbox.Views
             {
                 ListStatus.Text = "Couldn't load tournaments.";
                 ListStatus.Visibility = Visibility.Visible;
-                ListStatus.Focus(FocusState.Programmatic);
             }
             finally { Busy.IsActive = false; }
         }
