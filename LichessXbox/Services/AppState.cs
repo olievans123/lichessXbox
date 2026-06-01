@@ -32,6 +32,25 @@ namespace LichessXbox.Services
             return Account;
         }
 
+        /// <summary>Sign in with a personal API token: store it, then verify by fetching the account.</summary>
+        public async Task<bool> SignInWithTokenAsync(string token)
+        {
+            Auth.SetToken(token);
+            Account = null;
+            try
+            {
+                var acc = await Api.GetAccountAsync();
+                if (acc == null) { Auth.SetToken(null); return false; }
+                Account = acc;
+                return true;
+            }
+            catch
+            {
+                Auth.SetToken(null);
+                return false;
+            }
+        }
+
         public async Task SignOutAsync()
         {
             await Auth.SignOutAsync();

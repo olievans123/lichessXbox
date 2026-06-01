@@ -41,6 +41,14 @@ namespace LichessXbox.Services
             Token = LoadStoredToken();
         }
 
+        /// <summary>Set (or clear) the bearer token directly — used by personal-token sign-in.</summary>
+        public void SetToken(string token)
+        {
+            Token = string.IsNullOrWhiteSpace(token) ? null : token.Trim();
+            if (Token == null) ClearStoredToken();
+            else StoreToken(Token);
+        }
+
         public async Task<bool> SignInAsync()
         {
             string verifier = Pkce.GenerateCodeVerifier();

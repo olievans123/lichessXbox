@@ -5,7 +5,7 @@
     xmlns:controls="using:LichessXbox.Controls"
     Background="Transparent">
 
-    <Grid Padding="40,28,40,28">
+    <Grid Padding="32,24,32,24">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
@@ -13,12 +13,12 @@
 
         <!-- Left: hero + actions (scrolls so it can never be clipped) -->
         <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
-                      VerticalScrollMode="Auto" Margin="0,0,32,0">
-            <StackPanel Spacing="24" VerticalAlignment="Center">
-                <StackPanel Spacing="6">
-                    <TextBlock x:Name="GreetingText" Text="Welcome" FontSize="20"
+                      VerticalScrollMode="Auto" Margin="0,0,20,0">
+            <StackPanel Spacing="18" VerticalAlignment="Center">
+                <StackPanel Spacing="4">
+                    <TextBlock x:Name="GreetingText" Text="Welcome" FontSize="16"
                                Foreground="{StaticResource AccentGreenLightBrush}" FontWeight="SemiBold" />
-                    <TextBlock Text="Play the world." FontSize="48" FontWeight="Bold"
+                    <TextBlock Text="Play the world." FontSize="32" FontWeight="Bold"
                                Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
                     <TextBlock Text="Free chess on your TV. No ads, no nonsense — powered by lichess.org."
                                FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0" TextWrapping="Wrap" />
@@ -62,8 +62,8 @@
         </ScrollViewer>
 
         <!-- Right: decorative board preview (fixed size so it can't squeeze the content) -->
-        <Border Grid.Column="1" Width="440" Height="440" VerticalAlignment="Center"
-                CornerRadius="22" Padding="20" Background="#22000000" BorderBrush="#22FFFFFF" BorderThickness="1">
+        <Border Grid.Column="1" Width="248" Height="248" VerticalAlignment="Center"
+                CornerRadius="16" Padding="12" Background="#22000000" BorderBrush="#22FFFFFF" BorderThickness="1">
             <controls:ChessBoardControl x:Name="PreviewBoard" Interactive="False" />
         </Border>
     </Grid>

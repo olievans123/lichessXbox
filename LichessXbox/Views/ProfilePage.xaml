@@ -6,26 +6,32 @@
 
     <Grid Padding="48,36">
 
-        <!-- Signed out -->
-        <Border x:Name="SignedOutCard" MaxWidth="620" VerticalAlignment="Center" HorizontalAlignment="Center"
-                Style="{StaticResource CardBorder}" Padding="48" Visibility="Collapsed">
-            <StackPanel Spacing="22" HorizontalAlignment="Center">
-                <Border Width="84" Height="84" CornerRadius="20" Background="{StaticResource AccentGradientBrush}" HorizontalAlignment="Center">
-                    <TextBlock Text="♞" FontFamily="Segoe UI Symbol" FontSize="56" Foreground="#0E1207"
-                               HorizontalAlignment="Center" VerticalAlignment="Center" />
-                </Border>
-                <TextBlock Text="Sign in to Lichess" FontSize="34" FontWeight="Bold"
-                           Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" />
-                <TextBlock TextWrapping="Wrap" TextAlignment="Center" FontSize="18"
-                           Foreground="{StaticResource TextSecondaryBrush}"
-                           Text="Connect your free lichess.org account to play. Secure OAuth — your password is never seen by this app." />
-                <Button x:Name="SignInButton" Style="{StaticResource PrimaryButton}" Click="SignIn_Click"
-                        MinWidth="280" HorizontalAlignment="Center" Content="Sign in with Lichess" />
-                <ProgressRing x:Name="Busy" IsActive="False" Width="36" Height="36" Foreground="{StaticResource AccentGreenLightBrush}" />
-                <TextBlock x:Name="StatusText" Foreground="#E0A0A0" FontSize="16" HorizontalAlignment="Center"
-                           Visibility="Collapsed" TextWrapping="Wrap" TextAlignment="Center" />
-            </StackPanel>
-        </Border>
+        <!-- Signed out: personal-token sign-in (reliable on Xbox; no WebView/broker) -->
+        <ScrollViewer x:Name="SignedOutCard" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
+                      Visibility="Collapsed">
+            <Border MaxWidth="640" VerticalAlignment="Center" HorizontalAlignment="Center"
+                    Style="{StaticResource CardBorder}" Padding="32">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="Sign in to Lichess" FontSize="26" FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimaryBrush}" />
+                    <TextBlock TextWrapping="Wrap" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}"
+                               Text="On your phone or computer, open the link below, create a token (the chess scopes are pre-selected), then enter it here." />
+                    <Border Background="#22000000" CornerRadius="8" Padding="14,10">
+                        <TextBlock Text="lichess.org/account/oauth/token/create?scopes[]=board:play&amp;scopes[]=puzzle:read&amp;description=Lichess+for+Xbox"
+                                   FontSize="14" FontFamily="Consolas" Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
+                    </Border>
+                    <TextBlock Text="Paste your token:" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" />
+                    <TextBox x:Name="TokenBox" PlaceholderText="lip_xxxxxxxxxxxxxxxx" FontSize="16"
+                             Height="52" VerticalContentAlignment="Center" />
+                    <Button x:Name="SignInButton" Style="{StaticResource PrimaryButton}" Click="SignIn_Click"
+                            MinWidth="220" HorizontalAlignment="Left" Content="Sign in" />
+                    <ProgressRing x:Name="Busy" IsActive="False" Width="32" Height="32"
+                                  Foreground="{StaticResource AccentGreenLightBrush}" HorizontalAlignment="Left" />
+                    <TextBlock x:Name="StatusText" Foreground="#E0A0A0" FontSize="15"
+                               Visibility="Collapsed" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+        </ScrollViewer>
 
         <!-- Signed in -->
         <StackPanel x:Name="SignedInPanel" Spacing="28" Visibility="Collapsed" MaxWidth="900">
@@ -58,26 +64,5 @@
             <Button x:Name="SignOutButton" Style="{StaticResource TileButton}" Click="SignOut_Click"
                     Content="Sign out" MinWidth="200" HorizontalContentAlignment="Center" HorizontalAlignment="Left" />
         </StackPanel>
-
-        <!-- In-app Lichess login. Navigates to the OAuth page; we intercept the
-             loopback redirect to capture the authorization code. -->
-        <Grid x:Name="AuthOverlay" Visibility="Collapsed" Background="#F2000000"
-              Margin="-48,-36,-48,-36">
-            <Grid Margin="48,36">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid Grid.Row="0" Margin="0,0,0,12">
-                    <TextBlock Text="Sign in to Lichess" FontSize="26" FontWeight="SemiBold"
-                               Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
-                    <Button Content="Cancel" Click="CancelAuth_Click" Style="{StaticResource TileButton}"
-                            HorizontalAlignment="Right" HorizontalContentAlignment="Center" MinWidth="150" />
-                </Grid>
-                <Border Grid.Row="1" Background="White" CornerRadius="8">
-                    <WebView x:Name="AuthWeb" />
-                </Border>
-            </Grid>
-        </Grid>
     </Grid>
 </Page>

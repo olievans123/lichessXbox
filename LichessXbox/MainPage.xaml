@@ -9,7 +9,7 @@
             <StaticResource ResourceKey="HeroGradientBrush" />
         </Grid.Background>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="288" />
+            <ColumnDefinition Width="216" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
