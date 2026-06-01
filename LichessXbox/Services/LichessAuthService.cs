@@ -44,9 +44,11 @@ namespace LichessXbox.Services
             string challenge = Pkce.Challenge(verifier);
             string state = Pkce.RandomState();
 
-            // The broker's callback URI is unique to this app install; Lichess
-            // accepts it as the redirect_uri for a public client.
-            string redirect = WebAuthenticationBroker.GetCurrentApplicationCallbackUri().AbsoluteUri;
+            // Lichess rejects custom-scheme redirect URIs (e.g. the broker's ms-app://…)
+            // with HTTP 400 — it only accepts http/https/loopback. Use a loopback URI:
+            // the WebAuthenticationBroker intercepts the redirect to it (the URL is never
+            // actually fetched) and hands back the authorization code.
+            string redirect = "http://localhost/lichess-xbox-auth";
 
             string authUrl =
                 Authorize +
