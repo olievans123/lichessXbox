@@ -16,6 +16,8 @@ namespace LichessXbox.Views
             OutlineToggle.IsOn = BoardTheme.OutlinePieces;
             SoundToggle.IsOn = ElementSoundPlayer.State == ElementSoundPlayerState.On;
             MoveSoundToggle.IsOn = BoardTheme.MoveSounds;
+            PieceGrid.ItemsSource = PieceSets.All;
+            PieceGrid.SelectedItem = BoardTheme.PieceSet;
             _loaded = true;
             ThemeGrid.FocusOnLoad();
         }
@@ -23,6 +25,30 @@ namespace LichessXbox.Views
         void Theme_ItemClick(object sender, ItemClickEventArgs e)
         {
             if (e.ClickedItem is BoardTheme.Preset p) BoardTheme.Apply(p.Name);
+        }
+
+        async void PieceSet_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            if (!(e.ClickedItem is string set) || set == BoardTheme.PieceSet) return;
+            if (set == PieceSets.Native)
+            {
+                BoardTheme.SetPieceSet(set);
+                PieceStatus.Visibility = Visibility.Collapsed;
+                return;
+            }
+            PieceStatus.Text = "Downloading the " + set + " set…";
+            PieceStatus.Visibility = Visibility.Visible;
+            bool ok = await PieceSets.EnsureAsync(set);
+            if (ok)
+            {
+                BoardTheme.SetPieceSet(set);           // fires Changed → every board redraws with the SVG set
+                PieceStatus.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                PieceStatus.Text = "Couldn't download the " + set + " set — check your connection and try again.";
+                PieceGrid.SelectedItem = BoardTheme.PieceSet;   // revert the selection marker
+            }
         }
 
         void Outline_Toggled(object sender, RoutedEventArgs e)

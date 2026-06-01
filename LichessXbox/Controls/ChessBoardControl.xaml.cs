@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using LichessXbox.Chess;
 using LichessXbox.Helpers;
 using LichessXbox.Services;
@@ -8,6 +9,7 @@ using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Shapes;
 
 namespace LichessXbox.Controls
@@ -33,6 +35,7 @@ namespace LichessXbox.Controls
         readonly Viewbox[] _pieceHost = new Viewbox[64];
         readonly TextBlock[] _pieceFill = new TextBlock[64];
         readonly TextBlock[] _pieceOutline = new TextBlock[64];
+        readonly Image[] _pieceImg = new Image[64];   // SVG piece set (lichess); hidden unless a set is active
 
         ChessPosition _position = ChessPosition.Starting();
         readonly List<ChessMove> _legalFromSelected = new List<ChessMove>();
@@ -61,7 +64,7 @@ namespace LichessXbox.Controls
             this.InitializeComponent();
             BuildBoard();
             ApplyInteractivity();
-            this.Loaded += (s, e) => Render();
+            this.Loaded += async (s, e) => { Render(); await EnsurePieceSetAsync(); };
 
             Action reTheme = () => ReTheme();
             BoardTheme.Changed += reTheme;
@@ -173,6 +176,11 @@ namespace LichessXbox.Controls
                 _pieceFill[sq] = fill;
                 _pieceOutline[sq] = outline;
 
+                // SVG piece image (shown instead of the glyphs when a downloaded set is active).
+                var img = new Image { Stretch = Stretch.Uniform, Margin = new Thickness(6), IsHitTestVisible = false, Visibility = Visibility.Collapsed };
+                content.Children.Add(img);
+                _pieceImg[sq] = img;
+
                 // coordinate hints in the corners (a-h on rank 1, 1-8 on file a)
                 if (rank == 0 || file == 0)
                 {
@@ -281,6 +289,14 @@ namespace LichessXbox.Controls
             Render();
         }
 
+        // Ensure the selected SVG piece set is downloaded/cached, then redraw with it.
+        async Task EnsurePieceSetAsync()
+        {
+            string set = BoardTheme.PieceSet;
+            if (set == PieceSets.Native || PieceSets.IsReady(set)) return;
+            if (await PieceSets.EnsureAsync(set)) Render();
+        }
+
         void Render()
         {
             if (_cells[0] == null) return;
@@ -303,17 +319,33 @@ namespace LichessXbox.Controls
 
                 char piece = _position.PieceAt(sq);
                 bool empty = piece == '.';
-                _pieceHost[sq].Visibility = empty ? Visibility.Collapsed : Visibility.Visible;
-                if (!empty)
+                if (empty)
                 {
-                    string g = GlyphFor(piece);
-                    bool white = char.IsUpper(piece);
-                    _pieceFill[sq].Text = g;
-                    _pieceOutline[sq].Text = g;
-                    _pieceFill[sq].Foreground = new SolidColorBrush(white ? whiteFill : blackFill);
-                    _pieceOutline[sq].Foreground = new SolidColorBrush(white ? whiteOutline : blackOutline);
-                    // Nudge the outline so it reads as a thin border.
-                    _pieceOutline[sq].RenderTransform = new TranslateTransform { X = 0, Y = 2 };
+                    _pieceHost[sq].Visibility = Visibility.Collapsed;
+                    _pieceImg[sq].Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    var src = PieceSets.SourceFor(BoardTheme.PieceSet, piece);   // null → use the Unicode glyph
+                    if (src != null)
+                    {
+                        _pieceImg[sq].Source = new SvgImageSource(src);
+                        _pieceImg[sq].Visibility = Visibility.Visible;
+                        _pieceHost[sq].Visibility = Visibility.Collapsed;
+                    }
+                    else
+                    {
+                        string g = GlyphFor(piece);
+                        bool white = char.IsUpper(piece);
+                        _pieceFill[sq].Text = g;
+                        _pieceOutline[sq].Text = g;
+                        _pieceFill[sq].Foreground = new SolidColorBrush(white ? whiteFill : blackFill);
+                        _pieceOutline[sq].Foreground = new SolidColorBrush(white ? whiteOutline : blackOutline);
+                        // Nudge the outline so it reads as a thin border.
+                        _pieceOutline[sq].RenderTransform = new TranslateTransform { X = 0, Y = 2 };
+                        _pieceHost[sq].Visibility = Visibility.Visible;
+                        _pieceImg[sq].Visibility = Visibility.Collapsed;
+                    }
                 }
 
                 // Highlights

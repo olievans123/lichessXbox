@@ -35,6 +35,25 @@
                 </GridView.ItemTemplate>
             </GridView>
 
+            <TextBlock Text="Pieces" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+            <TextBlock Text="Choose a piece set from lichess (open source; downloaded on first use)." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+            <GridView x:Name="PieceGrid" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="PieceSet_ItemClick">
+                <GridView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Width="120" Height="96" CornerRadius="16"
+                                Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
+                            <StackPanel Margin="10" VerticalAlignment="Center" Spacing="4">
+                                <TextBlock Text="♞" FontFamily="Segoe UI Symbol" FontSize="30" HorizontalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}" />
+                                <TextBlock Text="{Binding}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold" TextAlignment="Center"
+                                           TextWrapping="Wrap" Foreground="{StaticResource TextPrimaryBrush}" />
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+            <TextBlock x:Name="PieceStatus" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
+                       Visibility="Collapsed" TextWrapping="Wrap" />
+
             <Border Style="{StaticResource CardBorder}" Padding="24">
                 <StackPanel Spacing="18">
                     <Grid>

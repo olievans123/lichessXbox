@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Xaml.Media;
@@ -44,6 +46,9 @@ namespace LichessXbox.Helpers
 
         public static string CurrentName { get; private set; } = "Green";
 
+        /// <summary>Selected piece set ("Native" = the built-in Unicode glyphs, else a lichess SVG set).</summary>
+        public static string PieceSet { get; private set; } = PieceSets.Native;
+
         public static event Action Changed;
 
         public static void Apply(string presetName)
@@ -67,6 +72,13 @@ namespace LichessXbox.Helpers
             Save("MoveSounds", on ? "1" : "0");
         }
 
+        public static void SetPieceSet(string set)
+        {
+            PieceSet = string.IsNullOrEmpty(set) ? PieceSets.Native : set;
+            Save("PieceSet", PieceSet);
+            Changed?.Invoke();
+        }
+
         public static void Load()
         {
             try
@@ -79,6 +91,7 @@ namespace LichessXbox.Helpers
                 }
                 if (s.TryGetValue("OutlinePieces", out var o) && o is string os) OutlinePieces = os == "1";
                 if (s.TryGetValue("MoveSounds", out var m) && m is string ms) MoveSounds = ms == "1";
+                if (s.TryGetValue("PieceSet", out var p) && p is string ps && !string.IsNullOrEmpty(ps)) PieceSet = ps;
             }
             catch { /* first run */ }
         }
@@ -89,5 +102,67 @@ namespace LichessXbox.Helpers
         }
 
         static Color C(byte r, byte g, byte b) => Color.FromArgb(0xFF, r, g, b);
+    }
+
+    /// <summary>
+    /// Open-source lichess piece sets (lichess-org/lila/public/piece). Each set is 12
+    /// SVGs (wK..bP); we download them on first use into local storage and render them
+    /// via SvgImageSource. "Native" = the built-in Unicode glyphs (always available).
+    /// </summary>
+    public static class PieceSets
+    {
+        public const string Native = "Native";
+        static readonly string[] Codes = { "wK", "wQ", "wR", "wB", "wN", "wP", "bK", "bQ", "bR", "bB", "bN", "bP" };
+
+        /// <summary>Native first, then the lichess sets.</summary>
+        public static readonly string[] All =
+        {
+            Native, "cburnett", "merida", "alpha", "maestro", "fresca", "cardinal", "staunty",
+            "governor", "dubrovny", "gioco", "icpieces", "tatiana", "california", "pixel", "mono",
+            "letter", "shapes", "chessnut", "companion", "leipzig", "fantasy", "spatial", "riohacha",
+            "celtic", "chess7", "kosal", "pirouetti", "reillycraig", "horsey", "anarcandy", "caliente",
+            "cooke", "disguised", "firi", "kiwen-suwi", "monarchy", "mpchess", "rhosgfx",
+            "shahi-ivory-brown", "totoy", "xkcd",
+        };
+
+        static readonly HashSet<string> _ready = new HashSet<string> { Native };
+        static HttpClient _http;
+
+        public static bool IsReady(string set) => string.IsNullOrEmpty(set) || set == Native || _ready.Contains(set);
+
+        /// <summary>Local URI for a piece's SVG, or null to fall back to the Unicode glyph.</summary>
+        public static Uri SourceFor(string set, char piece)
+        {
+            if (string.IsNullOrEmpty(set) || set == Native || !_ready.Contains(set)) return null;
+            string code = (char.IsUpper(piece) ? "w" : "b") + char.ToUpperInvariant(piece);
+            return new Uri($"ms-appdata:///local/piece/{set}/{code}.svg");
+        }
+
+        /// <summary>
+        /// Ensure a set's 12 SVGs are cached locally (downloading any that are missing).
+        /// Returns true once the set is usable. Safe to call repeatedly; cheap if cached.
+        /// </summary>
+        public static async Task<bool> EnsureAsync(string set)
+        {
+            if (string.IsNullOrEmpty(set) || set == Native) return true;
+            if (_ready.Contains(set)) return true;
+            try
+            {
+                var root = await ApplicationData.Current.LocalFolder.CreateFolderAsync("piece", CreationCollisionOption.OpenIfExists);
+                var dir = await root.CreateFolderAsync(set, CreationCollisionOption.OpenIfExists);
+                _http = _http ?? new HttpClient();
+                foreach (var code in Codes)
+                {
+                    if (await dir.TryGetItemAsync(code + ".svg") != null) continue;   // already cached
+                    var url = $"https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/{set}/{code}.svg";
+                    var bytes = await _http.GetByteArrayAsync(url);
+                    var file = await dir.CreateFileAsync(code + ".svg", CreationCollisionOption.ReplaceExisting);
+                    await FileIO.WriteBytesAsync(file, bytes);
+                }
+                _ready.Add(set);
+                return true;
+            }
+            catch { return false; }
+        }
     }
 }
