@@ -8,10 +8,6 @@
         <Grid.Background>
             <StaticResource ResourceKey="HeroGradientBrush" />
         </Grid.Background>
-
-        <!-- TV-safe area: inset content so display overscan can't clip it.
-             The gradient background above stays full-bleed. -->
-        <Grid Margin="64,40,64,40">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="288" />
             <ColumnDefinition Width="*" />
@@ -52,6 +48,5 @@
         </ScrollViewer>
 
         <Frame x:Name="ContentFrame" Grid.Column="1" Margin="12" />
-        </Grid>
     </Grid>
 </Page>
