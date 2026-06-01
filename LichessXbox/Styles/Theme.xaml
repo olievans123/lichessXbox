@@ -24,6 +24,15 @@
     <SolidColorBrush x:Key="LiveBrush" Color="#E0463A" />
     <SolidColorBrush x:Key="ClockChipBrush" Color="#22000000" />
 
+    <!-- Green the "on" state of every ToggleSwitch (default is system blue) so toggles
+         match the app's green accent. Overriding these well-known theme keys app-wide. -->
+    <SolidColorBrush x:Key="ToggleSwitchFillOn" Color="{StaticResource AccentGreenColor}" />
+    <SolidColorBrush x:Key="ToggleSwitchFillOnPointerOver" Color="{StaticResource AccentGreenLightColor}" />
+    <SolidColorBrush x:Key="ToggleSwitchFillOnPressed" Color="{StaticResource AccentGreenLightColor}" />
+    <SolidColorBrush x:Key="ToggleSwitchStrokeOn" Color="{StaticResource AccentGreenColor}" />
+    <SolidColorBrush x:Key="ToggleSwitchStrokeOnPointerOver" Color="{StaticResource AccentGreenLightColor}" />
+    <SolidColorBrush x:Key="ToggleSwitchStrokeOnPressed" Color="{StaticResource AccentGreenLightColor}" />
+
     <!-- Hero gradient used behind the home / login screens -->
     <LinearGradientBrush x:Key="HeroGradientBrush" StartPoint="0,0" EndPoint="1,1">
         <GradientStop Color="#1B2410" Offset="0.0" />

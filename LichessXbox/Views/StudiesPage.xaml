@@ -34,7 +34,6 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
                                     <TextBlock Text="{Binding Name}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
-                                    <TextBlock Text="{Binding Owner}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
                                 </StackPanel>
                                 <TextBlock Grid.Column="1" Text="Open ▶" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource AccentGreenLightBrush}"
                                            HorizontalAlignment="Right" VerticalAlignment="Center" Margin="12,0,0,0" />

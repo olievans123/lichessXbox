@@ -408,6 +408,14 @@ namespace LichessXbox.Views
         // Show each player's taken pieces and a "+N" material lead.
         void UpdateCaptured(ChessPosition pos)
         {
+            // start-minus-onboard only makes sense for the standard army; variants
+            // (Horde/Crazyhouse/…) run the board in Permissive mode — skip it there.
+            if (Board.Permissive)
+            {
+                TopCaptured.Text = ""; BottomCaptured.Text = "";
+                TopAdvantage.Text = ""; BottomAdvantage.Text = "";
+                return;
+            }
             int[] w = new int[5], b = new int[5];   // P N B R Q (king ignored)
             for (int i = 0; i < 64; i++)
             {

@@ -10,7 +10,7 @@
             <ColumnDefinition Width="320" />
         </Grid.ColumnDefinitions>
 
-        <Viewbox Grid.Column="0" Stretch="Uniform">
+        <Viewbox Grid.Column="0" Stretch="Uniform" MaxWidth="560" MaxHeight="560" HorizontalAlignment="Center">
             <Border CornerRadius="10" Background="#0E0C09" Padding="8">
                 <Grid x:Name="CoordGrid" Width="704" Height="704" />
             </Border>

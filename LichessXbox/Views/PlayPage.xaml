@@ -171,7 +171,7 @@
                                        Foreground="{StaticResource TextPrimaryBrush}" />
                             <TextBlock x:Name="TopRating" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                             <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,2,0,0">
-                                <TextBlock x:Name="TopCaptured" FontFamily="Segoe UI Symbol" FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                <TextBlock x:Name="TopCaptured" FontFamily="Segoe UI Symbol" FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" MaxWidth="170" TextTrimming="CharacterEllipsis" />
                                 <TextBlock x:Name="TopAdvantage" FontSize="{StaticResource CaptionSize}" FontWeight="Bold" Foreground="{StaticResource AccentGreenLightBrush}" VerticalAlignment="Center" />
                             </StackPanel>
                         </StackPanel>
@@ -207,7 +207,7 @@
                                        Foreground="{StaticResource TextPrimaryBrush}" />
                             <TextBlock x:Name="BottomRating" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                             <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,2,0,0">
-                                <TextBlock x:Name="BottomCaptured" FontFamily="Segoe UI Symbol" FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                <TextBlock x:Name="BottomCaptured" FontFamily="Segoe UI Symbol" FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" MaxWidth="170" TextTrimming="CharacterEllipsis" />
                                 <TextBlock x:Name="BottomAdvantage" FontSize="{StaticResource CaptionSize}" FontWeight="Bold" Foreground="{StaticResource AccentGreenLightBrush}" VerticalAlignment="Center" />
                             </StackPanel>
                         </StackPanel>

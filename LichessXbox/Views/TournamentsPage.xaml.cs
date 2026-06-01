@@ -59,8 +59,9 @@ namespace LichessXbox.Views
                 var (title, players) = await AppState.Current.Api.GetTournamentStandingsAsync(t.Id);
                 if (!string.IsNullOrEmpty(title)) DetailTitle.Text = title;
                 StandingsList.ItemsSource = players;
-                DetailStatus.Text = "";
-                DetailStatus.Visibility = Visibility.Collapsed;
+                bool anyStandings = players != null && players.Count > 0;
+                DetailStatus.Text = anyStandings ? "" : "No standings yet.";
+                DetailStatus.Visibility = anyStandings ? Visibility.Collapsed : Visibility.Visible;
             }
             catch
             {
