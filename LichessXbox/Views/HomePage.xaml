@@ -11,10 +11,11 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <!-- Left: hero + actions (scrolls so it can never be clipped) -->
-        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
-                      VerticalScrollMode="Auto" Margin="0,0,20,0">
-            <StackPanel Spacing="18" VerticalAlignment="Center">
+        <!-- Left: hero + actions. Placed directly in the grid column (which has a
+             definite width) rather than inside a ScrollViewer — a ScrollViewer hands
+             its content infinite width on the first measure pass, which let the
+             stretch-buttons blow past MaxWidth on first launch. -->
+        <StackPanel Grid.Column="0" Spacing="18" VerticalAlignment="Center" Margin="0,0,20,0">
                 <StackPanel Spacing="4">
                     <TextBlock x:Name="GreetingText" Text="Welcome" FontSize="16"
                                Foreground="{StaticResource AccentGreenLightBrush}" FontWeight="SemiBold" />
@@ -26,7 +27,7 @@
                                Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" TextWrapping="Wrap" />
                 </StackPanel>
 
-                <StackPanel Spacing="12" MaxWidth="620">
+                <StackPanel Spacing="12" MaxWidth="560" HorizontalAlignment="Left">
                     <Button x:Name="PlayButton" Style="{StaticResource TileButton}" Click="Play_Click" HorizontalAlignment="Stretch">
                         <StackPanel Orientation="Horizontal" Spacing="18">
                             <TextBlock Text="♟" FontFamily="Segoe UI Symbol" FontSize="32" Foreground="{StaticResource AccentGreenLightBrush}" />
@@ -59,7 +60,6 @@
                     </Button>
                 </StackPanel>
             </StackPanel>
-        </ScrollViewer>
 
         <!-- Right: decorative board preview (fixed size so it can't squeeze the content) -->
         <Border Grid.Column="1" Width="248" Height="248" VerticalAlignment="Center"
