@@ -145,4 +145,11 @@
         <Setter Property="FontWeight" Value="Bold" />
     </Style>
 
+    <!-- Compact navigation-pane button so the full menu fits without being cut off -->
+    <Style x:Key="NavButton" TargetType="Button" BasedOn="{StaticResource TileButton}">
+        <Setter Property="Padding" Value="16,9" />
+        <Setter Property="FontSize" Value="17" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
 </ResourceDictionary>

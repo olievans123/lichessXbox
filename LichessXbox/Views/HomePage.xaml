@@ -5,61 +5,66 @@
     xmlns:controls="using:LichessXbox.Controls"
     Background="Transparent">
 
-    <Grid Padding="40,32,40,24">
+    <Grid Padding="40,28,40,28">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1.2*" />
-            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <!-- Left: hero + actions -->
-        <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="28" Margin="0,0,40,0">
-            <StackPanel Spacing="6">
-                <TextBlock x:Name="GreetingText" Text="Welcome" FontSize="20"
-                           Foreground="{StaticResource AccentGreenLightBrush}" FontWeight="SemiBold" />
-                <TextBlock Text="Play the world." FontSize="64" FontWeight="Bold"
-                           Foreground="{StaticResource TextPrimaryBrush}" LineHeight="68" />
-                <TextBlock Text="Free chess on your TV. No ads, no nonsense — powered by lichess.org."
-                           FontSize="20" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0" />
-                <TextBlock x:Name="NetStatus" Text="Network: checking…" FontSize="15"
-                           Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" TextWrapping="Wrap" />
-            </StackPanel>
+        <!-- Left: hero + actions (scrolls so it can never be clipped) -->
+        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
+                      VerticalScrollMode="Auto" Margin="0,0,32,0">
+            <StackPanel Spacing="24" VerticalAlignment="Center">
+                <StackPanel Spacing="6">
+                    <TextBlock x:Name="GreetingText" Text="Welcome" FontSize="20"
+                               Foreground="{StaticResource AccentGreenLightBrush}" FontWeight="SemiBold" />
+                    <TextBlock Text="Play the world." FontSize="48" FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
+                    <TextBlock Text="Free chess on your TV. No ads, no nonsense — powered by lichess.org."
+                               FontSize="18" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0" TextWrapping="Wrap" />
+                    <TextBlock x:Name="NetStatus" Text="Network: checking…" FontSize="14"
+                               Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" TextWrapping="Wrap" />
+                </StackPanel>
 
-            <StackPanel Spacing="14" MaxWidth="560">
-                <Button x:Name="PlayButton" Style="{StaticResource TileButton}" Click="Play_Click">
-                    <StackPanel Orientation="Horizontal" Spacing="18">
-                        <TextBlock Text="♟" FontFamily="Segoe UI Symbol" FontSize="34" Foreground="{StaticResource AccentGreenLightBrush}" />
-                        <StackPanel>
-                            <TextBlock Text="Play online" FontSize="22" FontWeight="SemiBold" />
-                            <TextBlock Text="Bullet · Blitz · Rapid · Classical" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}" />
+                <StackPanel Spacing="12" MaxWidth="620">
+                    <Button x:Name="PlayButton" Style="{StaticResource TileButton}" Click="Play_Click" HorizontalAlignment="Stretch">
+                        <StackPanel Orientation="Horizontal" Spacing="18">
+                            <TextBlock Text="♟" FontFamily="Segoe UI Symbol" FontSize="32" Foreground="{StaticResource AccentGreenLightBrush}" />
+                            <StackPanel>
+                                <TextBlock Text="Play online" FontSize="21" FontWeight="SemiBold" />
+                                <TextBlock Text="Bullet · Blitz · Rapid · Classical" FontSize="14"
+                                           Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </Button>
-                <Button Style="{StaticResource TileButton}" Click="Tv_Click">
-                    <StackPanel Orientation="Horizontal" Spacing="18">
-                        <TextBlock Text="📺" FontSize="30" />
-                        <StackPanel>
-                            <TextBlock Text="Watch TV" FontSize="22" FontWeight="SemiBold" />
-                            <TextBlock Text="The best live game, right now" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}" />
+                    </Button>
+                    <Button Style="{StaticResource TileButton}" Click="Tv_Click" HorizontalAlignment="Stretch">
+                        <StackPanel Orientation="Horizontal" Spacing="18">
+                            <TextBlock Text="📺" FontSize="28" />
+                            <StackPanel>
+                                <TextBlock Text="Watch TV" FontSize="21" FontWeight="SemiBold" />
+                                <TextBlock Text="The best live game, right now" FontSize="14"
+                                           Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </Button>
-                <Button Style="{StaticResource TileButton}" Click="Puzzles_Click">
-                    <StackPanel Orientation="Horizontal" Spacing="18">
-                        <TextBlock Text="🧩" FontSize="30" />
-                        <StackPanel>
-                            <TextBlock Text="Solve puzzles" FontSize="22" FontWeight="SemiBold" />
-                            <TextBlock Text="Sharpen your tactics" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}" />
+                    </Button>
+                    <Button Style="{StaticResource TileButton}" Click="Puzzles_Click" HorizontalAlignment="Stretch">
+                        <StackPanel Orientation="Horizontal" Spacing="18">
+                            <TextBlock Text="🧩" FontSize="28" />
+                            <StackPanel>
+                                <TextBlock Text="Solve puzzles" FontSize="21" FontWeight="SemiBold" />
+                                <TextBlock Text="Sharpen your tactics" FontSize="14"
+                                           Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </Button>
+                    </Button>
+                </StackPanel>
             </StackPanel>
-        </StackPanel>
+        </ScrollViewer>
 
-        <!-- Right: decorative live board preview -->
-        <Grid Grid.Column="1">
-            <Border CornerRadius="22" Padding="24" Background="#22000000" BorderBrush="#22FFFFFF" BorderThickness="1">
-                <controls:ChessBoardControl x:Name="PreviewBoard" Interactive="False" />
-            </Border>
-        </Grid>
+        <!-- Right: decorative board preview (fixed size so it can't squeeze the content) -->
+        <Border Grid.Column="1" Width="440" Height="440" VerticalAlignment="Center"
+                CornerRadius="22" Padding="20" Background="#22000000" BorderBrush="#22FFFFFF" BorderThickness="1">
+            <controls:ChessBoardControl x:Name="PreviewBoard" Interactive="False" />
+        </Border>
     </Grid>
 </Page>

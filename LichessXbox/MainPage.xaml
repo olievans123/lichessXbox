@@ -17,45 +17,39 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!-- Navigation pane -->
-        <Grid Grid.Column="0" Background="#2A000000">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-
-            <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Margin="18,22,16,14">
-                <Border Width="44" Height="44" CornerRadius="10" Background="{StaticResource AccentGradientBrush}">
-                    <TextBlock Text="♞" FontFamily="Segoe UI Symbol" FontSize="30" Foreground="#0E1207"
-                               HorizontalAlignment="Center" VerticalAlignment="Center" />
-                </Border>
-                <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="lichess" FontSize="22" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
-                    <TextBlock Text="for Xbox" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
+        <!-- Navigation pane: one full-height scroller so every item is reachable
+             (compact buttons; scrolls if the list is taller than the pane). -->
+        <ScrollViewer Grid.Column="0" Background="#2A000000"
+                      VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+            <StackPanel Padding="12,16,12,16" Spacing="5">
+                <StackPanel Orientation="Horizontal" Spacing="12" Margin="6,2,6,12">
+                    <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource AccentGradientBrush}">
+                        <TextBlock Text="♞" FontFamily="Segoe UI Symbol" FontSize="26" Foreground="#0E1207"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="lichess" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                        <TextBlock Text="for Xbox" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" />
+                    </StackPanel>
                 </StackPanel>
-            </StackPanel>
 
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-                <StackPanel Spacing="6" Padding="12,4">
-                    <Button x:Name="HomeNav" Style="{StaticResource TileButton}" Tag="home" Click="Nav_Click" Content="🏠   Home" />
-                    <Button Style="{StaticResource TileButton}" Tag="play" Click="Nav_Click" Content="♟   Play" />
-                    <Button Style="{StaticResource TileButton}" Tag="watch" Click="Nav_Click" Content="📺   Watch" />
-                    <Button Style="{StaticResource TileButton}" Tag="analysis" Click="Nav_Click" Content="🔬   Analysis" />
-                    <Button Style="{StaticResource TileButton}" Tag="puzzles" Click="Nav_Click" Content="🧩   Puzzles" />
-                    <Button Style="{StaticResource TileButton}" Tag="tournaments" Click="Nav_Click" Content="🏆   Tournaments" />
-                    <Button Style="{StaticResource TileButton}" Tag="studies" Click="Nav_Click" Content="📚   Studies" />
-                    <Button Style="{StaticResource TileButton}" Tag="games" Click="Nav_Click" Content="📋   Games" />
-                    <Button Style="{StaticResource TileButton}" Tag="profile" Click="Nav_Click" Content="👤   Profile" />
-                </StackPanel>
-            </ScrollViewer>
+                <Button x:Name="HomeNav" Style="{StaticResource NavButton}" Tag="home" Click="Nav_Click" Content="🏠   Home" />
+                <Button Style="{StaticResource NavButton}" Tag="play" Click="Nav_Click" Content="♟   Play" />
+                <Button Style="{StaticResource NavButton}" Tag="watch" Click="Nav_Click" Content="📺   Watch" />
+                <Button Style="{StaticResource NavButton}" Tag="analysis" Click="Nav_Click" Content="🔬   Analysis" />
+                <Button Style="{StaticResource NavButton}" Tag="puzzles" Click="Nav_Click" Content="🧩   Puzzles" />
+                <Button Style="{StaticResource NavButton}" Tag="tournaments" Click="Nav_Click" Content="🏆   Tournaments" />
+                <Button Style="{StaticResource NavButton}" Tag="studies" Click="Nav_Click" Content="📚   Studies" />
+                <Button Style="{StaticResource NavButton}" Tag="games" Click="Nav_Click" Content="📋   Games" />
+                <Button Style="{StaticResource NavButton}" Tag="profile" Click="Nav_Click" Content="👤   Profile" />
 
-            <StackPanel Grid.Row="2" Spacing="6" Padding="12,8,12,16">
-                <Button Style="{StaticResource TileButton}" Tag="editor" Click="Nav_Click" Content="✏   Board editor" />
-                <Button Style="{StaticResource TileButton}" Tag="coords" Click="Nav_Click" Content="🎯   Coordinates" />
-                <Button Style="{StaticResource TileButton}" Tag="settings" Click="Nav_Click" Content="⚙   Settings" />
+                <Border Height="1" Background="#22FFFFFF" Margin="8,8,8,8" />
+
+                <Button Style="{StaticResource NavButton}" Tag="editor" Click="Nav_Click" Content="✏   Board editor" />
+                <Button Style="{StaticResource NavButton}" Tag="coords" Click="Nav_Click" Content="🎯   Coordinates" />
+                <Button Style="{StaticResource NavButton}" Tag="settings" Click="Nav_Click" Content="⚙   Settings" />
             </StackPanel>
-        </Grid>
+        </ScrollViewer>
 
         <Frame x:Name="ContentFrame" Grid.Column="1" Margin="12" />
         </Grid>
