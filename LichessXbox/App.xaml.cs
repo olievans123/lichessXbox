@@ -39,6 +39,11 @@ namespace LichessXbox
             // Restore the user's saved board theme before any board is built.
             LichessXbox.Helpers.BoardTheme.Load();
 
+            // Warm the selected piece set (default: lichess's cburnett) in the background so
+            // the SVGs are cached before the first board renders. Fire-and-forget; boards fall
+            // back to the built-in Unicode glyphs until it's ready, and self-heal on next load.
+            _ = LichessXbox.Helpers.PieceSets.EnsureAsync(LichessXbox.Helpers.BoardTheme.PieceSet);
+
             // Keep content inside the TV title-safe area (the default). NOTE: opting into
             // UseCoreWindow draws into the overscan region and gets clipped on many TVs.
 

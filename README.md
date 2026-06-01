@@ -24,8 +24,8 @@ gamepad‑first interface.
 | **Tournaments** | Browse live / upcoming / finished arenas, view standings, and **join** with one click. |
 | **Studies** | Browse any member's public studies and open a chapter on the analysis board. |
 | **In-game extras** | Offer/accept draws, request takebacks, **rematch**, plus correspondence (daily) games. |
-| **Tools** | A board editor (place pieces → analyze), a coordinate trainer (timed), and Settings: **6 board themes** (live), outline piece set, and UI sounds. |
-| **Gamepad‑first board** | A custom chess board control: D‑pad / left‑stick to move a focus cursor, **A** to pick up and drop a piece, **B** to cancel, on‑board promotion picker, last‑move / check / legal‑target highlights, smooth focus visuals. |
+| **Tools** | A board editor (place pieces → analyze), a coordinate trainer (timed), and Settings: **6 board themes** (live), **~40 lichess piece sets** (open source, downloaded on first use; defaults to **cburnett**), outline piece set, and UI sounds. |
+| **Gamepad‑first board** | A custom chess board control: D‑pad / left‑stick to move focus between squares, **A** to pick up and drop a piece, **B** to cancel, on‑board promotion picker, last‑move / check / legal‑target highlights, smooth focus visuals. |
 
 The whole UI is tuned for a TV: large type, controller focus animations, a warm
 "tournament" palette inspired by the Lichess board.
@@ -165,9 +165,10 @@ moves in every variant work today.
 
 ## 🚧 Notes & next steps
 
-- The board renders pieces with Unicode glyphs (`Segoe UI Symbol`) using a two‑layer
-  fill+outline for crisp contrast on any square. Swap in SVG/PNG piece sets in
-  `ChessBoardControl` for a custom look.
+- Pieces default to lichess's open‑source **cburnett** SVG set, downloaded on first
+  use into local storage and cached; while a set downloads (or if offline) the board
+  falls back to crisp two‑layer Unicode glyphs (`Segoe UI Symbol`). Settings offers
+  ~40 lichess sets, and "Native" keeps the glyphs. See `PieceSets` in `BoardTheme.cs`.
 - Move list shows UCI; adding SAN display is a small extension (`ChessPosition`
   already has the matcher; the reverse — generating SAN — is the only missing half).
 - Possible additions: challenge a specific user / the AI (`/api/challenge/*`),

@@ -32,7 +32,7 @@
                                     <ColumnDefinition Width="28" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="🏠" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="0" Text="🏠" FontFamily="Segoe UI Emoji" HorizontalAlignment="Center" />
                                 <TextBlock Grid.Column="1" Text="Home" Margin="8,0,0,0" />
                             </Grid>
                         </Button>
@@ -42,7 +42,7 @@
                                     <ColumnDefinition Width="28" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="♟" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="0" Text="♟️" FontFamily="Segoe UI Emoji" HorizontalAlignment="Center" />
                                 <TextBlock Grid.Column="1" Text="Play" Margin="8,0,0,0" />
                             </Grid>
                         </Button>
@@ -52,7 +52,7 @@
                                     <ColumnDefinition Width="28" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="📺" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="0" Text="📺" FontFamily="Segoe UI Emoji" HorizontalAlignment="Center" />
                                 <TextBlock Grid.Column="1" Text="Watch" Margin="8,0,0,0" />
                             </Grid>
                         </Button>
@@ -62,7 +62,7 @@
                                     <ColumnDefinition Width="28" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="🔬" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="0" Text="🔬" FontFamily="Segoe UI Emoji" HorizontalAlignment="Center" />
                                 <TextBlock Grid.Column="1" Text="Analysis" Margin="8,0,0,0" />
                             </Grid>
                         </Button>
@@ -72,7 +72,7 @@
                                     <ColumnDefinition Width="28" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="🧩" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="0" Text="🧩" FontFamily="Segoe UI Emoji" HorizontalAlignment="Center" />
                                 <TextBlock Grid.Column="1" Text="Puzzles" Margin="8,0,0,0" />
                             </Grid>
                         </Button>
@@ -82,7 +82,7 @@
                                     <ColumnDefinition Width="28" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="🏆" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="0" Text="🏆" FontFamily="Segoe UI Emoji" HorizontalAlignment="Center" />
                                 <TextBlock Grid.Column="1" Text="Tournaments" Margin="8,0,0,0" />
                             </Grid>
                         </Button>
@@ -92,7 +92,7 @@
                                     <ColumnDefinition Width="28" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="📚" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="0" Text="📚" FontFamily="Segoe UI Emoji" HorizontalAlignment="Center" />
                                 <TextBlock Grid.Column="1" Text="Studies" Margin="8,0,0,0" />
                             </Grid>
                         </Button>
@@ -102,7 +102,7 @@
                                     <ColumnDefinition Width="28" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="📋" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="0" Text="📋" FontFamily="Segoe UI Emoji" HorizontalAlignment="Center" />
                                 <TextBlock Grid.Column="1" Text="Games" Margin="8,0,0,0" />
                             </Grid>
                         </Button>
@@ -112,7 +112,7 @@
                                     <ColumnDefinition Width="28" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="👤" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="0" Text="👤" FontFamily="Segoe UI Emoji" HorizontalAlignment="Center" />
                                 <TextBlock Grid.Column="1" Text="Profile" Margin="8,0,0,0" />
                             </Grid>
                         </Button>
@@ -125,7 +125,7 @@
                                     <ColumnDefinition Width="28" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="✏" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="0" Text="✏️" FontFamily="Segoe UI Emoji" HorizontalAlignment="Center" />
                                 <TextBlock Grid.Column="1" Text="Board editor" Margin="8,0,0,0" />
                             </Grid>
                         </Button>
@@ -135,7 +135,7 @@
                                     <ColumnDefinition Width="28" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="🎯" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="0" Text="🎯" FontFamily="Segoe UI Emoji" HorizontalAlignment="Center" />
                                 <TextBlock Grid.Column="1" Text="Coordinates" Margin="8,0,0,0" />
                             </Grid>
                         </Button>
@@ -145,7 +145,7 @@
                                     <ColumnDefinition Width="28" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="⚙" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="0" Text="⚙️" FontFamily="Segoe UI Emoji" HorizontalAlignment="Center" />
                                 <TextBlock Grid.Column="1" Text="Settings" Margin="8,0,0,0" />
                             </Grid>
                         </Button>

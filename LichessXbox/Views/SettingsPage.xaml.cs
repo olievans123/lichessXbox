@@ -29,7 +29,10 @@ namespace LichessXbox.Views
 
         async void PieceSet_ItemClick(object sender, ItemClickEventArgs e)
         {
-            if (!(e.ClickedItem is string set) || set == BoardTheme.PieceSet) return;
+            if (!(e.ClickedItem is string set)) return;
+            // Re-clicking the current set is normally a no-op — unless it hasn't finished
+            // downloading (e.g. the default failed offline), in which case let it retry.
+            if (set == BoardTheme.PieceSet && PieceSets.IsReady(set)) return;
             if (set == PieceSets.Native)
             {
                 BoardTheme.SetPieceSet(set);

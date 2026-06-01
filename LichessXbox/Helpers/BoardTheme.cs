@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.UI;
@@ -46,10 +48,18 @@ namespace LichessXbox.Helpers
 
         public static string CurrentName { get; private set; } = "Green";
 
-        /// <summary>Selected piece set ("Native" = the built-in Unicode glyphs, else a lichess SVG set).</summary>
-        public static string PieceSet { get; private set; } = PieceSets.Native;
+        /// <summary>Selected piece set ("Native" = the built-in Unicode glyphs, else a lichess SVG set).
+        /// Defaults to lichess's classic set; downloaded on first use, glyphs shown until ready.</summary>
+        public static string PieceSet { get; private set; } = PieceSets.Default;
 
         public static event Action Changed;
+
+        static BoardTheme()
+        {
+            // When a piece set finishes downloading, treat it like a theme change so every
+            // live board redraws and swaps its glyphs for the SVGs (no manual reload needed).
+            PieceSets.Ready += _ => Changed?.Invoke();
+        }
 
         public static void Apply(string presetName)
         {
@@ -112,6 +122,8 @@ namespace LichessXbox.Helpers
     public static class PieceSets
     {
         public const string Native = "Native";
+        /// <summary>The set used by default — lichess's classic Colin M.L. Burnett pieces.</summary>
+        public const string Default = "cburnett";
         static readonly string[] Codes = { "wK", "wQ", "wR", "wB", "wN", "wP", "bK", "bQ", "bR", "bB", "bN", "bP" };
 
         /// <summary>Native first, then the lichess sets.</summary>
@@ -125,15 +137,22 @@ namespace LichessXbox.Helpers
             "shahi-ivory-brown", "totoy", "xkcd",
         };
 
-        static readonly HashSet<string> _ready = new HashSet<string> { Native };
-        static HttpClient _http;
+        // Native is handled by the explicit checks below, so it is never stored here.
+        // ConcurrentDictionary + a download semaphore keep the startup warm-up, each board's
+        // own load, and the Settings picker from racing on shared state. _http is created once.
+        static readonly ConcurrentDictionary<string, byte> _ready = new ConcurrentDictionary<string, byte>();
+        static readonly SemaphoreSlim _downloadGate = new SemaphoreSlim(1, 1);
+        static readonly HttpClient _http = new HttpClient();
 
-        public static bool IsReady(string set) => string.IsNullOrEmpty(set) || set == Native || _ready.Contains(set);
+        /// <summary>Raised (with the set name) once a set's SVGs are cached, so live boards can redraw.</summary>
+        public static event Action<string> Ready;
+
+        public static bool IsReady(string set) => string.IsNullOrEmpty(set) || set == Native || _ready.ContainsKey(set);
 
         /// <summary>Local URI for a piece's SVG, or null to fall back to the Unicode glyph.</summary>
         public static Uri SourceFor(string set, char piece)
         {
-            if (string.IsNullOrEmpty(set) || set == Native || !_ready.Contains(set)) return null;
+            if (string.IsNullOrEmpty(set) || set == Native || !_ready.ContainsKey(set)) return null;
             string code = (char.IsUpper(piece) ? "w" : "b") + char.ToUpperInvariant(piece);
             return new Uri($"ms-appdata:///local/piece/{set}/{code}.svg");
         }
@@ -145,12 +164,17 @@ namespace LichessXbox.Helpers
         public static async Task<bool> EnsureAsync(string set)
         {
             if (string.IsNullOrEmpty(set) || set == Native) return true;
-            if (_ready.Contains(set)) return true;
+            if (_ready.ContainsKey(set)) return true;
+
+            // Serialize downloads so the startup warm-up and a board's own load don't both
+            // fetch (and collide writing) the same 12 files. Whoever waits re-checks and exits.
+            await _downloadGate.WaitAsync();
+            bool fresh = false;
             try
             {
+                if (_ready.ContainsKey(set)) return true;   // another caller finished while we waited
                 var root = await ApplicationData.Current.LocalFolder.CreateFolderAsync("piece", CreationCollisionOption.OpenIfExists);
                 var dir = await root.CreateFolderAsync(set, CreationCollisionOption.OpenIfExists);
-                _http = _http ?? new HttpClient();
                 foreach (var code in Codes)
                 {
                     if (await dir.TryGetItemAsync(code + ".svg") != null) continue;   // already cached
@@ -159,10 +183,14 @@ namespace LichessXbox.Helpers
                     var file = await dir.CreateFileAsync(code + ".svg", CreationCollisionOption.ReplaceExisting);
                     await FileIO.WriteBytesAsync(file, bytes);
                 }
-                _ready.Add(set);
-                return true;
+                _ready[set] = 0;
+                fresh = true;
             }
             catch { return false; }
+            finally { _downloadGate.Release(); }
+
+            if (fresh) Ready?.Invoke(set);   // outside the gate; UI-thread continuation → safe for boards to redraw
+            return true;
         }
     }
 }
