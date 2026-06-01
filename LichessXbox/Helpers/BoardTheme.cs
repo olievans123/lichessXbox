@@ -91,7 +91,7 @@ namespace LichessXbox.Helpers
                 }
                 if (s.TryGetValue("OutlinePieces", out var o) && o is string os) OutlinePieces = os == "1";
                 if (s.TryGetValue("MoveSounds", out var m) && m is string ms) MoveSounds = ms == "1";
-                if (s.TryGetValue("PieceSet", out var p) && p is string ps && !string.IsNullOrEmpty(ps)) PieceSet = ps;
+                if (s.TryGetValue("PieceSet", out var pv) && pv is string ps && !string.IsNullOrEmpty(ps)) PieceSet = ps;
             }
             catch { /* first run */ }
         }
