@@ -82,6 +82,20 @@ namespace LichessXbox.Controls
             set { _position = value ?? ChessPosition.Starting(); ClearSelection(); Render(); }
         }
 
+        /// <summary>Bindable FEN — sets the position from a FEN string (for snapshot/thumbnail boards).</summary>
+        public static readonly DependencyProperty FenProperty =
+            DependencyProperty.Register(nameof(Fen), typeof(string), typeof(ChessBoardControl),
+                new PropertyMetadata(null, (d, e) =>
+                {
+                    var f = e.NewValue as string;
+                    if (!string.IsNullOrEmpty(f)) ((ChessBoardControl)d).Position = ChessPosition.FromFen(f);
+                }));
+        public string Fen
+        {
+            get => (string)GetValue(FenProperty);
+            set => SetValue(FenProperty, value);
+        }
+
         public static readonly DependencyProperty WhiteAtBottomProperty =
             DependencyProperty.Register(nameof(WhiteAtBottom), typeof(bool), typeof(ChessBoardControl),
                 new PropertyMetadata(true, (d, e) => ((ChessBoardControl)d).Render()));

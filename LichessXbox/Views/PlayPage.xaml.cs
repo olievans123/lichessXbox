@@ -41,6 +41,7 @@ namespace LichessXbox.Views
         CancellationTokenSource _gameCts;
 
         string _gameId;
+        bool _autoOpen;   // true after the user starts a pairing here → open the next gameStart
         string _opponentName;
         bool _playerIsWhite = true;
         string _initialFen = ChessPosition.StartFen;
@@ -91,8 +92,13 @@ namespace LichessXbox.Views
                 ShowOnly(SignInPrompt);
                 return;
             }
-            ShowOnly(LobbyPanel);
             StartEventStream();
+            // Opened from the "continue playing" panel with a specific game → resume it.
+            // Otherwise show the lobby (we no longer auto-jump into an ongoing game on entry).
+            if (e.Parameter is string gid && !string.IsNullOrEmpty(gid))
+                StartGame(gid);
+            else
+                ShowOnly(LobbyPanel);
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -144,7 +150,9 @@ namespace LichessXbox.Views
                 case "gameStart":
                 {
                     string id = ev["game"]?.Value<string>("id") ?? ev["game"]?.Value<string>("gameId");
-                    if (!string.IsNullOrEmpty(id)) StartGame(id);
+                    // Only jump into a game the user just started here (seek/challenge/rematch).
+                    // Pre-existing games replayed on connect stay in the "continue playing" panel.
+                    if (!string.IsNullOrEmpty(id) && _autoOpen) { _autoOpen = false; StartGame(id); }
                     break;
                 }
                 case "challenge":
@@ -208,6 +216,7 @@ namespace LichessXbox.Views
             // Default to a Blitz 5+3 challenge.
             var clock = new TimeControlPreset("Blitz 5+3", 300, 3, "⚡");
             ChallengeErrorText.Visibility = Visibility.Collapsed;
+            _autoOpen = true;
             SeekingText.Text = $"Waiting for {user} to accept…";
             ShowOnly(SeekingPanel);
             _seekCts = new CancellationTokenSource();
@@ -231,6 +240,7 @@ namespace LichessXbox.Views
             string id = (sender as FrameworkElement)?.Tag as string;
             if (string.IsNullOrEmpty(id)) return;
             RemoveChallenge(id);
+            _autoOpen = true;
             SeekingText.Text = "Joining game…";
             ShowOnly(SeekingPanel);
             await AppState.Current.Api.AcceptChallengeAsync(id);
@@ -260,6 +270,7 @@ namespace LichessXbox.Views
         async void Preset_ItemClick(object sender, ItemClickEventArgs e)
         {
             if (!(e.ClickedItem is TimeControlPreset preset)) return;
+            _autoOpen = true;
             SeekingText.Text = $"Finding a {preset.Label} game…";
             ShowOnly(SeekingPanel);
 
@@ -273,6 +284,7 @@ namespace LichessXbox.Views
 
         void CancelSeek_Click(object sender, RoutedEventArgs e)
         {
+            _autoOpen = false;
             _seekCts?.Cancel();
             ShowOnly(LobbyPanel);
         }
@@ -687,6 +699,7 @@ namespace LichessXbox.Views
         {
             if (string.IsNullOrEmpty(_opponentName)) return;
             var clock = new TimeControlPreset("Rematch", 300, 3, "⚡");
+            _autoOpen = true;
             SeekingText.Text = $"Rematch — waiting for {_opponentName}…";
             ShowOnly(SeekingPanel);
             await AppState.Current.Api.ChallengeUserAsync(_opponentName, clock, Variant);
@@ -696,6 +709,7 @@ namespace LichessXbox.Views
         {
             _gameCts?.Cancel();
             _gameId = null;
+            _autoOpen = false;
             _gameActive = false;
             ShowOnly(LobbyPanel);
         }

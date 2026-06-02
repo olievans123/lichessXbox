@@ -1,5 +1,11 @@
+using LichessXbox.Models;
+using LichessXbox.Services;
 using LichessXbox.Views;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Windows.System;
 using Windows.UI;
 using Windows.UI.Xaml;
@@ -13,14 +19,24 @@ namespace LichessXbox
     {
         string _pendingAnalysisParam;
         string _currentTag = "home";
+        readonly ObservableCollection<OngoingGame> _ongoing = new ObservableCollection<OngoingGame>();
+        readonly DispatcherTimer _ongoingTimer = new DispatcherTimer();
 
         public MainPage()
         {
             this.InitializeComponent();
             this.KeyDown += Page_KeyDown;
+            OngoingList.ItemsSource = _ongoing;
+            _ongoingTimer.Interval = TimeSpan.FromSeconds(15);
+            _ongoingTimer.Tick += async (s, e) => await RefreshOngoingAsync();
             // Pane stays closed at launch so the content gets full width; the page
             // focuses its own first control.
-            this.Loaded += (s, e) => GoTo("home");
+            this.Loaded += async (s, e) =>
+            {
+                GoTo("home");
+                _ongoingTimer.Start();
+                await RefreshOngoingAsync();
+            };
         }
 
         // The gamepad Menu (or View) button toggles the nav from anywhere; B / Esc closes it.
@@ -107,6 +123,51 @@ namespace LichessXbox
 
             _currentTag = tag;
             HighlightNav(tag);
+            _ = RefreshOngoingAsync();   // keep the "continue playing" panel current as you move around
+        }
+
+        // ----------------------------------------------------- in-progress games
+
+        async Task RefreshOngoingAsync()
+        {
+            if (!AppState.Current.IsSignedIn)
+            {
+                if (_ongoing.Count > 0) _ongoing.Clear();
+                OngoingPanel.Visibility = Visibility.Collapsed;
+                return;
+            }
+            List<OngoingGame> games;
+            try { games = await AppState.Current.Api.GetOngoingGamesAsync(); }
+            catch { return; }
+
+            // Only rebuild the cards when something actually changed, so the board snapshots
+            // don't re-render (flicker) on every refresh.
+            bool same = games.Count == _ongoing.Count;
+            if (same)
+                for (int i = 0; i < games.Count; i++)
+                    if (games[i].GameId != _ongoing[i].GameId || games[i].IsMyTurn != _ongoing[i].IsMyTurn || games[i].Fen != _ongoing[i].Fen)
+                    { same = false; break; }
+            if (!same)
+            {
+                _ongoing.Clear();
+                foreach (var g in games) _ongoing.Add(g);
+            }
+            OngoingPanel.Visibility = _ongoing.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        void OngoingGame_Click(object sender, RoutedEventArgs e)
+        {
+            if ((sender as FrameworkElement)?.Tag is string gameId && !string.IsNullOrEmpty(gameId))
+                OpenGame(gameId);
+        }
+
+        /// <summary>Resume a specific in-progress game on the Play page.</summary>
+        public void OpenGame(string gameId)
+        {
+            NavSplit.IsPaneOpen = false;
+            ContentFrame.Navigate(typeof(PlayPage), gameId);
+            _currentTag = "play";
+            HighlightNav("play");
         }
 
         /// <summary>Marks the active nav button green and resets the rest.</summary>

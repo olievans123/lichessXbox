@@ -256,4 +256,16 @@ namespace LichessXbox.Models
         public string LastMoveUci;
         public bool Orientation = true; // true = white at bottom
     }
+
+    /// <summary>One of the signed-in user's in-progress games (/api/account/playing).
+    /// Bound members are properties (UWP {Binding} ignores fields).</summary>
+    public class OngoingGame
+    {
+        public string GameId { get; set; }
+        public string OpponentName { get; set; }
+        public bool IsMyTurn { get; set; }
+        public string Fen { get; set; }
+        public bool WhiteAtBottom { get; set; }   // true = the user plays white
+        public string Status { get; set; }        // e.g. "Rapid · your move"
+    }
 }

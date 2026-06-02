@@ -64,6 +64,34 @@ namespace LichessXbox.Services
             }
         }
 
+        /// <summary>The signed-in user's in-progress games (/api/account/playing).</summary>
+        public async Task<List<OngoingGame>> GetOngoingGamesAsync()
+        {
+            var list = new List<OngoingGame>();
+            using (var req = Build(HttpMethod.Get, "/api/account/playing"))
+            using (var resp = await _http.SendAsync(req))
+            {
+                if (!resp.IsSuccessStatusCode) return list;
+                var o = JObject.Parse(await resp.Content.ReadAsStringAsync());
+                foreach (var g in o["nowPlaying"] as JArray ?? new JArray())
+                {
+                    bool myTurn = g.Value<bool?>("isMyTurn") ?? false;
+                    string speed = g.Value<string>("speed") ?? "";
+                    if (speed.Length > 0) speed = char.ToUpperInvariant(speed[0]) + speed.Substring(1);
+                    list.Add(new OngoingGame
+                    {
+                        GameId = g.Value<string>("gameId") ?? g.Value<string>("fullId"),
+                        OpponentName = g["opponent"]?.Value<string>("username") ?? "Opponent",
+                        IsMyTurn = myTurn,
+                        Fen = g.Value<string>("fen"),
+                        WhiteAtBottom = (g.Value<string>("color") ?? "white") == "white",
+                        Status = (speed.Length > 0 ? speed + " · " : "") + (myTurn ? "your move" : "their move"),
+                    });
+                }
+            }
+            return list;
+        }
+
         // --------------------------------------------------- generic NDJSON
 
         /// <summary>

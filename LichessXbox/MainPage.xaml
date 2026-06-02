@@ -1,7 +1,8 @@
 <Page
     x:Class="LichessXbox.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:LichessXbox.Controls">
 
     <Grid>
         <Grid.Background>
@@ -169,6 +170,46 @@
                         Content="☰" ToolTipService.ToolTip="Menu (Menu button)" />
 
                 <Frame x:Name="ContentFrame" Grid.Column="1" />
+
+                <!-- "Continue playing" — floats over the content; lists the user's in-progress
+                     games (board snapshot + opponent + a green dot on your move). Hidden when none. -->
+                <Border x:Name="OngoingPanel" Grid.Column="1" Visibility="Collapsed"
+                        HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,28,28" MaxWidth="320"
+                        CornerRadius="18" Padding="14,12" Background="{StaticResource AppSurfaceBrush}"
+                        BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Continue playing" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
+                                   Foreground="{StaticResource AccentGreenLightBrush}" />
+                        <ItemsControl x:Name="OngoingList">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Style="{StaticResource TileButton}" Padding="10" Margin="0,0,0,8"
+                                            HorizontalContentAlignment="Left" Tag="{Binding GameId}" Click="OngoingGame_Click">
+                                        <Grid ColumnSpacing="12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0" Width="76" Height="76" CornerRadius="8">
+                                                <controls:ChessBoardControl Fen="{Binding Fen}" WhiteAtBottom="{Binding WhiteAtBottom}"
+                                                                            Interactive="False" IsTabStop="False" />
+                                            </Border>
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <Ellipse Width="10" Height="10" VerticalAlignment="Center" Fill="{StaticResource AccentGreenLightBrush}"
+                                                             Opacity="{Binding IsMyTurn, Converter={StaticResource BoolToOpacity}}" />
+                                                    <TextBlock Text="{Binding OpponentName}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
+                                                               Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                                                </StackPanel>
+                                                <TextBlock Text="{Binding Status}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
             </Grid>
         </SplitView>
     </Grid>
