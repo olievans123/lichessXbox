@@ -34,6 +34,7 @@ namespace LichessXbox.Views
     public sealed partial class SettingsPage : Page
     {
         bool _loaded;
+        bool _expanded;
         const int CollapsedCount = 7;   // Native + 6 sets shown before "Show all"
         readonly ObservableCollection<PieceSetItem> _pieceItems = new ObservableCollection<PieceSetItem>();
 
@@ -67,7 +68,6 @@ namespace LichessXbox.Views
                 _pieceItems.Add(item);
                 _ = LoadPreviewAsync(item);
             }
-            ShowAllButton.Visibility = all ? Visibility.Collapsed : Visibility.Visible;
         }
 
         async Task LoadPreviewAsync(PieceSetItem item)
@@ -86,19 +86,32 @@ namespace LichessXbox.Views
             if (match != null) PieceGrid.SelectedItem = match;
         }
 
+        // Toggle the picker between the first few sets and all of them, editing the collection
+        // in place (no Clear/rebuild) so it doesn't reset, re-download, or flicker.
         void ShowAll_Click(object sender, RoutedEventArgs e)
         {
-            // Append the remaining sets in place — no Clear/rebuild — so the grid doesn't reset,
-            // re-download the visible thumbnails, or drop the current selection (avoids the jank).
-            foreach (var name in PieceSets.All)
-                if (_pieceItems.All(it => it.Name != name))
-                {
-                    var item = new PieceSetItem(name);
-                    _pieceItems.Add(item);
-                    _ = LoadPreviewAsync(item);
-                }
-            ShowAllButton.Visibility = Visibility.Collapsed;
-            // The button just vanished; move gamepad focus onto the current selection.
+            if (_expanded)
+            {
+                // Collapse: keep only the first few sets plus the applied one.
+                var keep = new HashSet<string>(PieceSets.All.Take(CollapsedCount)) { BoardTheme.PieceSet };
+                for (int i = _pieceItems.Count - 1; i >= 0; i--)
+                    if (!keep.Contains(_pieceItems[i].Name)) _pieceItems.RemoveAt(i);
+                ShowAllButton.Content = "Show all sets  ▾";
+            }
+            else
+            {
+                // Expand: append the remaining sets.
+                foreach (var name in PieceSets.All)
+                    if (_pieceItems.All(it => it.Name != name))
+                    {
+                        var item = new PieceSetItem(name);
+                        _pieceItems.Add(item);
+                        _ = LoadPreviewAsync(item);
+                    }
+                ShowAllButton.Content = "Show fewer  ▴";
+            }
+            _expanded = !_expanded;
+            SelectCurrentPiece();
             PieceGrid.Focus(FocusState.Programmatic);
         }
 
@@ -184,18 +197,6 @@ namespace LichessXbox.Views
         void MoveSound_Toggled(object sender, RoutedEventArgs e)
         {
             if (_loaded) BoardTheme.SetMoveSounds(MoveSoundToggle.IsOn);
-        }
-
-        void Editor_Click(object sender, RoutedEventArgs e)
-        {
-            var shell = (Window.Current.Content as Frame)?.Content as MainPage;
-            shell?.NavigateTo("editor");
-        }
-
-        void Coords_Click(object sender, RoutedEventArgs e)
-        {
-            var shell = (Window.Current.Content as Frame)?.Content as MainPage;
-            shell?.NavigateTo("coords");
         }
     }
 }

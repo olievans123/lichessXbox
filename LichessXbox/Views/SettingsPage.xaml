@@ -111,17 +111,6 @@
                         </Grid>
                     </StackPanel>
                 </Border>
-
-                <Border Style="{StaticResource CardBorder}" Padding="20">
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="More tools" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                        <TextBlock Text="Board editor and the coordinate trainer are in their own tabs." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
-                        <StackPanel Spacing="10" Margin="0,8,0,0">
-                            <Button Style="{StaticResource TileButton}" Click="Editor_Click" Content="Board editor" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                            <Button Style="{StaticResource TileButton}" Click="Coords_Click" Content="Coordinate trainer" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                        </StackPanel>
-                    </StackPanel>
-                </Border>
             </StackPanel>
         </ScrollViewer>
 
