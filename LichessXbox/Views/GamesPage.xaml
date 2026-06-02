@@ -34,18 +34,21 @@
                     <ListView x:Name="GamesList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Game_ItemClick">
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <Grid Padding="6,12">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0">
-                                        <TextBlock Text="{Binding Headline}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
-                                        <TextBlock Text="{Binding ResultText}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                                    </StackPanel>
-                                    <TextBlock Grid.Column="1" Text="▶ Replay" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource AccentGreenLightBrush}"
-                                               HorizontalAlignment="Right" VerticalAlignment="Center" Margin="12,0,0,0" />
-                                </Grid>
+                                <Border CornerRadius="12" Padding="18,14"
+                                        Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Headline}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding ResultText}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1" Text="▶ Replay" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource AccentGreenLightBrush}"
+                                                   HorizontalAlignment="Right" VerticalAlignment="Center" Margin="12,0,0,0" />
+                                    </Grid>
+                                </Border>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>

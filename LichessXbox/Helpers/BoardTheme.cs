@@ -125,6 +125,15 @@ namespace LichessXbox.Helpers
         static Color C(byte r, byte g, byte b) => Color.FromArgb(0xFF, r, g, b);
     }
 
+    /// <summary>true → 1.0, false → 0.0. Item templates bind a selection ring's Opacity to the
+    /// container's IsSelected through this — more reliable than selection visual states, which
+    /// use control-specific state names that don't all fire for GridViewItem/ListViewItem.</summary>
+    public sealed class BoolToOpacityConverter : Windows.UI.Xaml.Data.IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language) => (value is bool b && b) ? 1.0 : 0.0;
+        public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotSupportedException();
+    }
+
     /// <summary>
     /// Open-source lichess piece sets (lichess-org/lila/public/piece). Each set is 12
     /// SVGs (wK..bP); we download them on first use into local storage and render them

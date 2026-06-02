@@ -31,11 +31,11 @@
                 <GridView x:Name="PresetGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Preset_ItemClick">
                     <GridView.ItemTemplate>
                         <DataTemplate>
-                            <Border Width="240" Height="140" CornerRadius="16"
+                            <Border Width="240" Height="162" CornerRadius="16"
                                     Background="{StaticResource AppSurfaceHighBrush}"
                                     BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
-                                <StackPanel Margin="20" VerticalAlignment="Center" Spacing="6">
-                                    <TextBlock Text="{Binding Glyph}" FontSize="36" />
+                                <StackPanel Margin="16" VerticalAlignment="Center" Spacing="4">
+                                    <TextBlock Text="{Binding Glyph}" FontSize="30" />
                                     <TextBlock Text="{Binding Label}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                                TextWrapping="Wrap" Foreground="{StaticResource TextPrimaryBrush}" />
                                     <TextBlock Text="{Binding RatedLabel}" FontSize="{StaticResource CaptionSize}"
