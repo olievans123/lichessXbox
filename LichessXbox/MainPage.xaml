@@ -171,15 +171,40 @@
 
                 <Frame x:Name="ContentFrame" Grid.Column="1" />
 
-                <!-- "Continue playing" — floats over the content; lists the user's in-progress
-                     games (board snapshot + opponent + a green dot on your move). Hidden when none. -->
+                <!-- "Continue playing": collapsed to a small tab on the right edge by default so it
+                     isn't always over the content; selecting it expands the in-progress game cards. -->
+                <Button x:Name="OngoingTab" Grid.Column="1" Visibility="Collapsed" Style="{StaticResource TileButton}"
+                        HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,24,24"
+                        Background="{StaticResource AppSurfaceBrush}" Padding="14,10" HorizontalContentAlignment="Center"
+                        Click="ExpandOngoing_Click" ToolTipService.ToolTip="Games in progress">
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <Ellipse x:Name="OngoingTabDot" Width="10" Height="10" VerticalAlignment="Center"
+                                 Fill="{StaticResource AccentGreenLightBrush}" Visibility="Collapsed" />
+                        <TextBlock Text="♟" FontFamily="Segoe UI Symbol" FontSize="18" VerticalAlignment="Center"
+                                   Foreground="{StaticResource AccentGreenLightBrush}" />
+                        <TextBlock x:Name="OngoingTabCount" Text="0" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
+                                   VerticalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}" />
+                        <TextBlock Text="◂" FontSize="14" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
+                    </StackPanel>
+                </Button>
+
                 <Border x:Name="OngoingPanel" Grid.Column="1" Visibility="Collapsed"
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,28,28" MaxWidth="320"
+                        HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,24,24" MaxWidth="320"
                         CornerRadius="18" Padding="14,12" Background="{StaticResource AppSurfaceBrush}"
                         BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                     <StackPanel Spacing="10">
-                        <TextBlock Text="Continue playing" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
-                                   Foreground="{StaticResource AccentGreenLightBrush}" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Continue playing" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
+                                       VerticalAlignment="Center" Foreground="{StaticResource AccentGreenLightBrush}" />
+                            <Button Grid.Column="1" x:Name="OngoingCollapseButton" Style="{StaticResource IconButton}"
+                                    Width="32" Height="32" CornerRadius="16" Background="{StaticResource AppSurfaceHighBrush}"
+                                    FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" Content="▸"
+                                    Click="CollapseOngoing_Click" ToolTipService.ToolTip="Collapse" />
+                        </Grid>
                         <ItemsControl x:Name="OngoingList">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -201,7 +226,8 @@
                                                     <TextBlock Text="{Binding OpponentName}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                                                Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
                                                 </StackPanel>
-                                                <TextBlock Text="{Binding Status}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                                                <TextBlock Text="{Binding Status}" FontSize="{StaticResource CaptionSize}" TextWrapping="Wrap"
+                                                           Foreground="{StaticResource TextSecondaryBrush}" />
                                             </StackPanel>
                                         </Grid>
                                     </Button>

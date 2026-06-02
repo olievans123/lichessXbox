@@ -21,6 +21,7 @@ namespace LichessXbox
         string _currentTag = "home";
         readonly ObservableCollection<OngoingGame> _ongoing = new ObservableCollection<OngoingGame>();
         readonly DispatcherTimer _ongoingTimer = new DispatcherTimer();
+        bool _ongoingExpanded;   // tab (collapsed) vs cards (expanded)
 
         public MainPage()
         {
@@ -123,7 +124,8 @@ namespace LichessXbox
 
             _currentTag = tag;
             HighlightNav(tag);
-            if (tag == "play") OngoingPanel.Visibility = Visibility.Collapsed;   // suppressed on Play
+            _ongoingExpanded = false;    // collapse on navigation so it never sits over the new page
+            UpdateOngoingVisibility();
             _ = RefreshOngoingAsync();   // keep the "continue playing" panel current as you move around
         }
 
@@ -153,10 +155,35 @@ namespace LichessXbox
                 _ongoing.Clear();
                 foreach (var g in games) _ongoing.Add(g);
             }
-            // Don't float over the Play page — it has the lobby/board there (and would overlap
-            // the in-game action buttons and list the game you're already in).
-            OngoingPanel.Visibility = (_currentTag != "play" && _ongoing.Count > 0)
-                ? Visibility.Visible : Visibility.Collapsed;
+            // Update the collapsed tab's count + your-move dot.
+            OngoingTabCount.Text = _ongoing.Count.ToString();
+            bool anyMyTurn = false;
+            foreach (var g in _ongoing) if (g.IsMyTurn) { anyMyTurn = true; break; }
+            OngoingTabDot.Visibility = anyMyTurn ? Visibility.Visible : Visibility.Collapsed;
+            UpdateOngoingVisibility();
+        }
+
+        // Show the tab (collapsed) or the cards (expanded) when there are games and we're not on
+        // the Play page (which has its own lobby/board and would be overlapped).
+        void UpdateOngoingVisibility()
+        {
+            bool show = _currentTag != "play" && _ongoing.Count > 0;
+            OngoingTab.Visibility = (show && !_ongoingExpanded) ? Visibility.Visible : Visibility.Collapsed;
+            OngoingPanel.Visibility = (show && _ongoingExpanded) ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        void ExpandOngoing_Click(object sender, RoutedEventArgs e)
+        {
+            _ongoingExpanded = true;
+            UpdateOngoingVisibility();
+            OngoingCollapseButton.Focus(FocusState.Programmatic);
+        }
+
+        void CollapseOngoing_Click(object sender, RoutedEventArgs e)
+        {
+            _ongoingExpanded = false;
+            UpdateOngoingVisibility();
+            OngoingTab.Focus(FocusState.Programmatic);
         }
 
         void OngoingGame_Click(object sender, RoutedEventArgs e)
@@ -172,7 +199,7 @@ namespace LichessXbox
             ContentFrame.Navigate(typeof(PlayPage), gameId);
             _currentTag = "play";
             HighlightNav("play");
-            OngoingPanel.Visibility = Visibility.Collapsed;   // suppressed on Play
+            UpdateOngoingVisibility();   // suppressed on Play
         }
 
         /// <summary>Marks the active nav button green and resets the rest.</summary>
