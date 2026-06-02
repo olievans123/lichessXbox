@@ -16,14 +16,18 @@ using Windows.UI.Xaml.Navigation;
 namespace LichessXbox.Views
 {
     /// <summary>One row of the move list: number + the white and black moves (SAN),
-    /// with flags marking which (if either) is the move currently shown on the board.</summary>
-    public sealed class MoveRowVM
+    /// with flags marking which (if either) is the move currently shown on the board.
+    /// Notifies on change so rows can be reused (no flicker) as the game advances.</summary>
+    public sealed class MoveRowVM : System.ComponentModel.INotifyPropertyChanged
     {
-        public string No { get; set; }
-        public string White { get; set; }
-        public string Black { get; set; }
-        public bool WhiteCurrent { get; set; }
-        public bool BlackCurrent { get; set; }
+        string _no, _white, _black; bool _wc, _bc;
+        public string No { get => _no; set { if (_no != value) { _no = value; Raise(nameof(No)); } } }
+        public string White { get => _white; set { if (_white != value) { _white = value; Raise(nameof(White)); } } }
+        public string Black { get => _black; set { if (_black != value) { _black = value; Raise(nameof(Black)); } } }
+        public bool WhiteCurrent { get => _wc; set { if (_wc != value) { _wc = value; Raise(nameof(WhiteCurrent)); } } }
+        public bool BlackCurrent { get => _bc; set { if (_bc != value) { _bc = value; Raise(nameof(BlackCurrent)); } } }
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        void Raise(string n) => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(n));
     }
 
     public sealed partial class PlayPage : Page
@@ -511,17 +515,20 @@ namespace LichessXbox.Views
         // Pair the SAN moves into numbered rows, highlighting the move currently on the board.
         void RebuildMoveRows()
         {
-            _moveRows.Clear();
-            for (int i = 0; i < _sans.Count; i += 2)
+            // Reconcile in place — reuse existing rows and only update changed properties — so
+            // the list doesn't flicker (full Clear+re-add re-realizes every row each move/nav).
+            int rowCount = (_sans.Count + 1) / 2;
+            while (_moveRows.Count < rowCount) _moveRows.Add(new MoveRowVM());
+            while (_moveRows.Count > rowCount) _moveRows.RemoveAt(_moveRows.Count - 1);
+            for (int r = 0; r < rowCount; r++)
             {
-                _moveRows.Add(new MoveRowVM
-                {
-                    No = (i / 2 + 1) + ".",
-                    White = _sans[i],
-                    Black = i + 1 < _sans.Count ? _sans[i + 1] : "",
-                    WhiteCurrent = _viewPly == i + 1,
-                    BlackCurrent = _viewPly == i + 2,
-                });
+                int i = r * 2;
+                var row = _moveRows[r];
+                row.No = (r + 1) + ".";
+                row.White = _sans[i];
+                row.Black = i + 1 < _sans.Count ? _sans[i + 1] : "";
+                row.WhiteCurrent = _viewPly == i + 1;
+                row.BlackCurrent = _viewPly == i + 2;
             }
             // Keep the latest move visible while watching live.
             if (_viewPly >= _plies.Count)
