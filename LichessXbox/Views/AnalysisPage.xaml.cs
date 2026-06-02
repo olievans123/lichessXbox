@@ -265,24 +265,31 @@ namespace LichessXbox.Views
         }
 
         /// <summary>Load a full game (UCI move list) for replay — used by the Games list.</summary>
-        public void LoadGame(string initialFen, string movesUci)
+        public void LoadGame(string initialFen, string moves)
         {
             _history.Clear();
             _moves.Clear();
             var pos = string.IsNullOrEmpty(initialFen) || initialFen == "startpos"
                 ? ChessPosition.Starting() : ChessPosition.FromFen(initialFen);
             _history.Add(pos);
-            if (!string.IsNullOrWhiteSpace(movesUci))
+            if (!string.IsNullOrWhiteSpace(moves))
             {
-                foreach (var uci in movesUci.Split(' '))
+                foreach (var token in moves.Split(' '))
                 {
-                    if (string.IsNullOrWhiteSpace(uci)) continue;
-                    var mv = ChessMove.FromUci(uci);
-                    var next = pos.Apply(mv);
+                    if (string.IsNullOrWhiteSpace(token)) continue;
+                    // Lichess game export gives SAN ("e4 Nf3 O-O exd5 …"); accept UCI too just in case.
+                    ChessMove? mv = pos.ParseSan(token);
+                    if (mv == null)
+                    {
+                        var u = ChessMove.FromUci(token);
+                        if (u.From >= 0 && u.To >= 0) mv = u;
+                    }
+                    if (mv == null) break;
+                    var next = pos.Apply(mv.Value);
                     if (next == null) break;
                     pos = next;
                     _history.Add(pos);
-                    _moves.Add(mv);
+                    _moves.Add(mv.Value);
                 }
             }
             _ply = _history.Count - 1;
