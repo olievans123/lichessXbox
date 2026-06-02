@@ -4,6 +4,25 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:LichessXbox.Controls">
 
+    <Page.Resources>
+        <!-- Slide + fade the "continue playing" cards in from the right when expanding. -->
+        <Storyboard x:Key="OngoingPanelOpen">
+            <DoubleAnimation Storyboard.TargetName="OngoingPanel" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.18" />
+            <DoubleAnimation Storyboard.TargetName="OngoingPanelTransform" Storyboard.TargetProperty="X" From="44" To="0" Duration="0:0:0.24">
+                <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut" /></DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+        <Storyboard x:Key="OngoingPanelClose">
+            <DoubleAnimation Storyboard.TargetName="OngoingPanel" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.16" />
+            <DoubleAnimation Storyboard.TargetName="OngoingPanelTransform" Storyboard.TargetProperty="X" From="0" To="44" Duration="0:0:0.16">
+                <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseIn" /></DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+        <Storyboard x:Key="OngoingTabIn">
+            <DoubleAnimation Storyboard.TargetName="OngoingTab" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.16" />
+        </Storyboard>
+    </Page.Resources>
+
     <Grid>
         <Grid.Background>
             <StaticResource ResourceKey="HeroGradientBrush" />
@@ -178,20 +197,23 @@
                         Background="{StaticResource AppSurfaceBrush}" Padding="14,10" HorizontalContentAlignment="Center"
                         Click="ExpandOngoing_Click" ToolTipService.ToolTip="Games in progress">
                     <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <TextBlock Text="◂" FontSize="14" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
                         <Ellipse x:Name="OngoingTabDot" Width="10" Height="10" VerticalAlignment="Center"
                                  Fill="{StaticResource AccentGreenLightBrush}" Visibility="Collapsed" />
                         <TextBlock Text="♟" FontFamily="Segoe UI Symbol" FontSize="18" VerticalAlignment="Center"
                                    Foreground="{StaticResource AccentGreenLightBrush}" />
                         <TextBlock x:Name="OngoingTabCount" Text="0" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                    VerticalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}" />
-                        <TextBlock Text="◂" FontSize="14" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
                     </StackPanel>
                 </Button>
 
                 <Border x:Name="OngoingPanel" Grid.Column="1" Visibility="Collapsed"
                         HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,24,24" MaxWidth="320"
                         CornerRadius="18" Padding="14,12" Background="{StaticResource AppSurfaceBrush}"
-                        BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
+                        BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1" RenderTransformOrigin="1,1">
+                    <Border.RenderTransform>
+                        <TranslateTransform x:Name="OngoingPanelTransform" />
+                    </Border.RenderTransform>
                     <StackPanel Spacing="10">
                         <Grid>
                             <Grid.ColumnDefinitions>

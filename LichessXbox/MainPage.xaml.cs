@@ -12,6 +12,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 
 namespace LichessXbox
 {
@@ -28,6 +29,7 @@ namespace LichessXbox
             this.InitializeComponent();
             this.KeyDown += Page_KeyDown;
             OngoingList.ItemsSource = _ongoing;
+            ((Storyboard)Resources["OngoingPanelClose"]).Completed += OnOngoingPanelClosed;
             _ongoingTimer.Interval = TimeSpan.FromSeconds(15);
             _ongoingTimer.Tick += async (s, e) => await RefreshOngoingAsync();
             // Pane stays closed at launch so the content gets full width; the page
@@ -175,15 +177,28 @@ namespace LichessXbox
         void ExpandOngoing_Click(object sender, RoutedEventArgs e)
         {
             _ongoingExpanded = true;
-            UpdateOngoingVisibility();
+            OngoingTab.Visibility = Visibility.Collapsed;
+            OngoingPanel.Visibility = Visibility.Visible;
+            ((Storyboard)Resources["OngoingPanelOpen"]).Begin();   // slide + fade in
             OngoingCollapseButton.Focus(FocusState.Programmatic);
         }
 
         void CollapseOngoing_Click(object sender, RoutedEventArgs e)
         {
             _ongoingExpanded = false;
-            UpdateOngoingVisibility();
-            OngoingTab.Focus(FocusState.Programmatic);
+            ((Storyboard)Resources["OngoingPanelClose"]).Begin();   // OnOngoingPanelClosed swaps to the tab
+        }
+
+        // After the close animation, hide the panel and bring back the tab (fading it in).
+        void OnOngoingPanelClosed(object sender, object e)
+        {
+            OngoingPanel.Visibility = Visibility.Collapsed;
+            if (_currentTag != "play" && _ongoing.Count > 0)
+            {
+                OngoingTab.Visibility = Visibility.Visible;
+                ((Storyboard)Resources["OngoingTabIn"]).Begin();
+                OngoingTab.Focus(FocusState.Programmatic);
+            }
         }
 
         void OngoingGame_Click(object sender, RoutedEventArgs e)
