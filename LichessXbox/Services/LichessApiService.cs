@@ -75,12 +75,20 @@ namespace LichessXbox.Services
                 var o = JObject.Parse(await resp.Content.ReadAsStringAsync());
                 foreach (var g in o["nowPlaying"] as JArray ?? new JArray())
                 {
+                    // Board/move endpoints take the short 8-char gameId, not the 12-char fullId.
+                    string id = g.Value<string>("gameId");
+                    if (string.IsNullOrEmpty(id))
+                    {
+                        var fid = g.Value<string>("fullId");
+                        id = (fid != null && fid.Length >= 8) ? fid.Substring(0, 8) : fid;
+                    }
+                    if (string.IsNullOrEmpty(id)) continue;
                     bool myTurn = g.Value<bool?>("isMyTurn") ?? false;
                     string speed = g.Value<string>("speed") ?? "";
                     if (speed.Length > 0) speed = char.ToUpperInvariant(speed[0]) + speed.Substring(1);
                     list.Add(new OngoingGame
                     {
-                        GameId = g.Value<string>("gameId") ?? g.Value<string>("fullId"),
+                        GameId = id,
                         OpponentName = g["opponent"]?.Value<string>("username") ?? "Opponent",
                         IsMyTurn = myTurn,
                         Fen = g.Value<string>("fen"),

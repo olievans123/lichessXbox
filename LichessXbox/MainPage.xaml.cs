@@ -123,6 +123,7 @@ namespace LichessXbox
 
             _currentTag = tag;
             HighlightNav(tag);
+            if (tag == "play") OngoingPanel.Visibility = Visibility.Collapsed;   // suppressed on Play
             _ = RefreshOngoingAsync();   // keep the "continue playing" panel current as you move around
         }
 
@@ -152,7 +153,10 @@ namespace LichessXbox
                 _ongoing.Clear();
                 foreach (var g in games) _ongoing.Add(g);
             }
-            OngoingPanel.Visibility = _ongoing.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            // Don't float over the Play page — it has the lobby/board there (and would overlap
+            // the in-game action buttons and list the game you're already in).
+            OngoingPanel.Visibility = (_currentTag != "play" && _ongoing.Count > 0)
+                ? Visibility.Visible : Visibility.Collapsed;
         }
 
         void OngoingGame_Click(object sender, RoutedEventArgs e)
@@ -168,6 +172,7 @@ namespace LichessXbox
             ContentFrame.Navigate(typeof(PlayPage), gameId);
             _currentTag = "play";
             HighlightNav("play");
+            OngoingPanel.Visibility = Visibility.Collapsed;   // suppressed on Play
         }
 
         /// <summary>Marks the active nav button green and resets the rest.</summary>
