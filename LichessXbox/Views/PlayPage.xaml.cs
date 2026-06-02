@@ -199,6 +199,7 @@ namespace LichessXbox.Views
         async void Ai_ItemClick(object sender, ItemClickEventArgs e)
         {
             if (!(e.ClickedItem is AiLevel lvl)) return;
+            _autoOpen = true;
             SeekingText.Text = $"Starting a game vs Stockfish level {lvl.Level}…";
             ShowOnly(SeekingPanel);
             // Casual, no-clock game vs the AI for a relaxed couch experience.
