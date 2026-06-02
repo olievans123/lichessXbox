@@ -177,6 +177,57 @@
         <Setter Property="FontWeight" Value="Bold" />
     </Style>
 
+    <!-- Clickable move in the in-game move list: just text, with a soft hover fill and the
+         green focus ring so it's clearly selectable by gamepad or pointer. Foreground is set
+         per-item (green when it's the current move). -->
+    <Style x:Key="MoveButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="6,2" />
+        <Setter Property="FontSize" Value="{StaticResource CaptionSize}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Border x:Name="Fill" CornerRadius="6" Opacity="0">
+                            <Border.Background><SolidColorBrush Color="#FFFFFF" Opacity="0.10" /></Border.Background>
+                        </Border>
+                        <Border x:Name="Ring" CornerRadius="6" BorderThickness="2" IsHitTestVisible="False" Opacity="0">
+                            <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
+                        </Border>
+                        <ContentPresenter Padding="{TemplateBinding Padding}" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                          Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" />
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="Fill" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.1" /></Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="Fill" Storyboard.TargetProperty="Opacity" To="1" Duration="0" /></Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="FocusStates">
+                                <VisualState x:Name="Focused">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Ring" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.1" />
+                                        <DoubleAnimation Storyboard.TargetName="Fill" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.1" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Unfocused" />
+                                <VisualState x:Name="PointerFocused" />
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Compact navigation-pane button so the full menu fits without being cut off -->
     <Style x:Key="NavButton" TargetType="Button" BasedOn="{StaticResource TileButton}">
         <Setter Property="Padding" Value="16,7" />

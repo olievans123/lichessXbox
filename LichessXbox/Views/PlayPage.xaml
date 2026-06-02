@@ -192,17 +192,19 @@
                             <ItemsControl x:Name="MoveRows">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Grid Padding="0,3" ColumnSpacing="10">
+                                        <Grid Padding="0,1" ColumnSpacing="6">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="30" />
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="{Binding No}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                                            <TextBlock Grid.Column="1" Text="{Binding White}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
-                                                       Foreground="{Binding WhiteCurrent, Converter={StaticResource CurrentMoveBrush}}" />
-                                            <TextBlock Grid.Column="2" Text="{Binding Black}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
-                                                       Foreground="{Binding BlackCurrent, Converter={StaticResource CurrentMoveBrush}}" />
+                                            <TextBlock Grid.Column="0" Text="{Binding No}" FontSize="{StaticResource CaptionSize}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
+                                            <!-- Each move is clickable to jump the board to that position. -->
+                                            <Button Grid.Column="1" Style="{StaticResource MoveButton}" Tag="{Binding WhitePly}" Click="Move_Click"
+                                                    Content="{Binding White}" Foreground="{Binding WhiteCurrent, Converter={StaticResource CurrentMoveBrush}}" />
+                                            <Button Grid.Column="2" Style="{StaticResource MoveButton}" Tag="{Binding BlackPly}" Click="Move_Click"
+                                                    Content="{Binding Black}" Foreground="{Binding BlackCurrent, Converter={StaticResource CurrentMoveBrush}}"
+                                                    Visibility="{Binding BlackVisible}" />
                                         </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>

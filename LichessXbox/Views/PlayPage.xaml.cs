@@ -20,12 +20,15 @@ namespace LichessXbox.Views
     /// Notifies on change so rows can be reused (no flicker) as the game advances.</summary>
     public sealed class MoveRowVM : System.ComponentModel.INotifyPropertyChanged
     {
-        string _no, _white, _black; bool _wc, _bc;
+        string _no, _white, _black; bool _wc, _bc; int _wp, _bp; Visibility _bv = Visibility.Visible;
         public string No { get => _no; set { if (_no != value) { _no = value; Raise(nameof(No)); } } }
         public string White { get => _white; set { if (_white != value) { _white = value; Raise(nameof(White)); } } }
         public string Black { get => _black; set { if (_black != value) { _black = value; Raise(nameof(Black)); } } }
         public bool WhiteCurrent { get => _wc; set { if (_wc != value) { _wc = value; Raise(nameof(WhiteCurrent)); } } }
         public bool BlackCurrent { get => _bc; set { if (_bc != value) { _bc = value; Raise(nameof(BlackCurrent)); } } }
+        public int WhitePly { get => _wp; set { if (_wp != value) { _wp = value; Raise(nameof(WhitePly)); } } }
+        public int BlackPly { get => _bp; set { if (_bp != value) { _bp = value; Raise(nameof(BlackPly)); } } }
+        public Visibility BlackVisible { get => _bv; set { if (_bv != value) { _bv = value; Raise(nameof(BlackVisible)); } } }
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         void Raise(string n) => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(n));
     }
@@ -526,7 +529,11 @@ namespace LichessXbox.Views
                 var row = _moveRows[r];
                 row.No = (r + 1) + ".";
                 row.White = _sans[i];
-                row.Black = i + 1 < _sans.Count ? _sans[i + 1] : "";
+                bool hasBlack = i + 1 < _sans.Count;
+                row.Black = hasBlack ? _sans[i + 1] : "";
+                row.BlackVisible = hasBlack ? Visibility.Visible : Visibility.Collapsed;
+                row.WhitePly = i + 1;   // plies applied after white's move on this row
+                row.BlackPly = i + 2;   // plies applied after black's move
                 row.WhiteCurrent = _viewPly == i + 1;
                 row.BlackCurrent = _viewPly == i + 2;
             }
@@ -581,6 +588,12 @@ namespace LichessXbox.Views
             RenderViewedPosition();
             // Returning to the live move during an active game hands input back to the board.
             if (_viewPly >= _plies.Count && _gameActive) Board.FocusBoard();
+        }
+
+        // Jump straight to a clicked move in the list.
+        void Move_Click(object sender, RoutedEventArgs e)
+        {
+            if ((sender as FrameworkElement)?.Tag is int ply) SetViewPly(ply);
         }
 
         void MoveFirst_Click(object sender, RoutedEventArgs e) => SetViewPly(0);
