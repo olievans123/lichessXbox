@@ -20,6 +20,7 @@ namespace LichessXbox.Views
         readonly TextBlock[] _glyph = new TextBlock[64];
         readonly Image[] _img = new Image[64];
         readonly List<(char Piece, TextBlock Glyph, Image Img)> _palette = new List<(char, TextBlock, Image)>();
+        readonly Dictionary<string, SvgImageSource> _svgCache = new Dictionary<string, SvgImageSource>();
         char _selected = 'P';
         bool _whiteToMove = true;
 
@@ -178,7 +179,8 @@ namespace LichessXbox.Views
             var src = PieceSets.SourceFor(BoardTheme.PieceSet, p);
             if (src != null)
             {
-                img.Source = new SvgImageSource(src);
+                var svg = CachedSvg(src);
+                if (!ReferenceEquals(img.Source, svg)) img.Source = svg;
                 img.Visibility = Visibility.Visible;
                 glyph.Visibility = Visibility.Collapsed;
             }
@@ -191,6 +193,17 @@ namespace LichessXbox.Views
             }
         }
 
+        // Decode each SVG once and reuse it, so re-themes don't re-decode and flicker the pieces.
+        SvgImageSource CachedSvg(Uri src)
+        {
+            if (!_svgCache.TryGetValue(src.AbsoluteUri, out var svg))
+            {
+                svg = new SvgImageSource(src);
+                _svgCache[src.AbsoluteUri] = svg;
+            }
+            return svg;
+        }
+
         void RenderPalette()
         {
             foreach (var (piece, glyph, img) in _palette)
@@ -198,7 +211,8 @@ namespace LichessXbox.Views
                 var src = PieceSets.SourceFor(BoardTheme.PieceSet, piece);
                 if (src != null)
                 {
-                    img.Source = new SvgImageSource(src);
+                    var svg = CachedSvg(src);
+                    if (!ReferenceEquals(img.Source, svg)) img.Source = svg;
                     img.Visibility = Visibility.Visible;
                     glyph.Visibility = Visibility.Collapsed;
                 }

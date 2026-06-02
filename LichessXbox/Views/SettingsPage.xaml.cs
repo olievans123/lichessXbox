@@ -88,8 +88,14 @@ namespace LichessXbox.Views
 
         void ShowAll_Click(object sender, RoutedEventArgs e)
         {
+            // Keep whatever the user was previewing, and move focus into the grid since the
+            // Show-all button is about to collapse (otherwise gamepad focus is stranded).
+            string highlighted = (PieceGrid.SelectedItem as PieceSetItem)?.Name ?? BoardTheme.PieceSet;
             PopulatePieces(true);
-            SelectCurrentPiece();
+            var keep = _pieceItems.FirstOrDefault(i => i.Name == highlighted)
+                       ?? _pieceItems.FirstOrDefault(i => i.Name == BoardTheme.PieceSet);
+            if (keep != null) PieceGrid.SelectedItem = keep;
+            PieceGrid.Focus(FocusState.Programmatic);
         }
 
         void Theme_ItemClick(object sender, ItemClickEventArgs e)
