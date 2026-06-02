@@ -5,7 +5,7 @@
     xmlns:controls="using:LichessXbox.Controls"
     Background="Transparent">
 
-    <Grid Padding="40,28">
+    <Grid Padding="40,16">
 
         <!-- ============ SIGN-IN REQUIRED ============ -->
         <StackPanel x:Name="SignInPrompt" Visibility="Collapsed"
@@ -157,7 +157,7 @@
             </Viewbox>
 
             <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-            <StackPanel Margin="20,0,0,0" Spacing="12">
+            <StackPanel Margin="20,0,0,0" Spacing="10">
                 <!-- Opponent (top) -->
                 <Border Style="{StaticResource CardBorder}" Padding="16">
                     <Grid>
@@ -188,7 +188,7 @@
                         <TextBlock x:Name="StatusBanner" Text="Your move" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                    Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
                         <!-- Move history in algebraic notation (SAN); bounded, scrollable, current move highlighted. -->
-                        <ScrollViewer x:Name="MoveScroller" MaxHeight="150" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+                        <ScrollViewer x:Name="MoveScroller" MaxHeight="96" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
                             <ItemsControl x:Name="MoveRows">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>

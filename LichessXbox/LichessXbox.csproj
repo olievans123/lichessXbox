@@ -238,6 +238,20 @@
     <Content Include="Assets\Sounds\move.wav" />
     <Content Include="Assets\Sounds\capture.wav" />
     <Content Include="Assets\Sounds\check.wav" />
+    <!-- Default piece set bundled in the package so the board has pieces instantly on first
+         launch (no download, works offline). Other sets are still fetched on demand. -->
+    <Content Include="Assets\pieces\cburnett\wK.svg" />
+    <Content Include="Assets\pieces\cburnett\wQ.svg" />
+    <Content Include="Assets\pieces\cburnett\wR.svg" />
+    <Content Include="Assets\pieces\cburnett\wB.svg" />
+    <Content Include="Assets\pieces\cburnett\wN.svg" />
+    <Content Include="Assets\pieces\cburnett\wP.svg" />
+    <Content Include="Assets\pieces\cburnett\bK.svg" />
+    <Content Include="Assets\pieces\cburnett\bQ.svg" />
+    <Content Include="Assets\pieces\cburnett\bR.svg" />
+    <Content Include="Assets\pieces\cburnett\bB.svg" />
+    <Content Include="Assets\pieces\cburnett\bN.svg" />
+    <Content Include="Assets\pieces\cburnett\bP.svg" />
     <Content Include="Assets\engine\engine.html" />
     <!-- Optional: drop a real stockfish.js next to engine.html for offline analysis.
          When absent, engine.html loads one from a CDN. -->

@@ -170,6 +170,9 @@ namespace LichessXbox.Helpers
         // Native is handled by the explicit checks below, so it is never stored here.
         // ConcurrentDictionary + a download semaphore keep the startup warm-up, each board's
         // own load, and the Settings picker from racing on shared state. _http is created once.
+        // Sets shipped inside the app package (Assets/pieces/<set>) — available instantly on
+        // first launch, no download, works offline. Read-only after init (safe for concurrent reads).
+        static readonly HashSet<string> _bundled = new HashSet<string> { Default };
         static readonly ConcurrentDictionary<string, byte> _ready = new ConcurrentDictionary<string, byte>();
         static readonly ConcurrentDictionary<string, byte> _previewReady = new ConcurrentDictionary<string, byte>();
         static readonly SemaphoreSlim _downloadGate = new SemaphoreSlim(1, 1);
@@ -178,20 +181,23 @@ namespace LichessXbox.Helpers
         /// <summary>Raised (with the set name) once a set's SVGs are cached, so live boards can redraw.</summary>
         public static event Action<string> Ready;
 
-        public static bool IsReady(string set) => string.IsNullOrEmpty(set) || set == Native || _ready.ContainsKey(set);
+        public static bool IsReady(string set) => string.IsNullOrEmpty(set) || set == Native || _bundled.Contains(set) || _ready.ContainsKey(set);
 
-        /// <summary>Local URI for a piece's SVG, or null to fall back to the Unicode glyph.</summary>
+        /// <summary>URI for a piece's SVG (bundled in-package or downloaded), or null to fall back to the Unicode glyph.</summary>
         public static Uri SourceFor(string set, char piece)
         {
-            if (string.IsNullOrEmpty(set) || set == Native || !_ready.ContainsKey(set)) return null;
+            if (string.IsNullOrEmpty(set) || set == Native) return null;
             string code = (char.IsUpper(piece) ? "w" : "b") + char.ToUpperInvariant(piece);
+            if (_bundled.Contains(set)) return new Uri($"ms-appx:///Assets/pieces/{set}/{code}.svg");
+            if (!_ready.ContainsKey(set)) return null;
             return new Uri($"ms-appdata:///local/piece/{set}/{code}.svg");
         }
 
-        /// <summary>Local URI for a set's thumbnail piece (white knight), or null if not yet cached.</summary>
+        /// <summary>URI for a set's thumbnail piece (white knight), or null if not yet cached.</summary>
         public static Uri PreviewUriFor(string set)
         {
             if (string.IsNullOrEmpty(set) || set == Native) return null;
+            if (_bundled.Contains(set)) return new Uri($"ms-appx:///Assets/pieces/{set}/wN.svg");
             if (_ready.ContainsKey(set) || _previewReady.ContainsKey(set))
                 return new Uri($"ms-appdata:///local/piece/{set}/wN.svg");
             return null;
@@ -202,6 +208,7 @@ namespace LichessXbox.Helpers
         public static async Task<bool> EnsurePreviewAsync(string set)
         {
             if (string.IsNullOrEmpty(set) || set == Native) return false;
+            if (_bundled.Contains(set)) return true;   // shipped in-package
             if (_ready.ContainsKey(set) || _previewReady.ContainsKey(set)) return true;
             await _downloadGate.WaitAsync();
             try
@@ -228,7 +235,7 @@ namespace LichessXbox.Helpers
         /// </summary>
         public static async Task<bool> EnsureAsync(string set)
         {
-            if (string.IsNullOrEmpty(set) || set == Native) return true;
+            if (string.IsNullOrEmpty(set) || set == Native || _bundled.Contains(set)) return true;   // bundled = no download
             if (_ready.ContainsKey(set)) return true;
 
             // Serialize downloads so the startup warm-up and a board's own load don't both

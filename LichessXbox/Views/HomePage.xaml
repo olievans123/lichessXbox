@@ -60,8 +60,8 @@
             </StackPanel>
 
         <!-- Right: decorative board preview (fixed size so it can't squeeze the content) -->
-        <Border Grid.Column="1" Width="248" Height="248" VerticalAlignment="Center"
-                CornerRadius="16" Padding="12" Background="#22000000" BorderBrush="#22FFFFFF" BorderThickness="1">
+        <Border Grid.Column="1" Width="404" Height="404" VerticalAlignment="Center"
+                CornerRadius="18" Padding="14" Background="#22000000" BorderBrush="#22FFFFFF" BorderThickness="1">
             <controls:ChessBoardControl x:Name="PreviewBoard" Interactive="False" IsTabStop="False" />
         </Border>
     </Grid>
