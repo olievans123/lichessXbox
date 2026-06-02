@@ -52,11 +52,13 @@
                             <Border Width="128" Height="100" CornerRadius="14"
                                     Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                 <StackPanel Margin="8" VerticalAlignment="Center" Spacing="2">
-                                    <Grid Height="46">
+                                    <Grid Height="48">
                                         <TextBlock Text="♞" FontFamily="Segoe UI Symbol" FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Center"
                                                    Foreground="{StaticResource TextPrimaryBrush}" Visibility="{Binding GlyphVisibility}" />
-                                        <Image Source="{Binding Preview}" Width="44" Height="44" Stretch="Uniform"
-                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        <!-- Viewbox scales each set's SVG (which have differing intrinsic sizes) uniformly into the box. -->
+                                        <Viewbox MaxWidth="44" MaxHeight="44" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <Image Source="{Binding Preview}" Stretch="Uniform" />
+                                        </Viewbox>
                                     </Grid>
                                     <TextBlock Text="{Binding Name}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold" TextAlignment="Center"
                                                TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis" Foreground="{StaticResource TextPrimaryBrush}" />

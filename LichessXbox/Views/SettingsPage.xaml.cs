@@ -88,13 +88,17 @@ namespace LichessXbox.Views
 
         void ShowAll_Click(object sender, RoutedEventArgs e)
         {
-            // Keep whatever the user was previewing, and move focus into the grid since the
-            // Show-all button is about to collapse (otherwise gamepad focus is stranded).
-            string highlighted = (PieceGrid.SelectedItem as PieceSetItem)?.Name ?? BoardTheme.PieceSet;
-            PopulatePieces(true);
-            var keep = _pieceItems.FirstOrDefault(i => i.Name == highlighted)
-                       ?? _pieceItems.FirstOrDefault(i => i.Name == BoardTheme.PieceSet);
-            if (keep != null) PieceGrid.SelectedItem = keep;
+            // Append the remaining sets in place — no Clear/rebuild — so the grid doesn't reset,
+            // re-download the visible thumbnails, or drop the current selection (avoids the jank).
+            foreach (var name in PieceSets.All)
+                if (_pieceItems.All(it => it.Name != name))
+                {
+                    var item = new PieceSetItem(name);
+                    _pieceItems.Add(item);
+                    _ = LoadPreviewAsync(item);
+                }
+            ShowAllButton.Visibility = Visibility.Collapsed;
+            // The button just vanished; move gamepad focus onto the current selection.
             PieceGrid.Focus(FocusState.Programmatic);
         }
 
