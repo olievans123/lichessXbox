@@ -5,7 +5,7 @@
     xmlns:controls="using:LichessXbox.Controls"
     Background="Transparent">
 
-    <Grid Padding="40,28">
+    <Grid Padding="40,18">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="300" />
@@ -16,7 +16,7 @@
         </Viewbox>
 
         <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-        <StackPanel Margin="24,0,0,0" Padding="0,0,10,16" Spacing="12" VerticalAlignment="Top">
+        <StackPanel Margin="24,0,0,0" Padding="0,0,10,16" Spacing="10" VerticalAlignment="Top">
             <TextBlock Text="Puzzles" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
             <!-- Stacked (not a 3-wide row) so the labels never clip in the narrow sidebar. -->

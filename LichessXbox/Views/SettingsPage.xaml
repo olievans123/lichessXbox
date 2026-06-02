@@ -8,21 +8,21 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="340" />
+            <ColumnDefinition Width="404" />
         </Grid.ColumnDefinitions>
 
         <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-            <StackPanel Padding="32,24" Spacing="22">
+            <StackPanel Padding="32,24" Spacing="20">
                 <TextBlock Text="Settings" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
                 <TextBlock Text="Board theme" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
                 <GridView x:Name="ThemeGrid" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Theme_ItemClick">
                     <GridView.ItemTemplate>
                         <DataTemplate>
-                            <Border Width="160" Height="120" CornerRadius="16"
+                            <Border Width="138" Height="104" CornerRadius="14"
                                     Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
-                                <StackPanel Margin="14" Spacing="8">
-                                    <Border Height="48" CornerRadius="8">
+                                <StackPanel Margin="12" Spacing="8">
+                                    <Border Height="44" CornerRadius="8">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
@@ -49,21 +49,28 @@
                           ItemClick="PieceSet_ItemClick" SelectionChanged="PieceSet_SelectionChanged">
                     <GridView.ItemTemplate>
                         <DataTemplate>
-                            <Border Width="150" Height="104" CornerRadius="16"
+                            <Border Width="128" Height="100" CornerRadius="14"
                                     Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
-                                <StackPanel Margin="10" VerticalAlignment="Center" Spacing="4">
-                                    <TextBlock Text="♞" FontFamily="Segoe UI Symbol" FontSize="24" HorizontalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}" />
-                                    <TextBlock Text="{Binding}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold" TextAlignment="Center"
+                                <StackPanel Margin="8" VerticalAlignment="Center" Spacing="2">
+                                    <Grid Height="46">
+                                        <TextBlock Text="♞" FontFamily="Segoe UI Symbol" FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                   Foreground="{StaticResource TextPrimaryBrush}" Visibility="{Binding GlyphVisibility}" />
+                                        <Image Source="{Binding Preview}" Width="44" Height="44" Stretch="Uniform"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Grid>
+                                    <TextBlock Text="{Binding Name}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold" TextAlignment="Center"
                                                TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis" Foreground="{StaticResource TextPrimaryBrush}" />
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
                     </GridView.ItemTemplate>
                 </GridView>
+                <Button x:Name="ShowAllButton" Style="{StaticResource TileButton}" Padding="16,10" Click="ShowAll_Click"
+                        Content="Show all sets" HorizontalAlignment="Left" HorizontalContentAlignment="Center" />
                 <TextBlock x:Name="PieceStatus" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
                            Visibility="Collapsed" TextWrapping="Wrap" />
 
-                <Border Style="{StaticResource CardBorder}" Padding="24">
+                <Border Style="{StaticResource CardBorder}" Padding="20">
                     <StackPanel Spacing="18">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -101,7 +108,7 @@
                     </StackPanel>
                 </Border>
 
-                <Border Style="{StaticResource CardBorder}" Padding="24">
+                <Border Style="{StaticResource CardBorder}" Padding="20">
                     <StackPanel Spacing="6">
                         <TextBlock Text="More tools" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
                         <TextBlock Text="Board editor and the coordinate trainer are in their own tabs." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
@@ -118,12 +125,23 @@
              Non-interactive, so it never steals gamepad focus or shows a hover animation. -->
         <Border Grid.Column="1" Background="{StaticResource AppSurfaceBrush}"
                 BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1,0,0,0">
-            <StackPanel VerticalAlignment="Center" Spacing="14" Padding="20">
+            <StackPanel VerticalAlignment="Center" Spacing="14" Padding="22">
                 <TextBlock Text="Preview" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                            Foreground="{StaticResource AccentGreenLightBrush}" HorizontalAlignment="Center" />
-                <Viewbox MaxWidth="300" MaxHeight="300" HorizontalAlignment="Center">
-                    <controls:ChessBoardControl x:Name="PreviewBoard" Interactive="False" IsTabStop="False" />
-                </Viewbox>
+                <Grid HorizontalAlignment="Center">
+                    <Viewbox MaxWidth="360" MaxHeight="360">
+                        <controls:ChessBoardControl x:Name="PreviewBoard" Interactive="False" IsTabStop="False" />
+                    </Viewbox>
+                    <!-- Loading veil while a previewed set downloads, so it doesn't just sit on glyphs. -->
+                    <Border x:Name="PreviewVeil" Background="#88000000" CornerRadius="6" Visibility="Collapsed">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10">
+                            <ProgressRing x:Name="PreviewBusy" IsActive="False" Width="48" Height="48"
+                                          Foreground="{StaticResource AccentGreenLightBrush}" />
+                            <TextBlock Text="Downloading…" FontSize="{StaticResource CaptionSize}"
+                                       Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
                 <TextBlock x:Name="PreviewLabel" Text="" FontSize="{StaticResource CaptionSize}"
                            Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"
                            TextAlignment="Center" TextWrapping="Wrap" />

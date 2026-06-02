@@ -152,6 +152,7 @@ namespace LichessXbox.Helpers
         // ConcurrentDictionary + a download semaphore keep the startup warm-up, each board's
         // own load, and the Settings picker from racing on shared state. _http is created once.
         static readonly ConcurrentDictionary<string, byte> _ready = new ConcurrentDictionary<string, byte>();
+        static readonly ConcurrentDictionary<string, byte> _previewReady = new ConcurrentDictionary<string, byte>();
         static readonly SemaphoreSlim _downloadGate = new SemaphoreSlim(1, 1);
         static readonly HttpClient _http = new HttpClient();
 
@@ -166,6 +167,40 @@ namespace LichessXbox.Helpers
             if (string.IsNullOrEmpty(set) || set == Native || !_ready.ContainsKey(set)) return null;
             string code = (char.IsUpper(piece) ? "w" : "b") + char.ToUpperInvariant(piece);
             return new Uri($"ms-appdata:///local/piece/{set}/{code}.svg");
+        }
+
+        /// <summary>Local URI for a set's thumbnail piece (white knight), or null if not yet cached.</summary>
+        public static Uri PreviewUriFor(string set)
+        {
+            if (string.IsNullOrEmpty(set) || set == Native) return null;
+            if (_ready.ContainsKey(set) || _previewReady.ContainsKey(set))
+                return new Uri($"ms-appdata:///local/piece/{set}/wN.svg");
+            return null;
+        }
+
+        /// <summary>Download just the representative piece (white knight) for a picker thumbnail —
+        /// far cheaper than the full 12-SVG set. Returns true once the thumbnail is cached.</summary>
+        public static async Task<bool> EnsurePreviewAsync(string set)
+        {
+            if (string.IsNullOrEmpty(set) || set == Native) return false;
+            if (_ready.ContainsKey(set) || _previewReady.ContainsKey(set)) return true;
+            await _downloadGate.WaitAsync();
+            try
+            {
+                if (_ready.ContainsKey(set) || _previewReady.ContainsKey(set)) return true;
+                var root = await ApplicationData.Current.LocalFolder.CreateFolderAsync("piece", CreationCollisionOption.OpenIfExists);
+                var dir = await root.CreateFolderAsync(set, CreationCollisionOption.OpenIfExists);
+                if (await dir.TryGetItemAsync("wN.svg") == null)
+                {
+                    var bytes = await _http.GetByteArrayAsync($"https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/{set}/wN.svg");
+                    var file = await dir.CreateFileAsync("wN.svg", CreationCollisionOption.ReplaceExisting);
+                    await FileIO.WriteBytesAsync(file, bytes);
+                }
+                _previewReady[set] = 0;
+                return true;
+            }
+            catch { return false; }
+            finally { _downloadGate.Release(); }
         }
 
         /// <summary>
