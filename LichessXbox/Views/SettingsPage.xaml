@@ -65,8 +65,10 @@
                         </DataTemplate>
                     </GridView.ItemTemplate>
                 </GridView>
-                <Button x:Name="ShowAllButton" Style="{StaticResource TileButton}" Padding="16,10" Click="ShowAll_Click"
-                        Content="Show all sets" HorizontalAlignment="Left" HorizontalContentAlignment="Center" />
+                <Button x:Name="ShowAllButton" Style="{StaticResource TileButton}" Background="Transparent" Padding="12,8"
+                        Foreground="{StaticResource AccentGreenLightBrush}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
+                        Click="ShowAll_Click" Content="Show all sets  ▾"
+                        HorizontalAlignment="Center" HorizontalContentAlignment="Center" />
                 <TextBlock x:Name="PieceStatus" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
                            Visibility="Collapsed" TextWrapping="Wrap" />
 

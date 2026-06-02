@@ -353,7 +353,9 @@
                                 </VisualState>
                             </VisualStateGroup>
                             <VisualStateGroup x:Name="SelectionStates">
-                                <VisualState x:Name="Unselected" />
+                                <VisualState x:Name="Unselected">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="SelRing" Storyboard.TargetProperty="Opacity" To="0" Duration="0" /></Storyboard>
+                                </VisualState>
                                 <VisualState x:Name="Selected">
                                     <Storyboard><DoubleAnimation Storyboard.TargetName="SelRing" Storyboard.TargetProperty="Opacity" To="1" Duration="0" /></Storyboard>
                                 </VisualState>
@@ -425,7 +427,9 @@
                                 </VisualState>
                             </VisualStateGroup>
                             <VisualStateGroup x:Name="SelectionStates">
-                                <VisualState x:Name="Unselected" />
+                                <VisualState x:Name="Unselected">
+                                    <Storyboard><DoubleAnimation Storyboard.TargetName="SelRing" Storyboard.TargetProperty="Opacity" To="0" Duration="0" /></Storyboard>
+                                </VisualState>
                                 <VisualState x:Name="Selected">
                                     <Storyboard><DoubleAnimation Storyboard.TargetName="SelRing" Storyboard.TargetProperty="Opacity" To="1" Duration="0" /></Storyboard>
                                 </VisualState>
