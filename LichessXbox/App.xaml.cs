@@ -46,9 +46,9 @@ namespace LichessXbox
                 ? ElementSoundPlayerState.On
                 : ElementSoundPlayerState.Off;
 
-            // Warm the selected piece set (default: lichess's cburnett) in the background so
-            // the SVGs are cached before the first board renders. Fire-and-forget; boards fall
-            // back to the built-in Unicode glyphs until it's ready, and self-heal on next load.
+            // The default set (cburnett) is bundled in the package and available instantly, so
+            // this is a no-op for it. It only does work when the user previously chose a different
+            // (downloaded) set — pre-fetching it before the first board renders. Fire-and-forget.
             _ = LichessXbox.Helpers.PieceSets.EnsureAsync(LichessXbox.Helpers.BoardTheme.PieceSet);
 
             // Keep content inside the TV title-safe area (the default). NOTE: opting into

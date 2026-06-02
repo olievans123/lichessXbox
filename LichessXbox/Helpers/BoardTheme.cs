@@ -53,7 +53,7 @@ namespace LichessXbox.Helpers
         public static string CurrentName { get; private set; } = "Green";
 
         /// <summary>Selected piece set ("Native" = the built-in Unicode glyphs, else a lichess SVG set).
-        /// Defaults to lichess's classic set; downloaded on first use, glyphs shown until ready.</summary>
+        /// Defaults to lichess's classic cburnett set, which is bundled in-package (instant, offline).</summary>
         public static string PieceSet { get; private set; } = PieceSets.Default;
 
         public static event Action Changed;
@@ -145,9 +145,10 @@ namespace LichessXbox.Helpers
     }
 
     /// <summary>
-    /// Open-source lichess piece sets (lichess-org/lila/public/piece). Each set is 12
-    /// SVGs (wK..bP); we download them on first use into local storage and render them
-    /// via SvgImageSource. "Native" = the built-in Unicode glyphs (always available).
+    /// Open-source lichess piece sets (lichess-org/lila/public/piece). Each set is 12 SVGs
+    /// (wK..bP) rendered via SvgImageSource. The default (cburnett) is bundled in the app
+    /// package (Assets/pieces) for instant, offline first-load; other sets are downloaded on
+    /// first use into local storage. "Native" = the built-in Unicode glyphs (always available).
     /// </summary>
     public static class PieceSets
     {
