@@ -175,8 +175,8 @@
                                 <TextBlock x:Name="TopAdvantage" FontSize="{StaticResource CaptionSize}" FontWeight="Bold" Foreground="{StaticResource AccentGreenLightBrush}" VerticalAlignment="Center" />
                             </StackPanel>
                         </StackPanel>
-                        <Border Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="12,6">
+                        <Border x:Name="TopClockChip" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="14,7">
                             <TextBlock x:Name="TopClock" Text="--:--" FontSize="{StaticResource SubtitleSize}" FontFamily="Consolas"
                                        Foreground="{StaticResource TextPrimaryBrush}" />
                         </Border>
@@ -187,10 +187,26 @@
                     <StackPanel Spacing="10">
                         <TextBlock x:Name="StatusBanner" Text="Your move" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                    Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
-                        <!-- Bounded so the move history scrolls instead of growing the panel forever. -->
-                        <ScrollViewer x:Name="MoveScroller" MaxHeight="132" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-                            <TextBlock x:Name="MoveList" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
-                                       TextWrapping="Wrap" />
+                        <!-- Move history in algebraic notation (SAN); bounded, scrollable, current move highlighted. -->
+                        <ScrollViewer x:Name="MoveScroller" MaxHeight="150" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+                            <ItemsControl x:Name="MoveRows">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Padding="0,3" ColumnSpacing="10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="30" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding No}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                                            <TextBlock Grid.Column="1" Text="{Binding White}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
+                                                       Foreground="{Binding WhiteCurrent, Converter={StaticResource CurrentMoveBrush}}" />
+                                            <TextBlock Grid.Column="2" Text="{Binding Black}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
+                                                       Foreground="{Binding BlackCurrent, Converter={StaticResource CurrentMoveBrush}}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </ScrollViewer>
                         <!-- Step through the game: first / previous / next / latest. -->
                         <Grid ColumnSpacing="6">
@@ -231,8 +247,8 @@
                                 <TextBlock x:Name="BottomAdvantage" FontSize="{StaticResource CaptionSize}" FontWeight="Bold" Foreground="{StaticResource AccentGreenLightBrush}" VerticalAlignment="Center" />
                             </StackPanel>
                         </StackPanel>
-                        <Border Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="12,6">
+                        <Border x:Name="BottomClockChip" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="14,7">
                             <TextBlock x:Name="BottomClock" Text="--:--" FontSize="{StaticResource SubtitleSize}" FontFamily="Consolas"
                                        Foreground="{StaticResource TextPrimaryBrush}" />
                         </Border>

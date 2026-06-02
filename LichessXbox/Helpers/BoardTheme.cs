@@ -134,6 +134,16 @@ namespace LichessXbox.Helpers
         public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotSupportedException();
     }
 
+    /// <summary>true → accent green (the move being viewed), false → normal text. Used to
+    /// highlight the current move in the in-game move list.</summary>
+    public sealed class CurrentMoveBrushConverter : Windows.UI.Xaml.Data.IValueConverter
+    {
+        static readonly SolidColorBrush Current = new SolidColorBrush(Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F));
+        static readonly SolidColorBrush Normal = new SolidColorBrush(Color.FromArgb(0xFF, 0xF4, 0xF1, 0xEA));
+        public object Convert(object value, Type targetType, object parameter, string language) => (value is bool b && b) ? Current : Normal;
+        public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotSupportedException();
+    }
+
     /// <summary>
     /// Open-source lichess piece sets (lichess-org/lila/public/piece). Each set is 12
     /// SVGs (wK..bP); we download them on first use into local storage and render them

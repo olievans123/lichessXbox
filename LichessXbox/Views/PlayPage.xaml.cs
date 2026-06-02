@@ -7,12 +7,25 @@ using LichessXbox.Chess;
 using LichessXbox.Models;
 using LichessXbox.Services;
 using Newtonsoft.Json.Linq;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace LichessXbox.Views
 {
+    /// <summary>One row of the move list: number + the white and black moves (SAN),
+    /// with flags marking which (if either) is the move currently shown on the board.</summary>
+    public sealed class MoveRowVM
+    {
+        public string No { get; set; }
+        public string White { get; set; }
+        public string Black { get; set; }
+        public bool WhiteCurrent { get; set; }
+        public bool BlackCurrent { get; set; }
+    }
+
     public sealed partial class PlayPage : Page
     {
         readonly ObservableCollection<TimeControlPreset> _presets = new ObservableCollection<TimeControlPreset>();
@@ -32,6 +45,8 @@ namespace LichessXbox.Views
 
         readonly List<string> _plies = new List<string>();   // UCI moves of the live game
         int _viewPly;                                         // plies shown on the board (== _plies.Count → live/latest)
+        readonly List<string> _sans = new List<string>();    // algebraic notation per ply (cached)
+        readonly ObservableCollection<MoveRowVM> _moveRows = new ObservableCollection<MoveRowVM>();
 
         readonly ObservableCollection<IncomingChallenge> _challenges = new ObservableCollection<IncomingChallenge>();
         ChessVariant _selectedVariant = ChessVariant.All[0];
@@ -56,6 +71,7 @@ namespace LichessXbox.Views
                 NoChallengesText.Visibility = _challenges.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
             ChallengesList.ItemsSource = _challenges;
 
+            MoveRows.ItemsSource = _moveRows;
             Board.MoveRequested += Board_MoveRequested;
             _clockTimer.Interval = TimeSpan.FromMilliseconds(200);
             _clockTimer.Tick += ClockTick;
@@ -267,6 +283,7 @@ namespace LichessXbox.Views
             _gameId = gameId;
             _gameActive = true;
             _plies.Clear();
+            _sans.Clear();
             _viewPly = 0;
             ResignButton.Visibility = Visibility.Visible;
             DrawButton.Visibility = Visibility.Visible;
@@ -361,6 +378,8 @@ namespace LichessXbox.Views
                     if (!string.IsNullOrWhiteSpace(uci)) _plies.Add(uci);
             _viewPly = wasLive ? _plies.Count : Math.Min(_viewPly, _plies.Count);
 
+            RebuildSans();   // recompute algebraic notation for the new move list
+
             // The live position drives the clock turn and the status text below.
             var pos = ChessPosition.FromFen(_initialFen);
             foreach (var uci in _plies) pos = pos.ApplyUciLoose(uci);
@@ -375,7 +394,6 @@ namespace LichessXbox.Views
 
             string status = state.Value<string>("status") ?? "started";
             string winner = state.Value<string>("winner");
-            UpdateMoveList(moves);
 
             if (status != "started" && status != "created")
             {
@@ -471,17 +489,40 @@ namespace LichessXbox.Views
             return "Game over.";
         }
 
-        void UpdateMoveList(string moves)
+        // Recompute algebraic notation (SAN) for the whole game; cheap to keep, run only when
+        // the move list actually changes. Falls back to raw UCI for unparseable variant moves.
+        void RebuildSans()
         {
-            if (string.IsNullOrWhiteSpace(moves)) { MoveList.Text = ""; return; }
-            var parts = moves.Split(' ');
-            var sb = new System.Text.StringBuilder();
-            for (int i = 0; i < parts.Length; i++)
+            // Moves only grow during a game, so append SAN for new plies only; recompute from
+            // scratch if the list shrank (takeback). ToSan runs the legal-move generator, so
+            // this incremental approach avoids re-deriving the whole game on every move.
+            if (_sans.Count > _plies.Count) _sans.Clear();
+            var pos = ChessPosition.FromFen(_initialFen);
+            for (int i = 0; i < _sans.Count; i++) pos = pos.ApplyUciLoose(_plies[i]);
+            for (int i = _sans.Count; i < _plies.Count; i++)
             {
-                if (i % 2 == 0) sb.Append((i / 2 + 1) + ". ");
-                sb.Append(parts[i] + "  ");
+                var mv = ChessMove.FromUci(_plies[i]);
+                try { _sans.Add(mv.From >= 0 && mv.From < 64 ? pos.ToSan(mv) : _plies[i]); }
+                catch { _sans.Add(_plies[i]); }
+                pos = pos.ApplyUciLoose(_plies[i]);
             }
-            MoveList.Text = sb.ToString();
+        }
+
+        // Pair the SAN moves into numbered rows, highlighting the move currently on the board.
+        void RebuildMoveRows()
+        {
+            _moveRows.Clear();
+            for (int i = 0; i < _sans.Count; i += 2)
+            {
+                _moveRows.Add(new MoveRowVM
+                {
+                    No = (i / 2 + 1) + ".",
+                    White = _sans[i],
+                    Black = i + 1 < _sans.Count ? _sans[i + 1] : "",
+                    WhiteCurrent = _viewPly == i + 1,
+                    BlackCurrent = _viewPly == i + 2,
+                });
+            }
             // Keep the latest move visible while watching live.
             if (_viewPly >= _plies.Count)
             {
@@ -512,6 +553,7 @@ namespace LichessXbox.Views
             bool live = _viewPly >= _plies.Count;
             Board.Interactive = live && _gameActive;
             UpdateNavUi(live);
+            RebuildMoveRows();
         }
 
         void UpdateNavUi(bool live)
@@ -555,6 +597,17 @@ namespace LichessXbox.Views
             long theirMs = _playerIsWhite ? _blackMs : _whiteMs;
             BottomClock.Text = FormatClock(myMs);
             TopClock.Text = FormatClock(theirMs);
+            // Tint whoever is on the move so the active clock is obvious at a glance.
+            bool myTurn = _whiteToMove == _playerIsWhite;
+            HighlightClock(BottomClockChip, _gameActive && myTurn);
+            HighlightClock(TopClockChip, _gameActive && !myTurn);
+        }
+
+        static void HighlightClock(Border chip, bool active)
+        {
+            chip.Background = new SolidColorBrush(active
+                ? Color.FromArgb(0x55, 0x6F, 0xA6, 0x30)    // green tint = this player's turn
+                : Color.FromArgb(0x22, 0x00, 0x00, 0x00));  // resting chip
         }
 
         static string FormatClock(long ms)
