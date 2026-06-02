@@ -39,6 +39,13 @@ namespace LichessXbox
             // Restore the user's saved board theme before any board is built.
             LichessXbox.Helpers.BoardTheme.Load();
 
+            // Explicitly apply the UI-sound preference. On Xbox the default ElementSoundPlayer
+            // state is "Default" (which still PLAYS), so without this the toggle could read off
+            // while sounds played. Setting On/Off keeps the setting and behaviour in sync.
+            ElementSoundPlayer.State = LichessXbox.Helpers.BoardTheme.UiSounds
+                ? ElementSoundPlayerState.On
+                : ElementSoundPlayerState.Off;
+
             // Warm the selected piece set (default: lichess's cburnett) in the background so
             // the SVGs are cached before the first board renders. Fire-and-forget; boards fall
             // back to the built-in Unicode glyphs until it's ready, and self-heal on next load.

@@ -31,7 +31,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" Margin="0,0,12,0">
-                                    <TextBlock Text="{Binding Name}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding Name}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis" />
                                     <TextBlock Text="{Binding Info}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
                                 </StackPanel>
                                 <Border Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Background="{StaticResource HairlineBrush}" CornerRadius="8" Padding="10,4">
@@ -63,7 +63,7 @@
                 <Button Grid.Row="1" x:Name="JoinButton" Style="{StaticResource PrimaryButton}" Click="Join_Click"
                         Content="Join" MinWidth="160" Margin="0,14" Visibility="Collapsed" HorizontalAlignment="Left" />
                 <TextBlock Grid.Row="2" x:Name="DetailStatus" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" VerticalAlignment="Top" Margin="0,8,0,0" />
-                <ListView Grid.Row="2" x:Name="StandingsList" SelectionMode="None" IsItemClickEnabled="False">
+                <ListView Grid.Row="2" x:Name="StandingsList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Standings_ItemClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid Padding="2,8">

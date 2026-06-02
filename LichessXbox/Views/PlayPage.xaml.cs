@@ -30,6 +30,9 @@ namespace LichessXbox.Views
         bool _whiteToMove = true;
         bool _gameActive;
 
+        readonly List<string> _plies = new List<string>();   // UCI moves of the live game
+        int _viewPly;                                         // plies shown on the board (== _plies.Count → live/latest)
+
         readonly ObservableCollection<IncomingChallenge> _challenges = new ObservableCollection<IncomingChallenge>();
         ChessVariant _selectedVariant = ChessVariant.All[0];
         string Variant => _selectedVariant?.Key ?? "standard";
@@ -263,6 +266,8 @@ namespace LichessXbox.Views
 
             _gameId = gameId;
             _gameActive = true;
+            _plies.Clear();
+            _viewPly = 0;
             ResignButton.Visibility = Visibility.Visible;
             DrawButton.Visibility = Visibility.Visible;
             TakebackButton.Visibility = Visibility.Visible;
@@ -345,25 +350,24 @@ namespace LichessXbox.Views
         {
             if (state == null) return;
 
-            // Rebuild the position from the initial FEN + the UCI move list.
-            var pos = ChessPosition.FromFen(_initialFen);
             string moves = state.Value<string>("moves") ?? "";
-            ChessMove last = new ChessMove(-1, -1);
-            if (moves.Length > 0)
-            {
-                foreach (var uci in moves.Split(' '))
-                {
-                    if (string.IsNullOrWhiteSpace(uci)) continue;
-                    var mv = ChessMove.FromUci(uci);
-                    pos = pos.ApplyUciLoose(uci);
-                    if (mv.From >= 0) last = mv;
-                }
-            }
 
-            Board.LastMove = last.From >= 0 ? (ChessMove?)last : null;
-            Board.Position = pos;
+            // Update ply history for navigation, keeping the user's review position unless
+            // they were already viewing the latest (live) move — then follow the new move.
+            bool wasLive = _viewPly >= _plies.Count;
+            _plies.Clear();
+            if (moves.Length > 0)
+                foreach (var uci in moves.Split(' '))
+                    if (!string.IsNullOrWhiteSpace(uci)) _plies.Add(uci);
+            _viewPly = wasLive ? _plies.Count : Math.Min(_viewPly, _plies.Count);
+
+            // The live position drives the clock turn and the status text below.
+            var pos = ChessPosition.FromFen(_initialFen);
+            foreach (var uci in _plies) pos = pos.ApplyUciLoose(uci);
             _whiteToMove = pos.WhiteToMove;
-            UpdateCaptured(pos);
+
+            // Render whichever ply is being viewed (live, or a reviewed past position).
+            RenderViewedPosition();
 
             _whiteMs = state.Value<long?>("wtime") ?? _whiteMs;
             _blackMs = state.Value<long?>("btime") ?? _blackMs;
@@ -478,7 +482,62 @@ namespace LichessXbox.Views
                 sb.Append(parts[i] + "  ");
             }
             MoveList.Text = sb.ToString();
+            // Keep the latest move visible while watching live.
+            if (_viewPly >= _plies.Count)
+            {
+                MoveScroller.UpdateLayout();
+                MoveScroller.ChangeView(null, MoveScroller.ScrollableHeight, null);
+            }
         }
+
+        // ------------------------------------------------------- move navigation
+
+        // Render the position after _viewPly plies — the live game when at the latest move,
+        // or a past position while reviewing. Reviewing disables board input.
+        void RenderViewedPosition()
+        {
+            var pos = ChessPosition.FromFen(_initialFen);
+            ChessMove last = new ChessMove(-1, -1);
+            int upto = Math.Min(_viewPly, _plies.Count);
+            for (int i = 0; i < upto; i++)
+            {
+                var mv = ChessMove.FromUci(_plies[i]);
+                pos = pos.ApplyUciLoose(_plies[i]);
+                if (mv.From >= 0) last = mv;
+            }
+            Board.LastMove = last.From >= 0 ? (ChessMove?)last : null;
+            Board.Position = pos;
+            UpdateCaptured(pos);
+
+            bool live = _viewPly >= _plies.Count;
+            Board.Interactive = live && _gameActive;
+            UpdateNavUi(live);
+        }
+
+        void UpdateNavUi(bool live)
+        {
+            bool atStart = _viewPly <= 0;
+            MoveFirstButton.IsEnabled = !atStart;
+            MovePrevButton.IsEnabled = !atStart;
+            MoveNextButton.IsEnabled = !live;
+            MoveLastButton.IsEnabled = !live;
+            MovePositionText.Text = _plies.Count == 0 ? ""
+                : live ? "● Live"
+                : $"Reviewing — move {_viewPly} of {_plies.Count}";
+        }
+
+        void SetViewPly(int ply)
+        {
+            _viewPly = Math.Max(0, Math.Min(ply, _plies.Count));
+            RenderViewedPosition();
+            // Returning to the live move during an active game hands input back to the board.
+            if (_viewPly >= _plies.Count && _gameActive) Board.FocusBoard();
+        }
+
+        void MoveFirst_Click(object sender, RoutedEventArgs e) => SetViewPly(0);
+        void MovePrev_Click(object sender, RoutedEventArgs e) => SetViewPly(_viewPly - 1);
+        void MoveNext_Click(object sender, RoutedEventArgs e) => SetViewPly(_viewPly + 1);
+        void MoveLast_Click(object sender, RoutedEventArgs e) => SetViewPly(_plies.Count);
 
         // ------------------------------------------------------------- clocks
 

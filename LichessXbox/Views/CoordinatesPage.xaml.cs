@@ -47,14 +47,10 @@ namespace LichessXbox.Views
                     var btn = new Button
                     {
                         Background = new SolidColorBrush(isLight ? BoardTheme.Light : BoardTheme.Dark),
-                        BorderThickness = new Thickness(0),
-                        CornerRadius = new CornerRadius(0),
-                        HorizontalAlignment = HorizontalAlignment.Stretch,
-                        VerticalAlignment = VerticalAlignment.Stretch,
+                        // Shared board-square style: crisp inset green focus ring, no default gray.
+                        Style = (Style)Application.Current.Resources["BoardCellButton"],
                         Tag = sq,
                     };
-                    btn.UseSystemFocusVisuals = true;
-                    btn.FocusVisualPrimaryBrush = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F));
                     btn.Click += Cell_Click;
                     Grid.SetRow(btn, row);
                     Grid.SetColumn(btn, col);

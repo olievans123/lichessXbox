@@ -37,7 +37,7 @@
                                 <StackPanel Margin="20" VerticalAlignment="Center" Spacing="6">
                                     <TextBlock Text="{Binding Glyph}" FontSize="36" />
                                     <TextBlock Text="{Binding Label}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
-                                               Foreground="{StaticResource TextPrimaryBrush}" />
+                                               TextWrapping="Wrap" Foreground="{StaticResource TextPrimaryBrush}" />
                                     <TextBlock Text="{Binding RatedLabel}" FontSize="{StaticResource CaptionSize}"
                                                Foreground="{StaticResource TextSecondaryBrush}" />
                                 </StackPanel>
@@ -184,11 +184,33 @@
                 </Border>
 
                 <Border Style="{StaticResource CardBorder}" Padding="16">
-                    <StackPanel Spacing="6">
+                    <StackPanel Spacing="10">
                         <TextBlock x:Name="StatusBanner" Text="Your move" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
-                                   Foreground="{StaticResource AccentGreenLightBrush}" />
-                        <TextBlock x:Name="MoveList" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
-                                   TextWrapping="Wrap" />
+                                   Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
+                        <!-- Bounded so the move history scrolls instead of growing the panel forever. -->
+                        <ScrollViewer x:Name="MoveScroller" MaxHeight="132" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+                            <TextBlock x:Name="MoveList" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
+                                       TextWrapping="Wrap" />
+                        </ScrollViewer>
+                        <!-- Step through the game: first / previous / next / latest. -->
+                        <Grid ColumnSpacing="6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" x:Name="MoveFirstButton" Style="{StaticResource TileButton}" Padding="0,8" Click="MoveFirst_Click"
+                                    Content="⏮" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                            <Button Grid.Column="1" x:Name="MovePrevButton" Style="{StaticResource TileButton}" Padding="0,8" Click="MovePrev_Click"
+                                    Content="◀" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                            <Button Grid.Column="2" x:Name="MoveNextButton" Style="{StaticResource TileButton}" Padding="0,8" Click="MoveNext_Click"
+                                    Content="▶" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                            <Button Grid.Column="3" x:Name="MoveLastButton" Style="{StaticResource TileButton}" Padding="0,8" Click="MoveLast_Click"
+                                    Content="⏭" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                        </Grid>
+                        <TextBlock x:Name="MovePositionText" Text="" FontSize="{StaticResource CaptionSize}"
+                                   Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" />
                     </StackPanel>
                 </Border>
 

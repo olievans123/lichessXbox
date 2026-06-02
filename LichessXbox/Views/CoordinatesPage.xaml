@@ -17,7 +17,7 @@
         </Viewbox>
 
         <StackPanel Grid.Column="1" Margin="28,0,0,0" Spacing="20" VerticalAlignment="Center">
-            <TextBlock Text="Coordinate trainer" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+            <TextBlock Text="Coordinate trainer" FontSize="{StaticResource TitleSize}" FontWeight="Bold" TextWrapping="Wrap" Foreground="{StaticResource TextPrimaryBrush}" />
             <TextBlock Text="Find the named square as fast as you can. 30 seconds." FontSize="{StaticResource CaptionSize}"
                        Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
 

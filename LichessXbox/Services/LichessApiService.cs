@@ -241,29 +241,35 @@ namespace LichessXbox.Services
         public Task<PuzzleInfo> GetNextPuzzleAsync() => GetPuzzleAsync("/api/puzzle/next");
         public Task<PuzzleInfo> GetThemedPuzzleAsync(string angle) =>
             GetPuzzleAsync("/api/puzzle/next?angle=" + Uri.EscapeDataString(angle));
-        public Task<PuzzleInfo> GetStreakPuzzleAsync() => GetPuzzleAsync("/api/puzzle/streak");
 
         async Task<PuzzleInfo> GetPuzzleAsync(string path)
         {
-            using (var req = Build(HttpMethod.Get, path))
-            using (var resp = await _http.SendAsync(req))
+            // Fetch puzzles ANONYMOUSLY (no auth header). Authenticated /api/puzzle/next can
+            // return the same puzzle repeatedly in practice (it tracks per-user "seen" state,
+            // and there is no public endpoint to record a solve), so "Next" would appear stuck.
+            // Anonymous requests have no per-user history and reliably return a fresh random puzzle.
+            using (var req = new HttpRequestMessage(HttpMethod.Get, Base + path))
             {
-                if (!resp.IsSuccessStatusCode) return null;
-                var o = JObject.Parse(await resp.Content.ReadAsStringAsync());
-                var puzzle = o["puzzle"];
-                var game = o["game"];
-                if (puzzle == null) return null;
-
-                var info = new PuzzleInfo
+                req.Headers.Accept.ParseAdd("application/json");
+                using (var resp = await _http.SendAsync(req))
                 {
-                    Id = puzzle.Value<string>("id"),
-                    Rating = puzzle.Value<int?>("rating") ?? 0,
-                    InitialPly = puzzle.Value<int?>("initialPly") ?? 0,
-                    Pgn = game?.Value<string>("pgn"),
-                };
-                foreach (var t in puzzle["themes"] ?? new JArray()) info.Themes.Add(t.ToString());
-                foreach (var s in puzzle["solution"] ?? new JArray()) info.Solution.Add(s.ToString());
-                return info;
+                    if (!resp.IsSuccessStatusCode) return null;
+                    var o = JObject.Parse(await resp.Content.ReadAsStringAsync());
+                    var puzzle = o["puzzle"];
+                    var game = o["game"];
+                    if (puzzle == null) return null;
+
+                    var info = new PuzzleInfo
+                    {
+                        Id = puzzle.Value<string>("id"),
+                        Rating = puzzle.Value<int?>("rating") ?? 0,
+                        InitialPly = puzzle.Value<int?>("initialPly") ?? 0,
+                        Pgn = game?.Value<string>("pgn"),
+                    };
+                    foreach (var t in puzzle["themes"] ?? new JArray()) info.Themes.Add(t.ToString());
+                    foreach (var s in puzzle["solution"] ?? new JArray()) info.Solution.Add(s.ToString());
+                    return info;
+                }
             }
         }
 

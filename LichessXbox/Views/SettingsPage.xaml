@@ -2,106 +2,132 @@
     x:Class="LichessXbox.Views.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:LichessXbox.Controls"
     Background="Transparent">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-        <StackPanel Padding="32,24" Spacing="22" MaxWidth="720" HorizontalAlignment="Left">
-            <TextBlock Text="Settings" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="340" />
+        </Grid.ColumnDefinitions>
 
-            <TextBlock Text="Board theme" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-            <GridView x:Name="ThemeGrid" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Theme_ItemClick">
-                <GridView.ItemTemplate>
-                    <DataTemplate>
-                        <Border Width="160" Height="120" CornerRadius="16"
-                                Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
-                            <StackPanel Margin="14" Spacing="8">
-                                <Border Height="48" CornerRadius="8">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Border Grid.Column="0" Background="{Binding LightBrush}" />
-                                        <Border Grid.Column="1" Background="{Binding DarkBrush}" />
-                                        <Border Grid.Column="2" Background="{Binding LightBrush}" />
-                                        <Border Grid.Column="3" Background="{Binding DarkBrush}" />
-                                    </Grid>
-                                </Border>
-                                <TextBlock Text="{Binding Name}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
-                                           Foreground="{StaticResource TextPrimaryBrush}" />
+        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+            <StackPanel Padding="32,24" Spacing="22">
+                <TextBlock Text="Settings" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+
+                <TextBlock Text="Board theme" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                <GridView x:Name="ThemeGrid" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Theme_ItemClick">
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Width="160" Height="120" CornerRadius="16"
+                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
+                                <StackPanel Margin="14" Spacing="8">
+                                    <Border Height="48" CornerRadius="8">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0" Background="{Binding LightBrush}" />
+                                            <Border Grid.Column="1" Background="{Binding DarkBrush}" />
+                                            <Border Grid.Column="2" Background="{Binding LightBrush}" />
+                                            <Border Grid.Column="3" Background="{Binding DarkBrush}" />
+                                        </Grid>
+                                    </Border>
+                                    <TextBlock Text="{Binding Name}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+
+                <TextBlock Text="Pieces" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                <TextBlock Text="Open-source lichess sets, downloaded on first use. Move the highlight to preview a set on the right; press A to apply it."
+                           FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
+                <GridView x:Name="PieceGrid" SelectionMode="Single" IsItemClickEnabled="True"
+                          ItemClick="PieceSet_ItemClick" SelectionChanged="PieceSet_SelectionChanged">
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Width="150" Height="104" CornerRadius="16"
+                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
+                                <StackPanel Margin="10" VerticalAlignment="Center" Spacing="4">
+                                    <TextBlock Text="♞" FontFamily="Segoe UI Symbol" FontSize="24" HorizontalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}" />
+                                    <TextBlock Text="{Binding}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold" TextAlignment="Center"
+                                               TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis" Foreground="{StaticResource TextPrimaryBrush}" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+                <TextBlock x:Name="PieceStatus" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
+                           Visibility="Collapsed" TextWrapping="Wrap" />
+
+                <Border Style="{StaticResource CardBorder}" Padding="24">
+                    <StackPanel Spacing="18">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Outline piece set" FontSize="{StaticResource BodySize}" Foreground="{StaticResource TextPrimaryBrush}" />
+                                <TextBlock Text="Use hollow glyphs for the white pieces (Native set only)." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
                             </StackPanel>
-                        </Border>
-                    </DataTemplate>
-                </GridView.ItemTemplate>
-            </GridView>
-
-            <TextBlock Text="Pieces" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-            <TextBlock Text="Choose a piece set from lichess (open source; downloaded on first use)." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-            <GridView x:Name="PieceGrid" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="PieceSet_ItemClick">
-                <GridView.ItemTemplate>
-                    <DataTemplate>
-                        <Border Width="120" Height="96" CornerRadius="16"
-                                Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
-                            <StackPanel Margin="10" VerticalAlignment="Center" Spacing="4">
-                                <TextBlock Text="♞" FontFamily="Segoe UI Symbol" FontSize="30" HorizontalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}" />
-                                <TextBlock Text="{Binding}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold" TextAlignment="Center"
-                                           TextWrapping="Wrap" Foreground="{StaticResource TextPrimaryBrush}" />
+                            <ToggleSwitch x:Name="OutlineToggle" Grid.Column="1" Toggled="Outline_Toggled" />
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="UI sounds" FontSize="{StaticResource BodySize}" Foreground="{StaticResource TextPrimaryBrush}" />
+                                <TextBlock Text="Play navigation sounds when moving focus." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
                             </StackPanel>
-                        </Border>
-                    </DataTemplate>
-                </GridView.ItemTemplate>
-            </GridView>
-            <TextBlock x:Name="PieceStatus" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
-                       Visibility="Collapsed" TextWrapping="Wrap" />
-
-            <Border Style="{StaticResource CardBorder}" Padding="24">
-                <StackPanel Spacing="18">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="Outline piece set" FontSize="{StaticResource BodySize}" Foreground="{StaticResource TextPrimaryBrush}" />
-                            <TextBlock Text="Use hollow glyphs for the white pieces." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                        </StackPanel>
-                        <ToggleSwitch x:Name="OutlineToggle" Grid.Column="1" Toggled="Outline_Toggled" />
-                    </Grid>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="UI sounds" FontSize="{StaticResource BodySize}" Foreground="{StaticResource TextPrimaryBrush}" />
-                            <TextBlock Text="Play navigation sounds when moving focus." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                        </StackPanel>
-                        <ToggleSwitch x:Name="SoundToggle" Grid.Column="1" Toggled="Sound_Toggled" />
-                    </Grid>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="Move sounds" FontSize="{StaticResource BodySize}" Foreground="{StaticResource TextPrimaryBrush}" />
-                            <TextBlock Text="Play a sound for each move, capture, and check." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                        </StackPanel>
-                        <ToggleSwitch x:Name="MoveSoundToggle" Grid.Column="1" Toggled="MoveSound_Toggled" />
-                    </Grid>
-                </StackPanel>
-            </Border>
-
-            <Border Style="{StaticResource CardBorder}" Padding="24">
-                <StackPanel Spacing="6">
-                    <TextBlock Text="More tools" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                    <TextBlock Text="Board editor and the coordinate trainer are in their own tabs." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                    <StackPanel Spacing="10" Margin="0,8,0,0">
-                        <Button Style="{StaticResource TileButton}" Click="Editor_Click" Content="Board editor" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                        <Button Style="{StaticResource TileButton}" Click="Coords_Click" Content="Coordinate trainer" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                            <ToggleSwitch x:Name="SoundToggle" Grid.Column="1" Toggled="Sound_Toggled" />
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Move sounds" FontSize="{StaticResource BodySize}" Foreground="{StaticResource TextPrimaryBrush}" />
+                                <TextBlock Text="Play a sound for each move, capture, and check." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <ToggleSwitch x:Name="MoveSoundToggle" Grid.Column="1" Toggled="MoveSound_Toggled" />
+                        </Grid>
                     </StackPanel>
-                </StackPanel>
-            </Border>
-        </StackPanel>
-    </ScrollViewer>
+                </Border>
+
+                <Border Style="{StaticResource CardBorder}" Padding="24">
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="More tools" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                        <TextBlock Text="Board editor and the coordinate trainer are in their own tabs." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
+                        <StackPanel Spacing="10" Margin="0,8,0,0">
+                            <Button Style="{StaticResource TileButton}" Click="Editor_Click" Content="Board editor" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                            <Button Style="{StaticResource TileButton}" Click="Coords_Click" Content="Coordinate trainer" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Sticky live preview: reflects the chosen theme and the highlighted piece set.
+             Non-interactive, so it never steals gamepad focus or shows a hover animation. -->
+        <Border Grid.Column="1" Background="{StaticResource AppSurfaceBrush}"
+                BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1,0,0,0">
+            <StackPanel VerticalAlignment="Center" Spacing="14" Padding="20">
+                <TextBlock Text="Preview" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
+                           Foreground="{StaticResource AccentGreenLightBrush}" HorizontalAlignment="Center" />
+                <Viewbox MaxWidth="300" MaxHeight="300" HorizontalAlignment="Center">
+                    <controls:ChessBoardControl x:Name="PreviewBoard" Interactive="False" IsTabStop="False" />
+                </Viewbox>
+                <TextBlock x:Name="PreviewLabel" Text="" FontSize="{StaticResource CaptionSize}"
+                           Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"
+                           TextAlignment="Center" TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+    </Grid>
 </Page>

@@ -19,19 +19,15 @@
         <StackPanel Margin="24,0,0,0" Padding="0,0,10,16" Spacing="12" VerticalAlignment="Top">
             <TextBlock Text="Puzzles" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
-            <Grid ColumnSpacing="8">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Button x:Name="ModeTraining" Grid.Column="0" Style="{StaticResource NavButton}" Tag="training" Click="Mode_Click"
+            <!-- Stacked (not a 3-wide row) so the labels never clip in the narrow sidebar. -->
+            <StackPanel Spacing="8">
+                <Button x:Name="ModeTraining" Style="{StaticResource NavButton}" Tag="training" Click="Mode_Click"
                         Content="Training" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                <Button x:Name="ModeStreak" Grid.Column="1" Style="{StaticResource NavButton}" Tag="streak" Click="Mode_Click"
+                <Button x:Name="ModeStreak" Style="{StaticResource NavButton}" Tag="streak" Click="Mode_Click"
                         Content="Streak" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                <Button x:Name="ModeThemed" Grid.Column="2" Style="{StaticResource NavButton}" Tag="themed" Click="Mode_Click"
+                <Button x:Name="ModeThemed" Style="{StaticResource NavButton}" Tag="themed" Click="Mode_Click"
                         Content="Themed" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-            </Grid>
+            </StackPanel>
 
             <ComboBox x:Name="ThemeBox" Visibility="Collapsed" HorizontalAlignment="Stretch" Style="{StaticResource ThemedComboBox}" FontSize="{StaticResource CaptionSize}"
                       Header="Theme" SelectionChanged="ThemeBox_SelectionChanged" />

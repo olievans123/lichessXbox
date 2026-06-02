@@ -100,16 +100,17 @@ namespace LichessXbox.Views
                 switch (_mode)
                 {
                     case "streak":
-                        _puzzle = await AppState.Current.Api.GetStreakPuzzleAsync()
-                                  ?? await AppState.Current.Api.GetNextPuzzleAsync();
+                        // Streak is just a local consecutive-solve counter over random puzzles
+                        // (there is no public puzzle-streak endpoint).
+                        _puzzle = await AppState.Current.Api.GetNextPuzzleAsync();
                         break;
                     case "themed":
                         _puzzle = await AppState.Current.Api.GetThemedPuzzleAsync(_theme);
                         break;
                     default:
-                        _puzzle = AppState.Current.IsSignedIn
-                            ? await AppState.Current.Api.GetNextPuzzleAsync()
-                            : await AppState.Current.Api.GetDailyPuzzleAsync();
+                        // A fresh random puzzle each time (works signed in or out); daily as a fallback.
+                        _puzzle = await AppState.Current.Api.GetNextPuzzleAsync()
+                                  ?? await AppState.Current.Api.GetDailyPuzzleAsync();
                         break;
                 }
 

@@ -29,7 +29,7 @@ namespace LichessXbox.Views
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             StartChannel(_currentChannel, "Lichess TV");
-            Board.Focus(Windows.UI.Xaml.FocusState.Programmatic);
+            // The board is non-interactive (watch only), so it can't take focus — the list does.
             await LoadListsAsync();
         }
 
@@ -53,9 +53,18 @@ namespace LichessXbox.Views
             }
             finally { Busy.IsActive = false; }
 
-            if (ChannelList.Items.Count > 0)
-                ChannelList.Focus(Windows.UI.Xaml.FocusState.Programmatic);
+            // Land gamepad focus on the first non-empty list so the page is never a dead-end.
+            Control target =
+                ChannelList.Items.Count > 0 ? (Control)ChannelList :
+                StreamerList.Items.Count > 0 ? StreamerList :
+                SimulList.Items.Count > 0 ? SimulList :
+                BroadcastList.Items.Count > 0 ? BroadcastList : null;
+            target?.Focus(Windows.UI.Xaml.FocusState.Programmatic);
         }
+
+        // Streamer/simul/broadcast cards are informational; they're click-enabled only so a
+        // gamepad can move focus onto them (and pull the list into view). No action on press.
+        void InfoCard_ItemClick(object sender, ItemClickEventArgs e) { }
 
         static void SetEmptyState(ListView list, TextBlock empty)
         {

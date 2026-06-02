@@ -53,6 +53,9 @@ namespace LichessXbox.Views
             finally { Busy.IsActive = false; }
         }
 
+        // Standings rows are read-only; click-enabled only so a gamepad can focus and scroll them.
+        void Standings_ItemClick(object sender, ItemClickEventArgs e) { }
+
         async void Tournament_ItemClick(object sender, ItemClickEventArgs e)
         {
             if (!(e.ClickedItem is TournamentItem t)) return;

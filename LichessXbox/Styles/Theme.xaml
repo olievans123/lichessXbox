@@ -263,8 +263,24 @@
         </Setter>
     </Style>
 
-    <!-- Combo boxes get the green focus ring to match the rest of the app -->
+    <!-- Combo boxes get the green focus ring to match the rest of the app. UseSystemFocusVisuals
+         must be on for the FocusVisual*Brush rectangle to actually be drawn. -->
     <Style x:Key="ThemedComboBox" TargetType="ComboBox">
+        <Setter Property="UseSystemFocusVisuals" Value="True" />
+        <Setter Property="FocusVisualPrimaryBrush" Value="{StaticResource AccentGreenLightBrush}" />
+        <Setter Property="FocusVisualSecondaryBrush" Value="#99000000" />
+    </Style>
+
+    <!-- Every text box and toggle switch gets the app's green focus ring instead of the default
+         system/accent visual, so gamepad focus reads consistently across the app. The system
+         focus visual must be enabled for the green FocusVisual brush to render. Implicit = app-wide. -->
+    <Style TargetType="TextBox">
+        <Setter Property="UseSystemFocusVisuals" Value="True" />
+        <Setter Property="FocusVisualPrimaryBrush" Value="{StaticResource AccentGreenLightBrush}" />
+        <Setter Property="FocusVisualSecondaryBrush" Value="#99000000" />
+    </Style>
+    <Style TargetType="ToggleSwitch">
+        <Setter Property="UseSystemFocusVisuals" Value="True" />
         <Setter Property="FocusVisualPrimaryBrush" Value="{StaticResource AccentGreenLightBrush}" />
         <Setter Property="FocusVisualSecondaryBrush" Value="#99000000" />
     </Style>

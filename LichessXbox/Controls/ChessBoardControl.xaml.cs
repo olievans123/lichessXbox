@@ -113,6 +113,15 @@ namespace LichessXbox.Controls
         /// <summary>Highlight this move as the most recent one.</summary>
         public ChessMove? LastMove { get; set; }
 
+        string _pieceSetOverride;
+        /// <summary>When set, the board renders this piece set instead of the global
+        /// <see cref="BoardTheme.PieceSet"/> — used by Settings to preview a set before applying it.</summary>
+        public string PieceSetOverride
+        {
+            get => _pieceSetOverride;
+            set { if (_pieceSetOverride == value) return; _pieceSetOverride = value; Render(); }
+        }
+
         #endregion
 
         #region geometry
@@ -268,12 +277,22 @@ namespace LichessXbox.Controls
         void ApplyInteractivity()
         {
             bool on = Interactive;
+            // The board itself is a gamepad focus stop only while interactive, so a watch /
+            // preview / reviewed board never steals focus (live boards focus a cell directly).
+            IsTabStop = on;
             for (int sq = 0; sq < 64; sq++)
             {
                 var cell = _cells[sq];
                 if (cell == null) continue;
                 cell.IsTabStop = on;
                 cell.IsHitTestVisible = on;
+            }
+            // If input is disabled mid-promotion (game ended, or the user is reviewing a past
+            // move), dismiss the picker so it can't commit a move for a position they've left.
+            if (!on && PromotionOverlay != null)
+            {
+                PromotionOverlay.Visibility = Visibility.Collapsed;
+                _pendingPromotion = new ChessMove(-1, -1);
             }
         }
 
@@ -329,7 +348,7 @@ namespace LichessXbox.Controls
                 }
                 else
                 {
-                    var src = PieceSets.SourceFor(BoardTheme.PieceSet, piece);   // null → use the Unicode glyph
+                    var src = PieceSets.SourceFor(_pieceSetOverride ?? BoardTheme.PieceSet, piece);   // null → use the Unicode glyph
                     if (src != null)
                     {
                         if (!_svgCache.TryGetValue(src.AbsoluteUri, out var img))

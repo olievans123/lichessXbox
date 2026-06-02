@@ -14,10 +14,10 @@ namespace LichessXbox.Views
             ThemeGrid.ItemsSource = BoardTheme.Presets;
             ThemeGrid.SelectedItem = BoardTheme.Presets.Find(p => p.Name == BoardTheme.CurrentName);
             OutlineToggle.IsOn = BoardTheme.OutlinePieces;
-            SoundToggle.IsOn = ElementSoundPlayer.State == ElementSoundPlayerState.On;
+            SoundToggle.IsOn = BoardTheme.UiSounds;
             MoveSoundToggle.IsOn = BoardTheme.MoveSounds;
             PieceGrid.ItemsSource = PieceSets.All;
-            PieceGrid.SelectedItem = BoardTheme.PieceSet;
+            PieceGrid.SelectedItem = BoardTheme.PieceSet;   // fires SelectionChanged → seeds the preview
             _loaded = true;
             ThemeGrid.FocusOnLoad();
         }
@@ -25,6 +25,16 @@ namespace LichessXbox.Views
         void Theme_ItemClick(object sender, ItemClickEventArgs e)
         {
             if (e.ClickedItem is BoardTheme.Preset p) BoardTheme.Apply(p.Name);
+        }
+
+        // Live-preview the highlighted piece set on the side board without applying it.
+        // On Xbox the highlight follows gamepad focus, so this updates as the user browses.
+        void PieceSet_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!(PieceGrid.SelectedItem is string set)) return;
+            PreviewBoard.PieceSetOverride = set;   // "Native" → Unicode glyphs; else the SVG set
+            PreviewLabel.Text = set == PieceSets.Native ? "Native — Unicode glyphs" : set;
+            if (set != PieceSets.Native) _ = PieceSets.EnsureAsync(set);   // fetch SVGs so the preview fills in
         }
 
         async void PieceSet_ItemClick(object sender, ItemClickEventArgs e)
@@ -62,6 +72,7 @@ namespace LichessXbox.Views
         void Sound_Toggled(object sender, RoutedEventArgs e)
         {
             if (!_loaded) return;
+            BoardTheme.SetUiSounds(SoundToggle.IsOn);
             ElementSoundPlayer.State = SoundToggle.IsOn ? ElementSoundPlayerState.On : ElementSoundPlayerState.Off;
         }
 
