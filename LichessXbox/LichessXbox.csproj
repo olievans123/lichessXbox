@@ -235,9 +235,9 @@
     <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
-    <Content Include="Assets\Sounds\move.wav" />
-    <Content Include="Assets\Sounds\capture.wav" />
-    <Content Include="Assets\Sounds\check.wav" />
+    <Content Include="Assets\Sounds\move.mp3" />
+    <Content Include="Assets\Sounds\capture.mp3" />
+    <Content Include="Assets\Sounds\check.mp3" />
     <!-- Default piece set bundled in the package so the board has pieces instantly on first
          launch (no download, works offline). Other sets are still fetched on demand. -->
     <Content Include="Assets\pieces\cburnett\wK.svg" />

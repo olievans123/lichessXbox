@@ -24,7 +24,7 @@ namespace LichessXbox.Services
                 {
                     mp = new MediaPlayer
                     {
-                        Source = MediaSource.CreateFromUri(new Uri($"ms-appx:///Assets/Sounds/{name}.wav")),
+                        Source = MediaSource.CreateFromUri(new Uri($"ms-appx:///Assets/Sounds/{name}.mp3")),
                         AutoPlay = false,
                         Volume = 0.6,
                     };
