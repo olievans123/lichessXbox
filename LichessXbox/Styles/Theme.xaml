@@ -33,6 +33,24 @@
     <SolidColorBrush x:Key="ToggleSwitchStrokeOnPointerOver" Color="{StaticResource AccentGreenLightColor}" />
     <SolidColorBrush x:Key="ToggleSwitchStrokeOnPressed" Color="{StaticResource AccentGreenLightColor}" />
 
+    <!-- Text boxes themed to the warm dark surface. The default UWP TextBox is a near-white
+         box with dark text, which looked out of place; these well-known theme keys recolor
+         every TextBox (background, text, border, placeholder, selection) to match the app. -->
+    <SolidColorBrush x:Key="TextControlBackground" Color="{StaticResource AppSurfaceHighColor}" />
+    <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="{StaticResource AppSurfaceHighColor}" />
+    <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="{StaticResource AppSurfaceHighColor}" />
+    <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="{StaticResource AppSurfaceColor}" />
+    <SolidColorBrush x:Key="TextControlForeground" Color="{StaticResource TextPrimaryColor}" />
+    <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="{StaticResource TextPrimaryColor}" />
+    <SolidColorBrush x:Key="TextControlForegroundFocused" Color="{StaticResource TextPrimaryColor}" />
+    <SolidColorBrush x:Key="TextControlBorderBrush" Color="#33FFFFFF" />
+    <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="#55FFFFFF" />
+    <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#66FFFFFF" />
+    <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="{StaticResource TextSecondaryColor}" />
+    <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="{StaticResource TextSecondaryColor}" />
+    <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="{StaticResource TextSecondaryColor}" />
+    <SolidColorBrush x:Key="TextControlSelectionHighlightColor" Color="{StaticResource AccentGreenColor}" />
+
     <!-- Hero gradient used behind the home / login screens -->
     <LinearGradientBrush x:Key="HeroGradientBrush" StartPoint="0,0" EndPoint="1,1">
         <GradientStop Color="#1B2410" Offset="0.0" />
