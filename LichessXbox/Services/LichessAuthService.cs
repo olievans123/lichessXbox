@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using Windows.Security.Authentication.Web;
 using Windows.Security.Credentials;
 
 namespace LichessXbox.Services
@@ -11,8 +10,11 @@ namespace LichessXbox.Services
     /// <summary>
     /// OAuth2 + PKCE login against Lichess. Lichess is an open OAuth provider:
     /// no client secret and no app pre-registration are required for a public
-    /// client. We use the UWP <see cref="WebAuthenticationBroker"/> which works
-    /// on Xbox, then exchange the code for a token over PKCE.
+    /// client. Sign-in happens on a second device (the correct pattern for a
+    /// console): we build the authorize URL (<see cref="BuildAuthorization"/>),
+    /// the user approves it in their phone's real browser, and the code returns to
+    /// a LAN loopback callback, which we exchange for a token over PKCE
+    /// (<see cref="CompleteAuthAsync"/>). No embedded browser is ever used.
     ///
     /// The bearer token is stored in the Windows <see cref="PasswordVault"/> so the
     /// user stays signed in between sessions.
@@ -24,9 +26,6 @@ namespace LichessXbox.Services
         const string Authorize = "https://lichess.org/oauth";
         const string TokenEndpoint = "https://lichess.org/api/token";
         const string Scopes = "board:play challenge:write puzzle:read preference:read";
-        // Loopback redirect (Lichess accepts it; custom schemes get HTTP 400). The login
-        // WebView intercepts the redirect here without actually loading it.
-        public const string RedirectUri = "http://localhost/lichess-xbox-auth";
 
         const string VaultResource = "LichessXbox";
         const string VaultUser = "bearer";
@@ -47,50 +46,6 @@ namespace LichessXbox.Services
             Token = string.IsNullOrWhiteSpace(token) ? null : token.Trim();
             if (Token == null) ClearStoredToken();
             else StoreToken(Token);
-        }
-
-        public async Task<bool> SignInAsync()
-        {
-            string verifier = Pkce.GenerateCodeVerifier();
-            string challenge = Pkce.Challenge(verifier);
-            string state = Pkce.RandomState();
-
-            // Lichess rejects custom-scheme redirect URIs (e.g. the broker's ms-app://…)
-            // with HTTP 400 — it only accepts http/https/loopback. Use a loopback URI:
-            // the WebAuthenticationBroker intercepts the redirect to it (the URL is never
-            // actually fetched) and hands back the authorization code.
-            string redirect = "http://localhost/lichess-xbox-auth";
-
-            string authUrl =
-                Authorize +
-                "?response_type=code" +
-                "&client_id=" + Uri.EscapeDataString(ClientId) +
-                "&redirect_uri=" + Uri.EscapeDataString(redirect) +
-                "&code_challenge_method=S256" +
-                "&code_challenge=" + Uri.EscapeDataString(challenge) +
-                "&scope=" + Uri.EscapeDataString(Scopes) +
-                "&state=" + Uri.EscapeDataString(state);
-
-            WebAuthenticationResult result;
-            try
-            {
-                result = await WebAuthenticationBroker.AuthenticateAsync(
-                    WebAuthenticationOptions.None, new Uri(authUrl), new Uri(redirect));
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Auth broker failed: " + ex);
-                return false;
-            }
-
-            if (result.ResponseStatus != WebAuthenticationStatus.Success)
-                return false;
-
-            var query = ParseQuery(result.ResponseData);
-            if (!query.TryGetValue("code", out string code)) return false;
-            if (query.TryGetValue("state", out string returnedState) && returnedState != state) return false;
-
-            return await ExchangeCodeAsync(code, verifier, redirect);
         }
 
         /// <summary>Build the authorize URL + PKCE verifier + state for the given redirect URI.</summary>
@@ -183,19 +138,6 @@ namespace LichessXbox.Services
                 foreach (var c in vault.FindAllByResource(VaultResource)) vault.Remove(c);
             }
             catch { /* nothing stored */ }
-        }
-
-        static Dictionary<string, string> ParseQuery(string responseUri)
-        {
-            var dict = new Dictionary<string, string>();
-            int q = responseUri.IndexOf('?');
-            if (q < 0) return dict;
-            foreach (var pair in responseUri.Substring(q + 1).Split('&'))
-            {
-                var kv = pair.Split(new[] { '=' }, 2);
-                if (kv.Length == 2) dict[kv[0]] = Uri.UnescapeDataString(kv[1]);
-            }
-            return dict;
         }
     }
 }
