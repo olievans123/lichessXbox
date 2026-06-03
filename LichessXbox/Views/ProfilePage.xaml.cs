@@ -4,10 +4,14 @@ using System.Threading.Tasks;
 using LichessXbox.Helpers;
 using LichessXbox.Models;
 using LichessXbox.Services;
+using Windows.Foundation;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.Xaml.Shapes;
 
 namespace LichessXbox.Views
 {
@@ -16,6 +20,7 @@ namespace LichessXbox.Views
         LanCallbackServer _server;
         string _verifier, _state;
         string _webVerifier, _webState;   // in-app WebView login
+        bool _gamesLoaded;                // recent games are perf-independent — fetch them once
         int _pairAttempt;   // guards against stale callbacks when restarting/cancelling
         readonly DispatcherTimer _qrExpiry = new DispatcherTimer { Interval = TimeSpan.FromSeconds(90) };
 
@@ -93,6 +98,14 @@ namespace LichessXbox.Views
             if (a.ClassicalRating.HasValue) ratings.Add(new RatingTile("Classical", a.ClassicalRating.Value));
             RatingsGrid.ItemsSource = ratings;
             NoRatings.Visibility = (ratings.Count == 0) ? Visibility.Visible : Visibility.Collapsed;
+
+            // Start with the in-page detail hidden; it opens when a rating is chosen.
+            RatingDetailPanel.Visibility = Visibility.Collapsed;
+            _gamesLoaded = false;
+            ProfileGames.ItemsSource = null;
+            ProfileGraph.Children.Clear();
+            ProfileRatingRange.Text = "";
+
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => SignOutButton.Focus(FocusState.Programmatic));
         }
 
@@ -224,11 +237,85 @@ namespace LichessXbox.Views
             await RefreshAsync();
         }
 
-        // Clicking a rating opens your games + rating graph (the Games tab).
-        void Rating_ItemClick(object sender, ItemClickEventArgs e)
+        // Clicking a rating reveals that perf's elo graph + your recent games right here.
+        async void Rating_ItemClick(object sender, ItemClickEventArgs e)
         {
+            if (!(e.ClickedItem is RatingTile t)) return;
+            await ShowRatingDetailAsync(t.Mode);
+        }
+
+        async Task ShowRatingDetailAsync(string perf)
+        {
+            RatingDetailTitle.Text = perf + " rating";
+            RatingDetailPanel.Visibility = Visibility.Visible;
+
+            var account = await AppState.Current.EnsureAccountAsync();
+            if (account == null) return;
+
+            // Rating graph for the chosen perf.
+            try { DrawGraph(await AppState.Current.Api.GetRatingHistoryAsync(account.Username, perf)); }
+            catch { ProfileGraph.Children.Clear(); ProfileRatingRange.Text = "Couldn't load rating history."; }
+
+            // Recent games are the same regardless of perf, so only fetch them once.
+            if (!_gamesLoaded)
+            {
+                ProfileGamesBusy.IsActive = true;
+                ProfileNoGames.Visibility = Visibility.Collapsed;
+                try
+                {
+                    var games = await AppState.Current.Api.GetUserGamesAsync(account.Username, 12);
+                    ProfileGames.ItemsSource = games;
+                    bool any = games != null && games.Count > 0;
+                    ProfileNoGames.Text = "No games yet.";
+                    ProfileNoGames.Visibility = any ? Visibility.Collapsed : Visibility.Visible;
+                    _gamesLoaded = any;   // leave unset on empty so a later click retries
+                }
+                catch
+                {
+                    ProfileNoGames.Text = "Couldn't load your games.";
+                    ProfileNoGames.Visibility = Visibility.Visible;
+                }
+                finally { ProfileGamesBusy.IsActive = false; }
+            }
+        }
+
+        void ProfileGame_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            if (!(e.ClickedItem is GameSummary g)) return;
             var shell = (Window.Current.Content as Frame)?.Content as LichessXbox.MainPage;
-            shell?.NavigateTo("games");
+            shell?.OpenAnalysis((g.InitialFen ?? "startpos") + "|" + (g.Moves ?? ""));
+        }
+
+        // Simple rating sparkline (same style as the Games page graph).
+        void DrawGraph(List<(int x, int y)> points)
+        {
+            ProfileGraph.Children.Clear();
+            if (points == null || points.Count < 2) { ProfileRatingRange.Text = "No rating history yet."; return; }
+
+            double w = 560, h = 150, pad = 10;
+            if (ProfileGraph.ActualWidth > 10) w = ProfileGraph.ActualWidth;
+            if (ProfileGraph.ActualHeight > 10) h = ProfileGraph.ActualHeight;
+
+            int minR = int.MaxValue, maxR = int.MinValue;
+            foreach (var p in points) { if (p.y < minR) minR = p.y; if (p.y > maxR) maxR = p.y; }
+            if (maxR == minR) { maxR += 1; minR -= 1; }
+
+            int n = points.Count;
+            var line = new Polyline
+            {
+                Stroke = new SolidColorBrush(Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F)),
+                StrokeThickness = 3,
+            };
+            var pts = new PointCollection();
+            for (int i = 0; i < n; i++)
+            {
+                double x = pad + (w - 2 * pad) * i / (n - 1);
+                double y = pad + (h - 2 * pad) * (1 - (double)(points[i].y - minR) / (maxR - minR));
+                pts.Add(new Point(x, y));
+            }
+            line.Points = pts;
+            ProfileGraph.Children.Add(line);
+            ProfileRatingRange.Text = $"{minR} – {maxR}  ·  {n} games tracked";
         }
 
         // ----------------------------------------------------- in-app WebView login
