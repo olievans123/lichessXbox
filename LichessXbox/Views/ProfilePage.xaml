@@ -25,6 +25,12 @@
                     <TextBlock Text="Sign in to Lichess" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold"
                                Foreground="{StaticResource TextPrimaryBrush}" />
 
+                    <!-- Sign in right on the TV (in-app lichess login) -->
+                    <Button x:Name="WebLoginButton" Style="{StaticResource PrimaryButton}" Click="WebLogin_Click"
+                            Content="Sign in on this TV" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                    <TextBlock Text="Log in to lichess right here. Or pair with your phone / paste a token below."
+                               FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
+
                     <!-- QR device pairing (default) -->
                     <StackPanel x:Name="QrPanel" Spacing="14">
                         <Grid>
@@ -120,5 +126,27 @@
                     Content="Sign out" MinWidth="160" HorizontalContentAlignment="Center" HorizontalAlignment="Left" />
         </StackPanel>
         </ScrollViewer>
+
+        <!-- In-app lichess login: a WebView that loads the OAuth page; we intercept the
+             loopback redirect to capture the authorization code. Covers the page when active. -->
+        <Grid x:Name="LoginWebPanel" Visibility="Collapsed" Background="{StaticResource AppBackgroundBrush}" Margin="-32,-24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Padding="32,20,32,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Sign in to lichess" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                    <TextBlock x:Name="LoginWebStatus" Text="Loading…" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                </StackPanel>
+                <Button Grid.Column="1" x:Name="LoginCancelButton" Style="{StaticResource TileButton}" Padding="20,10" Click="CancelWebLogin_Click"
+                        Content="Cancel" HorizontalContentAlignment="Center" VerticalAlignment="Center" />
+            </Grid>
+            <WebView x:Name="LoginWeb" Grid.Row="1" NavigationStarting="LoginWeb_NavigationStarting" />
+        </Grid>
     </Grid>
 </Page>

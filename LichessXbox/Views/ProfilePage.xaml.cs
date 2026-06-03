@@ -15,6 +15,7 @@ namespace LichessXbox.Views
     {
         LanCallbackServer _server;
         string _verifier, _state;
+        string _webVerifier, _webState;   // in-app WebView login
         int _pairAttempt;   // guards against stale callbacks when restarting/cancelling
         readonly DispatcherTimer _qrExpiry = new DispatcherTimer { Interval = TimeSpan.FromSeconds(90) };
 
@@ -221,6 +222,63 @@ namespace LichessXbox.Views
         {
             var shell = (Window.Current.Content as Frame)?.Content as LichessXbox.MainPage;
             shell?.NavigateTo("games");
+        }
+
+        // ----------------------------------------------------- in-app WebView login
+
+        void WebLogin_Click(object sender, RoutedEventArgs e)
+        {
+            StopPairing();   // don't run the QR/LAN pairing concurrently
+            var (url, verifier, state) = AppState.Current.Auth.BuildAuthorization(LichessAuthService.RedirectUri);
+            _webVerifier = verifier;
+            _webState = state;
+            LoginWebStatus.Text = "Loading…";
+            LoginWebPanel.Visibility = Visibility.Visible;
+            LoginCancelButton.Focus(FocusState.Programmatic);
+            LoginWeb.Navigate(new Uri(url));
+        }
+
+        // Catch the loopback redirect (which the WebView can't actually load) to grab the code.
+        async void LoginWeb_NavigationStarting(WebView sender, WebViewNavigationStartingEventArgs args)
+        {
+            var uri = args.Uri;
+            if (uri == null || !uri.AbsoluteUri.StartsWith(LichessAuthService.RedirectUri, StringComparison.OrdinalIgnoreCase))
+                return;   // a normal lichess page — let it load
+            args.Cancel = true;
+
+            string code = null, st = null, err = null;
+            foreach (var pair in uri.Query.TrimStart('?').Split('&'))
+            {
+                var kv = pair.Split(new[] { '=' }, 2);
+                if (kv.Length < 2) continue;
+                string val = Uri.UnescapeDataString(kv[1]);
+                if (kv[0] == "code") code = val;
+                else if (kv[0] == "state") st = val;
+                else if (kv[0] == "error") err = val;
+            }
+
+            if (err != null || string.IsNullOrEmpty(code))
+            {
+                LoginWebPanel.Visibility = Visibility.Collapsed;
+                return;   // user denied / cancelled
+            }
+            if (st != _webState)
+            {
+                LoginWebStatus.Text = "Sign-in failed (state mismatch). Try again.";
+                return;
+            }
+
+            LoginWebStatus.Text = "Signing in…";
+            bool ok = await AppState.Current.Auth.CompleteAuthAsync(code, _webVerifier, LichessAuthService.RedirectUri);
+            LoginWebPanel.Visibility = Visibility.Collapsed;
+            if (ok) await RefreshAsync();
+            else ShowAuthError("Sign-in failed — please try again.");
+        }
+
+        void CancelWebLogin_Click(object sender, RoutedEventArgs e)
+        {
+            LoginWebPanel.Visibility = Visibility.Collapsed;
+            try { LoginWeb.NavigateToString(""); } catch { }   // stop loading
         }
     }
 }
