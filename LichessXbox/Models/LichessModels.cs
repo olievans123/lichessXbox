@@ -184,6 +184,7 @@ namespace LichessXbox.Models
         public string InitialFen { get; set; }
         public string FinalFen { get; set; }      // position after the last move (for the board thumbnail)
         public bool PlayerWhite { get; set; }     // orient the thumbnail to the player's side
+        public int Outcome { get; set; }          // 0 = win, 1 = loss, 2 = draw (for the result colour)
     }
 
     // ===================== Watch =====================

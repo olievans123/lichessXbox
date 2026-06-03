@@ -188,7 +188,7 @@
                                        HorizontalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}" />
                             <TextBlock x:Name="ResultMethod" Text="" FontSize="{StaticResource BodySize}"
                                        HorizontalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
-                            <StackPanel x:Name="ResultRatingRow" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center"
+                            <StackPanel x:Name="ResultRatingRow" Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center"
                                         Visibility="Collapsed" Margin="0,2,0,0">
                                 <TextBlock x:Name="ResultRating" FontSize="{StaticResource BodySize}" Foreground="{StaticResource TextSecondaryBrush}" />
                                 <TextBlock x:Name="ResultRatingDelta" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Visibility="Collapsed" />
@@ -200,7 +200,8 @@
                                         Content="New game" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
                                 <Button x:Name="ResultReviewButton" Style="{StaticResource TileButton}" Padding="16,11" Click="ReviewGame_Click"
                                         Content="Review game" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                                <Button x:Name="ResultViewBoardButton" Style="{StaticResource MoveButton}" Padding="8,8" Click="DismissResult_Click"
+                                <Button x:Name="ResultViewBoardButton" Style="{StaticResource MoveButton}" Padding="8,6" Margin="0,6,0,0"
+                                        FontSize="{StaticResource CaptionSize}" Click="DismissResult_Click"
                                         Content="View board" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                                         Foreground="{StaticResource TextSecondaryBrush}" />
                             </StackPanel>

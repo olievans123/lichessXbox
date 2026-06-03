@@ -5,6 +5,7 @@
 
     <helpers:BoolToOpacityConverter x:Key="BoolToOpacity" />
     <helpers:CurrentMoveBrushConverter x:Key="CurrentMoveBrush" />
+    <helpers:OutcomeBrushConverter x:Key="OutcomeBrush" />
 
     <!-- ============ Palette ============ -->
     <!-- Warm "tournament" dark, inspired by lichess board tones -->

@@ -439,18 +439,25 @@ namespace LichessXbox.Services
                 using (var resp = await _http.SendAsync(req, HttpCompletionOption.ResponseHeadersRead))
                 {
                     if (!resp.IsSuccessStatusCode) return list;
+                    var raw = new System.Collections.Generic.List<string>();
                     using (var stream = await resp.Content.ReadAsStreamAsync())
                     using (var reader = new StreamReader(stream))
                     {
                         string line;
                         while ((line = await reader.ReadLineAsync()) != null)
+                            if (!string.IsNullOrWhiteSpace(line)) raw.Add(line);
+                    }
+                    // Parse + replay SAN to the final position off the UI thread (this is the
+                    // expensive part — legal-move generation per ply across all games).
+                    await Task.Run(() =>
+                    {
+                        foreach (var line in raw)
                         {
-                            if (string.IsNullOrWhiteSpace(line)) continue;
                             JObject g;
                             try { g = JObject.Parse(line); } catch { continue; }
                             list.Add(ParseGameSummary(g, username));
                         }
-                    }
+                    });
                 }
             }
             return list;
@@ -467,10 +474,12 @@ namespace LichessXbox.Services
             string winner = g.Value<string>("winner");
             string speed = g.Value<string>("speed") ?? "game";
             string result;
-            if (winner == null) result = "Draw · ½-½";
+            int outcome;
+            if (winner == null) { result = "Draw · ½-½"; outcome = 2; }
             else
             {
                 bool iWon = (winner == "white") == iAmWhite;
+                outcome = iWon ? 0 : 1;
                 result = (iWon ? "Win · " : "Loss · ") + (winner == "white" ? "1-0" : "0-1");
             }
             string initialFen = g.Value<string>("initialFen");
@@ -485,6 +494,7 @@ namespace LichessXbox.Services
                 InitialFen = initialFen,
                 FinalFen = ComputeFinalFen(initialFen, moves),
                 PlayerWhite = iAmWhite,
+                Outcome = outcome,
             };
         }
 

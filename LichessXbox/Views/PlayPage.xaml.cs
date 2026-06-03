@@ -603,7 +603,7 @@ namespace LichessXbox.Views
             if (rc == null || !_resultShown || gameId != _gameId) return;
 
             var (rating, diff) = rc.Value;
-            ResultRating.Text = "Rating " + rating;
+            ResultRating.Text = rating.ToString();
             if (diff != 0)
             {
                 ResultRatingDelta.Text = (diff > 0 ? "+" : "") + diff;

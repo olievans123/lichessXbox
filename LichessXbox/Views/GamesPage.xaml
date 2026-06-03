@@ -17,43 +17,55 @@
             <Button x:Name="GoSignInButton" Style="{StaticResource PrimaryButton}" Click="GoSignIn_Click" HorizontalAlignment="Center" Content="Sign in with Lichess" />
         </StackPanel>
 
-        <ScrollViewer x:Name="GamesContent" IsTabStop="True" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" Visibility="Collapsed">
-            <Grid Padding="0,0,12,24">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="300" />
-                </Grid.ColumnDefinitions>
+        <!-- The board grid scrolls itself (it must NOT be nested in a ScrollViewer, or its
+             ItemsWrapGrid is measured with infinite height and realises every board at once). -->
+        <Grid x:Name="GamesContent" Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="300" />
+            </Grid.ColumnDefinitions>
 
-                <!-- Games -->
-                <StackPanel Grid.Column="0" Spacing="14" Margin="0,0,20,0">
-                    <TextBlock Text="Your games" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+            <!-- Games (grid of board thumbnails) -->
+            <Grid Grid.Column="0" Margin="0,0,20,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="Your games" FontSize="{StaticResource TitleSize}" FontWeight="Bold"
+                           Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,14" />
+                <StackPanel Grid.Row="1" Spacing="12" Margin="0,0,0,10">
                     <TextBlock x:Name="NoGames" Text="No games yet." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
                     <Button x:Name="RetryGamesButton" Style="{StaticResource TileButton}" Click="Retry_Click"
                             Content="Refresh" HorizontalAlignment="Left" HorizontalContentAlignment="Center" MinWidth="160" Visibility="Collapsed" />
                     <ProgressRing x:Name="Busy" IsActive="False" Visibility="Collapsed" Width="34" Height="34" HorizontalAlignment="Left"
                                   Foreground="{StaticResource AccentGreenLightBrush}" />
-                    <GridView x:Name="GamesList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Game_ItemClick">
-                        <GridView.ItemTemplate>
-                            <DataTemplate>
-                                <Border CornerRadius="14" Padding="10" Width="184"
-                                        Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
-                                    <StackPanel Spacing="8">
-                                        <Border CornerRadius="8" Width="164" Height="164">
-                                            <controls:ChessBoardControl Fen="{Binding FinalFen}" WhiteAtBottom="{Binding PlayerWhite}"
-                                                                        Interactive="False" IsTabStop="False" />
-                                        </Border>
-                                        <TextBlock Text="{Binding Headline}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
-                                                   Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
-                                        <TextBlock Text="{Binding ResultText}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </GridView.ItemTemplate>
-                    </GridView>
                 </StackPanel>
+                <GridView Grid.Row="2" x:Name="GamesList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Game_ItemClick"
+                          Padding="0,0,0,16" ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+                            <Border CornerRadius="14" Padding="10" Width="184"
+                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
+                                <StackPanel Spacing="8">
+                                    <Border CornerRadius="8" Width="164" Height="164">
+                                        <controls:ChessBoardControl Fen="{Binding FinalFen}" WhiteAtBottom="{Binding PlayerWhite}"
+                                                                    Interactive="False" IsTabStop="False" />
+                                    </Border>
+                                    <TextBlock Text="{Binding Headline}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding ResultText}" FontSize="{StaticResource CaptionSize}"
+                                               Foreground="{Binding Outcome, Converter={StaticResource OutcomeBrush}}" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+            </Grid>
 
-                <!-- Rating + friends -->
-                <StackPanel Grid.Column="1" Spacing="16">
+            <!-- Rating + friends -->
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+                <StackPanel Spacing="16">
                     <Border Style="{StaticResource CardBorder}" Padding="20">
                         <StackPanel Spacing="10">
                             <TextBlock x:Name="RatingTitle" Text="Blitz rating" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
@@ -80,7 +92,7 @@
                         </StackPanel>
                     </Border>
                 </StackPanel>
-            </Grid>
-        </ScrollViewer>
+            </ScrollViewer>
+        </Grid>
     </Grid>
 </Page>

@@ -179,6 +179,20 @@ namespace LichessXbox.Helpers
         public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotSupportedException();
     }
 
+    /// <summary>Game outcome (0 = win, 1 = loss, 2 = draw) → green / red / grey.</summary>
+    public sealed class OutcomeBrushConverter : Windows.UI.Xaml.Data.IValueConverter
+    {
+        static readonly SolidColorBrush Win = new SolidColorBrush(Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F));
+        static readonly SolidColorBrush Loss = new SolidColorBrush(Color.FromArgb(0xFF, 0xE0, 0x79, 0x5E));
+        static readonly SolidColorBrush Draw = new SolidColorBrush(Color.FromArgb(0xFF, 0x9A, 0x93, 0x86));
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            int o = value is int i ? i : 2;
+            return o == 0 ? Win : o == 1 ? Loss : Draw;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotSupportedException();
+    }
+
     /// <summary>
     /// Open-source lichess piece sets (lichess-org/lila/public/piece). Each set is 12 SVGs
     /// (wK..bP) rendered via SvgImageSource. The default (cburnett) is bundled in the app
