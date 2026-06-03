@@ -180,8 +180,10 @@ namespace LichessXbox.Models
         public string Headline { get; set; }    // "vs DrNykterstein (Blitz)"
         public string ResultText { get; set; }  // "Win · 1-0"
         public string DateText { get; set; }
-        public string Moves { get; set; }        // space-separated UCI for replay
+        public string Moves { get; set; }        // space-separated SAN moves
         public string InitialFen { get; set; }
+        public string FinalFen { get; set; }      // position after the last move (for the board thumbnail)
+        public bool PlayerWhite { get; set; }     // orient the thumbnail to the player's side
     }
 
     // ===================== Watch =====================

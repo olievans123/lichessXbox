@@ -13,7 +13,8 @@ namespace LichessXbox.Services
 
         public static void Move() => Play("move");
         public static void Capture() => Play("capture");
-        public static void Check() => Play("check");
+        /// <summary>The lichess game-over "dong" (GenericNotify) — checkmate, resign, time-out, draw.</summary>
+        public static void GameEnd() => Play("notify");
 
         static void Play(string name)
         {

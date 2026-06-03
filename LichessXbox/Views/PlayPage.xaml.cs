@@ -501,17 +501,15 @@ namespace LichessXbox.Views
 
         string ResultText(string status, string winner)
         {
-            if (status == "mate")
-            {
-                bool iWon = (winner == "white") == _playerIsWhite;
-                return iWon ? "Checkmate — you win! 🎉" : "Checkmate — you lose.";
-            }
-            if (status == "resign") return winner == (_playerIsWhite ? "white" : "black") ? "Opponent resigned — you win! 🎉" : "You resigned.";
-            if (status == "draw" || status == "stalemate") return "Draw.";
-            if (status == "timeout" || status == "outoftime")
-                return (winner == "white") == _playerIsWhite ? "Opponent flagged — you win! 🎉" : "You ran out of time.";
-            if (status == "aborted") return "Game aborted.";
-            return "Game over.";
+            // Kept concise and method-free: the result card already shows how the game ended,
+            // so the side-panel banner just states the outcome (no duplicate "checkmate", no emoji).
+            if (status == "aborted") return "Game aborted";
+            if (status == "draw" || status == "stalemate") return "Draw";
+            if (string.IsNullOrEmpty(winner)) return "Game over";
+            bool iWon = status == "resign"
+                ? winner == (_playerIsWhite ? "white" : "black")
+                : (winner == "white") == _playerIsWhite;
+            return iWon ? "You won" : "You lost";
         }
 
         // A satisfying win / loss / draw card over the board (lichess / chess.com style):
@@ -519,6 +517,8 @@ namespace LichessXbox.Views
         void ShowResult(string status, string winner)
         {
             _resultShown = true;
+            ResultRatingRow.Visibility = Visibility.Collapsed;
+            SoundService.GameEnd();   // the lichess game-over "dong"
 
             // 0 = win, 1 = loss, 2 = draw, 3 = aborted
             int kind;
@@ -591,6 +591,27 @@ namespace LichessXbox.Views
             ((Storyboard)Resources["ResultIn"]).Begin();
             var primary = ResultRematchButton.Visibility == Visibility.Visible ? ResultRematchButton : ResultNewGameButton;
             primary.Focus(FocusState.Programmatic);
+
+            _ = LoadRatingChangeAsync(_gameId, _playerIsWhite);
+        }
+
+        // After the game ends, fetch this game's rating + rating change and show it on the card.
+        async Task LoadRatingChangeAsync(string gameId, bool amWhite)
+        {
+            var rc = await AppState.Current.Api.GetGameRatingChangeAsync(gameId, amWhite);
+            // Bail if the card was dismissed or a new game started while we waited.
+            if (rc == null || !_resultShown || gameId != _gameId) return;
+
+            var (rating, diff) = rc.Value;
+            ResultRating.Text = "Rating " + rating;
+            if (diff != 0)
+            {
+                ResultRatingDelta.Text = (diff > 0 ? "+" : "") + diff;
+                ResultRatingDelta.Foreground = Res(diff > 0 ? "AccentGreenLightBrush" : "ErrorBrush");
+                ResultRatingDelta.Visibility = Visibility.Visible;
+            }
+            else ResultRatingDelta.Visibility = Visibility.Collapsed;
+            ResultRatingRow.Visibility = Visibility.Visible;
         }
 
         static Brush Res(string key) => (Brush)Application.Current.Resources[key];

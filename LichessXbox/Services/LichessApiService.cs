@@ -473,15 +473,66 @@ namespace LichessXbox.Services
                 bool iWon = (winner == "white") == iAmWhite;
                 result = (iWon ? "Win · " : "Loss · ") + (winner == "white" ? "1-0" : "0-1");
             }
+            string initialFen = g.Value<string>("initialFen");
+            string moves = g.Value<string>("moves") ?? "";
             return new GameSummary
             {
                 Id = g.Value<string>("id"),
                 Headline = $"vs {opp}  ·  {char.ToUpperInvariant(speed[0]) + speed.Substring(1)}",
                 ResultText = result,
                 DateText = "",
-                Moves = g.Value<string>("moves") ?? "",
-                InitialFen = g.Value<string>("initialFen"),
+                Moves = moves,
+                InitialFen = initialFen,
+                FinalFen = ComputeFinalFen(initialFen, moves),
+                PlayerWhite = iAmWhite,
             };
+        }
+
+        // Replay SAN moves from the start to get the final position, for the board thumbnail.
+        static string ComputeFinalFen(string initialFen, string sanMoves)
+        {
+            try
+            {
+                var pos = LichessXbox.Chess.ChessPosition.FromFen(
+                    string.IsNullOrEmpty(initialFen) ? LichessXbox.Chess.ChessPosition.StartFen : initialFen);
+                if (!string.IsNullOrWhiteSpace(sanMoves))
+                {
+                    foreach (var tok in sanMoves.Split(' '))
+                    {
+                        if (string.IsNullOrWhiteSpace(tok)) continue;
+                        var mv = pos.ParseSan(tok);
+                        if (mv == null) { try { mv = LichessXbox.Chess.ChessMove.FromUci(tok); } catch { mv = null; } }
+                        if (mv != null) { var next = pos.Apply(mv.Value); if (next != null) pos = next; }
+                    }
+                }
+                return pos.ToFen();
+            }
+            catch { return initialFen; }
+        }
+
+        /// <summary>The player's rating and rating change for a finished game (null if unrated/unavailable).</summary>
+        public async Task<(int rating, int diff)?> GetGameRatingChangeAsync(string gameId, bool amWhite)
+        {
+            if (string.IsNullOrEmpty(gameId)) return null;
+            try
+            {
+                using (var req = Build(HttpMethod.Get, $"/game/export/{gameId}?moves=false&clocks=false&evals=false&opening=false"))
+                {
+                    req.Headers.Accept.Clear();
+                    req.Headers.Accept.ParseAdd("application/json");
+                    using (var resp = await _http.SendAsync(req))
+                    {
+                        if (!resp.IsSuccessStatusCode) return null;
+                        var o = JObject.Parse(await resp.Content.ReadAsStringAsync());
+                        var p = o["players"]?[amWhite ? "white" : "black"];
+                        int? rating = p?.Value<int?>("rating");
+                        if (rating == null) return null;
+                        int diff = p.Value<int?>("ratingDiff") ?? 0;
+                        return (rating.Value, diff);
+                    }
+                }
+            }
+            catch { return null; }
         }
 
         /// <summary>Rating history for a user; returns points (x = day index, y = rating) for one perf.</summary>
