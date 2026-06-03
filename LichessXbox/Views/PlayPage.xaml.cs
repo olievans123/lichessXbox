@@ -530,21 +530,19 @@ namespace LichessXbox.Views
                     method = "by checkmate";
                     break;
                 case "resign":
-                    bool iWonResign = winner == (_playerIsWhite ? "white" : "black");
-                    kind = iWonResign ? 0 : 1;
-                    method = iWonResign ? "Your opponent resigned" : "You resigned";
+                    kind = winner == (_playerIsWhite ? "white" : "black") ? 0 : 1;
+                    method = "by resignation";
                     break;
                 case "timeout":
                 case "outoftime":
-                    bool iWonTime = (winner == "white") == _playerIsWhite;
-                    kind = iWonTime ? 0 : 1;
-                    method = iWonTime ? "Your opponent ran out of time" : "You ran out of time";
+                    kind = (winner == "white") == _playerIsWhite ? 0 : 1;
+                    method = "by timeout";
                     break;
                 case "stalemate":
                     kind = 2; method = "by stalemate";
                     break;
                 case "draw":
-                    kind = 2; method = "½–½";
+                    kind = 2; method = "";   // lichess doesn't say agreement vs repetition — don't guess
                     break;
                 case "aborted":
                     kind = 3; method = "";
