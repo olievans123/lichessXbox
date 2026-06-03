@@ -253,9 +253,9 @@
     <Content Include="Assets\pieces\cburnett\bN.svg" />
     <Content Include="Assets\pieces\cburnett\bP.svg" />
     <Content Include="Assets\engine\engine.html" />
-    <!-- Optional: drop a real stockfish.js next to engine.html for offline analysis.
-         When absent, engine.html loads one from a CDN. -->
-    <Content Include="Assets\engine\stockfish.js" Condition="Exists('Assets\engine\stockfish.js')" />
+    <!-- Bundled single-threaded Stockfish 10 (pure asm.js, no wasm/threads) so local
+         analysis runs offline inside the Xbox WebView. engine.html boots it as a Worker. -->
+    <Content Include="Assets\engine\stockfish.js" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LichessXbox_TemporaryKey.pfx" />

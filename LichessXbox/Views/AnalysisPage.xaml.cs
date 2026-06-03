@@ -213,9 +213,19 @@ namespace LichessXbox.Views
             {
                 _engine = new LocalEngine(EngineWeb);
                 _engine.Info += OnEngineInfo;
+                _engine.ReadyChanged += OnEngineReady;
             }
             if (!_useLocalEngine) _engine?.Stop();
             Sync();
+        }
+
+        // The engine boots asynchronously inside the WebView; once it's up, analyse the
+        // position the user is currently looking at (the first toggle-on lands here).
+        void OnEngineReady(bool ready)
+        {
+            if (!ready || !_useLocalEngine || _engine == null) return;
+            BestLineText.Text = "Analysing locally…";
+            _engine.Analyze(Current);
         }
 
         void OnEngineInfo(int depth, string evalText, string pvSan)
