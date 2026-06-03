@@ -36,6 +36,10 @@ namespace LichessXbox.Views
 
         async System.Threading.Tasks.Task RefreshAsync()
         {
+            // The signed-in view lives in its own ScrollViewer; keep it fully collapsed (not just
+            // its content) in every other state, so it can't overlay the sign-in card and swallow
+            // gamepad focus — an empty ScrollViewer is still a focus stop on Xbox.
+            SignedInScroller.Visibility = Visibility.Collapsed;
             if (!AppState.Current.IsSignedIn)
             {
                 LoadingPanel.Visibility = Visibility.Collapsed;
@@ -75,6 +79,7 @@ namespace LichessXbox.Views
             LoadingPanel.Visibility = Visibility.Collapsed;
             LoadingRing.IsActive = false;
             SignedOutCard.Visibility = Visibility.Collapsed;
+            SignedInScroller.Visibility = Visibility.Visible;
             SignedInPanel.Visibility = Visibility.Visible;
 
             UsernameText.Text = a.DisplayName;
@@ -140,7 +145,8 @@ namespace LichessXbox.Views
             string qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=10&data="
                            + Uri.EscapeDataString(auth.url);
             QrImage.Source = new BitmapImage(new Uri(qrUrl));
-            QrStatus.Text = "Scan, sign in on your phone, and approve…";
+            QrStatus.Text = "Waiting for you to approve on your phone…";
+            QrBusy.IsActive = false;   // the code is ready to scan — no spinner while we wait
             _qrExpiry.Start();
 
             try
@@ -161,6 +167,7 @@ namespace LichessXbox.Views
                 }
 
                 QrStatus.Text = "Approved! Finishing sign-in…";
+                QrBusy.IsActive = true;
                 bool ok = await AppState.Current.Auth.CompleteAuthAsync(code, _verifier, server.RedirectUri);
                 if (attempt != _pairAttempt) return;
                 if (ok) await RefreshAsync();

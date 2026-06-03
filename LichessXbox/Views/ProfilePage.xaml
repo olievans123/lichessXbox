@@ -22,40 +22,57 @@
             <Border MaxWidth="760" VerticalAlignment="Center" HorizontalAlignment="Center"
                     Style="{StaticResource CardBorder}" Padding="32">
                 <StackPanel Spacing="14">
-                    <TextBlock Text="Sign in to Lichess" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold"
-                               Foreground="{StaticResource TextPrimaryBrush}" />
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Sign in to Lichess" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold"
+                                   Foreground="{StaticResource TextPrimaryBrush}" />
+                        <TextBlock Text="Connect your account to play, solve puzzles and track your rating."
+                                   FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
+                    </StackPanel>
 
-                    <!-- Sign in right on the TV (in-app lichess login) -->
+                    <!-- Primary: log in right on the console -->
                     <Button x:Name="WebLoginButton" Style="{StaticResource PrimaryButton}" Click="WebLogin_Click"
                             Content="Sign in on this TV" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                    <TextBlock Text="Log in to lichess right here. Or pair with your phone / paste a token below."
-                               FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
 
-                    <!-- QR device pairing (default) -->
+                    <!-- or pair with phone -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Rectangle Grid.Column="0" Height="1" Fill="{StaticResource HairlineBrush}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1" Text="or pair with your phone" Margin="14,0" FontSize="{StaticResource CaptionSize}"
+                                   Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                        <Rectangle Grid.Column="2" Height="1" Fill="{StaticResource HairlineBrush}" VerticalAlignment="Center" />
+                    </Grid>
+
+                    <!-- QR device pairing -->
                     <StackPanel x:Name="QrPanel" Spacing="14">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="10" VerticalAlignment="Top">
-                                <Image x:Name="QrImage" Width="220" Height="220" />
+                            <Border Grid.Column="0" Background="White" CornerRadius="12" Padding="8" VerticalAlignment="Center">
+                                <Image x:Name="QrImage" Width="168" Height="168" />
                             </Border>
-                            <StackPanel Grid.Column="1" Margin="22,0,0,0" VerticalAlignment="Center" Spacing="10">
+                            <StackPanel Grid.Column="1" Margin="24,0,0,0" VerticalAlignment="Center" Spacing="10">
                                 <TextBlock Text="Scan with your phone" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimaryBrush}" />
                                 <TextBlock TextWrapping="Wrap" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
-                                           Text="Log in to Lichess on your phone and approve — your Xbox signs in automatically, no typing. (Phone must be on the same Wi-Fi.)" />
+                                           Text="Scan, approve on your phone, and you're in — no typing. (Same Wi-Fi.)" />
                                 <StackPanel Orientation="Horizontal" Spacing="10">
-                                    <ProgressRing x:Name="QrBusy" IsActive="True" Width="22" Height="22"
-                                                  Foreground="{StaticResource AccentGreenLightBrush}" />
+                                    <ProgressRing x:Name="QrBusy" IsActive="False" Width="18" Height="18"
+                                                  Foreground="{StaticResource AccentGreenLightBrush}" VerticalAlignment="Center" />
                                     <TextBlock x:Name="QrStatus" Text="Preparing…" FontSize="{StaticResource CaptionSize}"
-                                               Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                                               Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
                                 </StackPanel>
-                                <Button x:Name="RefreshQrButton" Style="{StaticResource TileButton}" Click="ShowQr_Click"
-                                        Content="↻ New code" HorizontalContentAlignment="Center" />
-                                <Button x:Name="ManualToggleButton" Style="{StaticResource TileButton}" Click="ShowManual_Click"
-                                        Content="Enter a token manually instead" HorizontalContentAlignment="Center" />
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Button x:Name="RefreshQrButton" Style="{StaticResource TileButton}" Click="ShowQr_Click"
+                                            Content="↻ New code" Padding="18,10" HorizontalContentAlignment="Center" />
+                                    <Button x:Name="ManualToggleButton" Style="{StaticResource TileButton}" Click="ShowManual_Click"
+                                            Content="Paste a token" Padding="18,10" HorizontalContentAlignment="Center" />
+                                </StackPanel>
                             </StackPanel>
                         </Grid>
                     </StackPanel>
@@ -91,7 +108,7 @@
         </ScrollViewer>
 
         <!-- Signed in -->
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+        <ScrollViewer x:Name="SignedInScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" Visibility="Collapsed">
         <StackPanel x:Name="SignedInPanel" Spacing="18" Visibility="Collapsed" MaxWidth="640">
             <StackPanel Orientation="Horizontal" Spacing="24">
                 <Border Width="72" Height="72" CornerRadius="24" Background="{StaticResource AccentGradientBrush}">
