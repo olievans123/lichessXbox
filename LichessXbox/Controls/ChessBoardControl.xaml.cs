@@ -560,7 +560,10 @@ namespace LichessXbox.Controls
             bool moveChanged = LastMove.HasValue &&
                 (!_lastSounded.HasValue || !LastMove.Value.Equals(_lastSounded.Value));
 
-            if (_soundReady && moveChanged)
+            // Only a live, interactive board (the Play board) makes move sounds — never the
+            // home preview, ongoing-game thumbnails, the settings preview or watch boards,
+            // which also set LastMove and would otherwise ding on load.
+            if (Interactive && _soundReady && moveChanged)
             {
                 bool capture = _lastPieceCount >= 0 && pieceCount < _lastPieceCount;
                 // Like lichess's standard theme: a checking move just plays the move/capture
