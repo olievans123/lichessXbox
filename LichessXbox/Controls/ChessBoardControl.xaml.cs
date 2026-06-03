@@ -129,6 +129,17 @@ namespace LichessXbox.Controls
             set => SetValue(InteractiveProperty, value);
         }
 
+        /// <summary>Opt a non-interactive board into move/capture sounds (e.g. the Watch/TV board).
+        /// Interactive boards always sound; previews and thumbnails never do.</summary>
+        public static readonly DependencyProperty SoundsEnabledProperty =
+            DependencyProperty.Register(nameof(SoundsEnabled), typeof(bool), typeof(ChessBoardControl),
+                new PropertyMetadata(false));
+        public bool SoundsEnabled
+        {
+            get => (bool)GetValue(SoundsEnabledProperty);
+            set => SetValue(SoundsEnabledProperty, value);
+        }
+
         /// <summary>The colour the local human controls (only relevant when Interactive).</summary>
         public bool PlayerIsWhite { get; set; } = true;
 
@@ -563,7 +574,7 @@ namespace LichessXbox.Controls
             // Only a live, interactive board (the Play board) makes move sounds — never the
             // home preview, ongoing-game thumbnails, the settings preview or watch boards,
             // which also set LastMove and would otherwise ding on load.
-            if (Interactive && _soundReady && moveChanged)
+            if ((Interactive || SoundsEnabled) && _soundReady && moveChanged)
             {
                 bool capture = _lastPieceCount >= 0 && pieceCount < _lastPieceCount;
                 // Like lichess's standard theme: a checking move just plays the move/capture

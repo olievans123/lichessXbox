@@ -11,6 +11,7 @@ using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
 namespace LichessXbox.Views
@@ -44,6 +45,7 @@ namespace LichessXbox.Views
         bool _autoOpen;   // true after the user starts a pairing here → open the next gameStart
         string _opponentName;
         bool _playerIsWhite = true;
+        bool _resultShown;   // guards the game-over overlay against repeated terminal states
         string _initialFen = ChessPosition.StartFen;
         readonly DispatcherTimer _clockTimer = new DispatcherTimer();
 
@@ -311,6 +313,8 @@ namespace LichessXbox.Views
             RematchButton.Visibility = Visibility.Collapsed;
             NewGameButton.Visibility = Visibility.Collapsed;
             DrawOfferBanner.Visibility = Visibility.Collapsed;
+            ResultOverlay.Visibility = Visibility.Collapsed;
+            _resultShown = false;
             Board.Interactive = true;
             ShowOnly(GamePanel);
             // Clear stale design-time labels until the first gameFull arrives.
@@ -427,8 +431,9 @@ namespace LichessXbox.Views
                 RematchButton.Visibility = string.IsNullOrEmpty(_opponentName) ? Visibility.Collapsed : Visibility.Visible;
                 NewGameButton.Visibility = Visibility.Visible;
                 StatusBanner.Text = ResultText(status, winner);
-                // Move gamepad focus to the primary action; board cells just lost their tab stops.
-                (RematchButton.Visibility == Visibility.Visible ? RematchButton : NewGameButton).Focus(FocusState.Programmatic);
+                // Reveal the satisfying win/loss/draw card over the board (once), which also
+                // takes gamepad focus — board cells just lost their tab stops.
+                if (!_resultShown) ShowResult(status, winner);
             }
             else
             {
@@ -507,6 +512,106 @@ namespace LichessXbox.Views
                 return (winner == "white") == _playerIsWhite ? "Opponent flagged — you win! 🎉" : "You ran out of time.";
             if (status == "aborted") return "Game aborted.";
             return "Game over.";
+        }
+
+        // A satisfying win / loss / draw card over the board (lichess / chess.com style):
+        // colour-coded accent, big outcome, the method, and quick actions.
+        void ShowResult(string status, string winner)
+        {
+            _resultShown = true;
+
+            // 0 = win, 1 = loss, 2 = draw, 3 = aborted
+            int kind;
+            string method;
+            switch (status)
+            {
+                case "mate":
+                    kind = (winner == "white") == _playerIsWhite ? 0 : 1;
+                    method = "by checkmate";
+                    break;
+                case "resign":
+                    bool iWonResign = winner == (_playerIsWhite ? "white" : "black");
+                    kind = iWonResign ? 0 : 1;
+                    method = iWonResign ? "Your opponent resigned" : "You resigned";
+                    break;
+                case "timeout":
+                case "outoftime":
+                    bool iWonTime = (winner == "white") == _playerIsWhite;
+                    kind = iWonTime ? 0 : 1;
+                    method = iWonTime ? "Your opponent ran out of time" : "You ran out of time";
+                    break;
+                case "stalemate":
+                    kind = 2; method = "by stalemate";
+                    break;
+                case "draw":
+                    kind = 2; method = "½–½";
+                    break;
+                case "aborted":
+                    kind = 3; method = "";
+                    break;
+                default:
+                    if (!string.IsNullOrEmpty(winner)) { kind = (winner == "white") == _playerIsWhite ? 0 : 1; method = ""; }
+                    else { kind = 2; method = ""; }
+                    break;
+            }
+
+            string title;
+            ResultIcon.Visibility = Visibility.Collapsed;
+            switch (kind)
+            {
+                case 0:
+                    title = "You won!";
+                    ResultAccent.Background = Res("AccentGreenBrush");
+                    ResultTitle.Foreground = Res("AccentGreenLightBrush");
+                    ResultIcon.Text = "";   // filled star
+                    ResultIcon.Foreground = Res("AccentGreenLightBrush");
+                    ResultIcon.Visibility = Visibility.Visible;
+                    break;
+                case 1:
+                    title = "You lost";
+                    ResultAccent.Background = Res("ErrorBrush");
+                    ResultTitle.Foreground = Res("TextPrimaryBrush");
+                    break;
+                case 3:
+                    title = "Game aborted";
+                    ResultAccent.Background = Res("HairlineBrush");
+                    ResultTitle.Foreground = Res("TextPrimaryBrush");
+                    break;
+                default:
+                    title = "Draw";
+                    ResultAccent.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0xF2, 0xD2, 0x6B));
+                    ResultTitle.Foreground = Res("TextPrimaryBrush");
+                    break;
+            }
+
+            ResultTitle.Text = title;
+            ResultMethod.Text = method;
+            ResultMethod.Visibility = string.IsNullOrEmpty(method) ? Visibility.Collapsed : Visibility.Visible;
+            ResultRematchButton.Visibility = string.IsNullOrEmpty(_opponentName) ? Visibility.Collapsed : Visibility.Visible;
+
+            ResultOverlay.Visibility = Visibility.Visible;
+            ((Storyboard)Resources["ResultIn"]).Begin();
+            var primary = ResultRematchButton.Visibility == Visibility.Visible ? ResultRematchButton : ResultNewGameButton;
+            primary.Focus(FocusState.Programmatic);
+        }
+
+        static Brush Res(string key) => (Brush)Application.Current.Resources[key];
+
+        // Close the card to study the final position; leave the side-panel actions for next steps.
+        void DismissResult_Click(object sender, RoutedEventArgs e)
+        {
+            ResultOverlay.Visibility = Visibility.Collapsed;
+            var b = RematchButton.Visibility == Visibility.Visible ? RematchButton : NewGameButton;
+            b.Focus(FocusState.Programmatic);
+        }
+
+        // Open this game on the analysis board.
+        void ReviewGame_Click(object sender, RoutedEventArgs e)
+        {
+            ResultOverlay.Visibility = Visibility.Collapsed;
+            string fen = string.IsNullOrEmpty(_initialFen) ? "startpos" : _initialFen;
+            string param = fen + "|" + string.Join(" ", _plies);
+            ((Window.Current.Content as Frame)?.Content as LichessXbox.MainPage)?.OpenAnalysis(param);
         }
 
         // Recompute algebraic notation (SAN) for the whole game; cheap to keep, run only when

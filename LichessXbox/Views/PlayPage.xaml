@@ -5,6 +5,19 @@
     xmlns:controls="using:LichessXbox.Controls"
     Background="Transparent">
 
+    <Page.Resources>
+        <!-- Game-over card: a satisfying scale-overshoot pop-in. -->
+        <Storyboard x:Key="ResultIn">
+            <DoubleAnimation Storyboard.TargetName="ResultOverlay" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.18" />
+            <DoubleAnimation Storyboard.TargetName="ResultCardScale" Storyboard.TargetProperty="ScaleX" From="0.84" To="1" Duration="0:0:0.36">
+                <DoubleAnimation.EasingFunction><BackEase EasingMode="EaseOut" Amplitude="0.5" /></DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="ResultCardScale" Storyboard.TargetProperty="ScaleY" From="0.84" To="1" Duration="0:0:0.36">
+                <DoubleAnimation.EasingFunction><BackEase EasingMode="EaseOut" Amplitude="0.5" /></DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+    </Page.Resources>
+
     <Grid Padding="40,16">
 
         <!-- ============ SIGN-IN REQUIRED ============ -->
@@ -155,6 +168,44 @@
             <Viewbox Grid.Column="0" Stretch="Uniform">
                 <controls:ChessBoardControl x:Name="Board" Interactive="True" />
             </Viewbox>
+
+            <!-- Game-over result, revealed over the (dimmed) board -->
+            <Grid x:Name="ResultOverlay" Grid.Column="0" Visibility="Collapsed">
+                <Rectangle Fill="#B3000000" />
+                <Border MaxWidth="400" VerticalAlignment="Center" HorizontalAlignment="Center"
+                        CornerRadius="20" Background="{StaticResource AppSurfaceBrush}"
+                        BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1"
+                        RenderTransformOrigin="0.5,0.5">
+                    <Border.RenderTransform>
+                        <ScaleTransform x:Name="ResultCardScale" ScaleX="1" ScaleY="1" />
+                    </Border.RenderTransform>
+                    <StackPanel>
+                        <Border x:Name="ResultAccent" Height="6" CornerRadius="20,20,0,0" Background="{StaticResource AccentGreenBrush}" />
+                        <Grid>
+                            <Button x:Name="ResultCloseButton" Style="{StaticResource IconButton}" Click="DismissResult_Click"
+                                    HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,8,8,0"
+                                    Width="36" Height="36" CornerRadius="18" FontFamily="Segoe MDL2 Assets" FontSize="13"
+                                    Foreground="{StaticResource TextSecondaryBrush}" Content="&#xE711;" ToolTipService.ToolTip="View board" />
+                            <StackPanel Padding="32,26,32,28" Spacing="6" HorizontalAlignment="Center">
+                                <TextBlock x:Name="ResultIcon" FontFamily="Segoe MDL2 Assets" FontSize="42" HorizontalAlignment="Center"
+                                           Foreground="{StaticResource AccentGreenLightBrush}" Visibility="Collapsed" Margin="0,0,0,4" />
+                                <TextBlock x:Name="ResultTitle" Text="" FontSize="{StaticResource TitleSize}" FontWeight="Bold"
+                                           HorizontalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}" />
+                                <TextBlock x:Name="ResultMethod" Text="" FontSize="{StaticResource BodySize}"
+                                           HorizontalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
+                                <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,18,0,0" HorizontalAlignment="Center">
+                                    <Button x:Name="ResultRematchButton" Style="{StaticResource PrimaryButton}" Padding="22,11" Click="Rematch_Click"
+                                            Content="Rematch" HorizontalContentAlignment="Center" Visibility="Collapsed" />
+                                    <Button x:Name="ResultReviewButton" Style="{StaticResource TileButton}" Padding="22,11" Click="ReviewGame_Click"
+                                            Content="Review" HorizontalContentAlignment="Center" />
+                                    <Button x:Name="ResultNewGameButton" Style="{StaticResource TileButton}" Padding="22,11" Click="NewGame_Click"
+                                            Content="New game" HorizontalContentAlignment="Center" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Grid>
 
             <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
             <StackPanel Margin="20,0,0,0" Spacing="10">
