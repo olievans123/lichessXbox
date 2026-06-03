@@ -36,14 +36,16 @@
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <Border Grid.Column="0" Background="White" CornerRadius="12" Padding="8" VerticalAlignment="Center">
-                                <Image x:Name="QrImage" Width="168" Height="168" />
+                            <Border Grid.Column="0" Background="White" CornerRadius="12" Padding="10" VerticalAlignment="Center">
+                                <Image x:Name="QrImage" Width="200" Height="200" />
                             </Border>
-                            <StackPanel Grid.Column="1" Margin="24,0,0,0" VerticalAlignment="Center" Spacing="10">
+                            <StackPanel Grid.Column="1" Margin="26,0,0,0" VerticalAlignment="Center" Spacing="10">
                                 <TextBlock Text="Scan with your phone" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimaryBrush}" />
                                 <TextBlock TextWrapping="Wrap" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
-                                           Text="Scan, approve on your phone, and you're in — no typing. (Same Wi-Fi.)" />
+                                           Text="1.  Point your phone's camera at the code&#x0a;2.  Sign in to Lichess and tap approve&#x0a;3.  You're in — nothing to type here" />
+                                <TextBlock Text="You only do this once — the console stays signed in afterwards." TextWrapping="Wrap"
+                                           FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource AccentGreenLightBrush}" />
                                 <StackPanel Orientation="Horizontal" Spacing="10">
                                     <ProgressRing x:Name="QrBusy" IsActive="False" Width="18" Height="18"
                                                   Foreground="{StaticResource AccentGreenLightBrush}" VerticalAlignment="Center" />
@@ -54,22 +56,31 @@
                                     <Button x:Name="RefreshQrButton" Style="{StaticResource TileButton}" Click="ShowQr_Click"
                                             Content="↻ New code" Padding="18,10" HorizontalContentAlignment="Center" />
                                     <Button x:Name="ManualToggleButton" Style="{StaticResource TileButton}" Click="ShowManual_Click"
-                                            Content="Paste a token" Padding="18,10" HorizontalContentAlignment="Center" />
+                                            Content="Enter a token" Padding="18,10" HorizontalContentAlignment="Center" />
                                 </StackPanel>
                             </StackPanel>
                         </Grid>
                     </StackPanel>
 
-                    <!-- Manual token paste (only if selected) -->
+                    <!-- Manual token entry (only if selected) -->
                     <StackPanel x:Name="ManualPanel" Spacing="12" Visibility="Collapsed">
+                        <TextBlock Text="Enter a token" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
                         <TextBlock TextWrapping="Wrap" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
-                                   Text="On your phone or computer, open this link, create a token (chess scopes pre-selected), then paste it here:" />
+                                   Text="On your phone or computer, open this link to create a token (chess permissions are pre-selected), then type or paste it below:" />
                         <Border Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="14,10">
                             <TextBlock Text="lichess.org/account/oauth/token/create?scopes[]=board:play&amp;scopes[]=challenge:write&amp;scopes[]=puzzle:read&amp;description=Lichess+for+Xbox"
                                        FontSize="{StaticResource CaptionSize}" FontFamily="Consolas" Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
                         </Border>
-                        <TextBox x:Name="TokenBox" PlaceholderText="lip_xxxxxxxxxxxxxxxx" FontSize="16"
-                                 Height="52" VerticalContentAlignment="Center" />
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="TokenBox" Grid.Column="0" PlaceholderText="lip_xxxxxxxxxxxxxxxx" FontSize="16"
+                                     Height="52" VerticalContentAlignment="Center" />
+                            <Button x:Name="PasteTokenButton" Grid.Column="1" Style="{StaticResource TileButton}" Click="PasteToken_Click"
+                                    Content="Paste" Padding="18,10" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                        </Grid>
                         <Grid ColumnSpacing="10">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />

@@ -230,6 +230,21 @@ namespace LichessXbox.Views
             StatusText.Visibility = Visibility.Visible;
         }
 
+        // Fill the token box from the system clipboard, so the user doesn't have to type it.
+        async void PasteToken_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var content = Windows.ApplicationModel.DataTransfer.Clipboard.GetContent();
+                if (content.Contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.Text))
+                {
+                    string text = await content.GetTextAsync();
+                    if (!string.IsNullOrWhiteSpace(text)) { TokenBox.Text = text.Trim(); StatusText.Visibility = Visibility.Collapsed; }
+                }
+            }
+            catch { /* clipboard unavailable */ }
+        }
+
         async void SignOut_Click(object sender, RoutedEventArgs e)
         {
             await AppState.Current.SignOutAsync();
