@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using LichessXbox.Helpers;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -47,6 +48,7 @@ namespace LichessXbox.Views
             SoundToggle.IsOn = BoardTheme.UiSounds;
             MoveSoundToggle.IsOn = BoardTheme.MoveSounds;
             AnimToggle.IsOn = BoardTheme.Animations;
+            UpdateSpeedButtons();
 
             PieceGrid.ItemsSource = _pieceItems;
             PopulatePieces(false);
@@ -203,6 +205,45 @@ namespace LichessXbox.Views
         void Anim_Toggled(object sender, RoutedEventArgs e)
         {
             if (_loaded) BoardTheme.SetAnimations(AnimToggle.IsOn);
+            UpdateSpeedButtons();   // grey out / restore the speed picker to match
+        }
+
+        void Speed_Click(object sender, RoutedEventArgs e)
+        {
+            if (!_loaded) return;
+            if ((sender as Button)?.Tag is string tag)
+            {
+                BoardTheme.SetAnimationSpeed(tag);
+                UpdateSpeedButtons();
+            }
+        }
+
+        // Highlight the selected speed (green, like the active nav) and dim the row when
+        // animations are off.
+        void UpdateSpeedButtons()
+        {
+            string sel = BoardTheme.AnimationSpeed;
+            StyleSpeed(SpeedSlow, sel == "Slow");
+            StyleSpeed(SpeedNormal, sel == "Normal");
+            StyleSpeed(SpeedFast, sel == "Fast");
+
+            bool on = AnimToggle.IsOn;
+            SpeedSlow.IsEnabled = SpeedNormal.IsEnabled = SpeedFast.IsEnabled = on;
+            SpeedRow.Opacity = on ? 1.0 : 0.45;
+        }
+
+        void StyleSpeed(Button b, bool selected)
+        {
+            if (selected)
+            {
+                b.Background = (Brush)Application.Current.Resources["AccentGreenBrush"];
+                b.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0x0E, 0x12, 0x07));
+            }
+            else
+            {
+                b.ClearValue(Control.BackgroundProperty);
+                b.ClearValue(Control.ForegroundProperty);
+            }
         }
     }
 }

@@ -495,7 +495,7 @@ namespace LichessXbox.Controls
             _animFly = fly;
 
             var ease = new CubicEase { EasingMode = EasingMode.EaseOut };
-            var dur = new Duration(TimeSpan.FromMilliseconds(160));
+            var dur = new Duration(TimeSpan.FromMilliseconds(BoardTheme.AnimationDurationMs));
             var ax = new DoubleAnimation { To = 0, Duration = dur, EasingFunction = ease };
             Storyboard.SetTarget(ax, tt);
             Storyboard.SetTargetProperty(ax, "X");

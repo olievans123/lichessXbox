@@ -53,6 +53,23 @@ namespace LichessXbox.Helpers
         /// <summary>Slide pieces to their square when a move is played (lichess-style). On by default.</summary>
         public static bool Animations { get; private set; } = true;
 
+        /// <summary>Slide speed: "Slow" | "Normal" | "Fast". Drives <see cref="AnimationDurationMs"/>.</summary>
+        public static string AnimationSpeed { get; private set; } = "Normal";
+
+        /// <summary>The slide duration in milliseconds for the current speed.</summary>
+        public static int AnimationDurationMs
+        {
+            get
+            {
+                switch (AnimationSpeed)
+                {
+                    case "Slow": return 320;
+                    case "Fast": return 90;
+                    default: return 170;
+                }
+            }
+        }
+
         public static string CurrentName { get; private set; } = "Green";
 
         /// <summary>Selected piece set ("Native" = the built-in Unicode glyphs, else a lichess SVG set).
@@ -101,6 +118,13 @@ namespace LichessXbox.Helpers
             Save("Animations", on ? "1" : "0");
         }
 
+        public static void SetAnimationSpeed(string speed)
+        {
+            if (speed != "Slow" && speed != "Normal" && speed != "Fast") speed = "Normal";
+            AnimationSpeed = speed;
+            Save("AnimationSpeed", speed);
+        }
+
         public static void SetPieceSet(string set)
         {
             PieceSet = string.IsNullOrEmpty(set) ? PieceSets.Native : set;
@@ -122,6 +146,7 @@ namespace LichessXbox.Helpers
                 if (s.TryGetValue("MoveSounds", out var m) && m is string ms) MoveSounds = ms == "1";
                 if (s.TryGetValue("UiSounds", out var u) && u is string us) UiSounds = us == "1";
                 if (s.TryGetValue("Animations", out var a) && a is string ans) Animations = ans == "1";
+                if (s.TryGetValue("AnimationSpeed", out var asp) && asp is string asps && !string.IsNullOrEmpty(asps)) AnimationSpeed = asps;
                 if (s.TryGetValue("PieceSet", out var pv) && pv is string ps && !string.IsNullOrEmpty(ps)) PieceSet = ps;
             }
             catch { /* first run */ }

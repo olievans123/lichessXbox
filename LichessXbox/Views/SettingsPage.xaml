@@ -120,6 +120,21 @@
                             </StackPanel>
                             <ToggleSwitch x:Name="AnimToggle" Grid.Column="1" Toggled="Anim_Toggled" />
                         </Grid>
+                        <Grid x:Name="SpeedRow">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Animation speed" FontSize="{StaticResource BodySize}" Foreground="{StaticResource TextPrimaryBrush}" />
+                                <TextBlock Text="How fast pieces slide." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <Button x:Name="SpeedSlow" Tag="Slow" Content="Slow" Click="Speed_Click" Style="{StaticResource TileButton}" Padding="16,8" MinWidth="76" HorizontalContentAlignment="Center" />
+                                <Button x:Name="SpeedNormal" Tag="Normal" Content="Normal" Click="Speed_Click" Style="{StaticResource TileButton}" Padding="16,8" MinWidth="76" HorizontalContentAlignment="Center" />
+                                <Button x:Name="SpeedFast" Tag="Fast" Content="Fast" Click="Speed_Click" Style="{StaticResource TileButton}" Padding="16,8" MinWidth="76" HorizontalContentAlignment="Center" />
+                            </StackPanel>
+                        </Grid>
                     </StackPanel>
                 </Border>
             </StackPanel>
