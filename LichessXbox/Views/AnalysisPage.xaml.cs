@@ -67,10 +67,12 @@ namespace LichessXbox.Views
         void Sync()
         {
             var cur = Current;
-            Board.Position = cur;
             Board.PlayerIsWhite = cur.WhiteToMove;   // free exploration: side-to-move is always "yours"
             Board.Interactive = true;
+            // Set LastMove BEFORE Position: assigning Position is what triggers the render (and
+            // the slide animation), which needs the new move already in place to detect it.
             Board.LastMove = _ply > 0 ? (ChessMove?)_moves[_ply - 1] : null;
+            Board.Position = cur;
 
             EvalText.Text = "…";
             DepthText.Text = "";
