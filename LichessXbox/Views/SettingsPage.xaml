@@ -109,6 +109,17 @@
                             </StackPanel>
                             <ToggleSwitch x:Name="MoveSoundToggle" Grid.Column="1" Toggled="MoveSound_Toggled" />
                         </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Piece animations" FontSize="{StaticResource BodySize}" Foreground="{StaticResource TextPrimaryBrush}" />
+                                <TextBlock Text="Slide pieces to their square when a move is played." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <ToggleSwitch x:Name="AnimToggle" Grid.Column="1" Toggled="Anim_Toggled" />
+                        </Grid>
                     </StackPanel>
                 </Border>
             </StackPanel>

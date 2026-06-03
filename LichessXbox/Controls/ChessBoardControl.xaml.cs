@@ -9,6 +9,7 @@ using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Shapes;
 
@@ -49,6 +50,20 @@ namespace LichessXbox.Controls
         ChessMove? _lastSounded;
         int _lastPieceCount = -1;
         bool _soundReady;
+
+        // Move-animation bookkeeping: a snapshot of the previous render so we can tell a
+        // forward move (piece left From, now sits on To) apart from a jump/takeback.
+        char[] _prevSquares;
+        ChessMove? _prevLastMove;
+        Storyboard _animStoryboard;
+        FrameworkElement _animFly;     // the piece currently sliding (lives in AnimLayer)
+        int _animSquare = -1;          // destination square whose real piece is hidden during the slide
+
+        // Piece glyph colours (shared by the board and the flying overlay piece).
+        static readonly Color WhiteFill = Color.FromArgb(0xFF, 0xFA, 0xFA, 0xF6);
+        static readonly Color WhiteOutline = Color.FromArgb(0xFF, 0x33, 0x2E, 0x26);
+        static readonly Color BlackFill = Color.FromArgb(0xFF, 0x26, 0x22, 0x1C);
+        static readonly Color BlackOutline = Color.FromArgb(0xFF, 0xB8, 0xB2, 0xA6);
 
         // The clean board-cell style (inset green focus ring, no default-button gray)
         // lives in Theme.xaml; resolve it once from the merged app resources.
@@ -341,10 +356,10 @@ namespace LichessXbox.Controls
             if (_position.IsInCheck(_position.WhiteToMove))
                 checkSquare = _position.FindKing(_position.WhiteToMove);
 
-            var whiteFill = Color.FromArgb(0xFF, 0xFA, 0xFA, 0xF6);
-            var whiteOutline = Color.FromArgb(0xFF, 0x33, 0x2E, 0x26);
-            var blackFill = Color.FromArgb(0xFF, 0x26, 0x22, 0x1C);
-            var blackOutline = Color.FromArgb(0xFF, 0xB8, 0xB2, 0xA6);
+            var whiteFill = WhiteFill;
+            var whiteOutline = WhiteOutline;
+            var blackFill = BlackFill;
+            var blackOutline = BlackOutline;
 
             for (int sq = 0; sq < 64; sq++)
             {
@@ -362,14 +377,9 @@ namespace LichessXbox.Controls
                 }
                 else
                 {
-                    var src = PieceSets.SourceFor(_pieceSetOverride ?? BoardTheme.PieceSet, piece);   // null → use the Unicode glyph
-                    if (src != null)
+                    var img = SvgFor(piece);   // null → use the Unicode glyph
+                    if (img != null)
                     {
-                        if (!_svgCache.TryGetValue(src.AbsoluteUri, out var img))
-                        {
-                            img = new SvgImageSource(src);
-                            _svgCache[src.AbsoluteUri] = img;
-                        }
                         if (!ReferenceEquals(_pieceImg[sq].Source, img)) _pieceImg[sq].Source = img;   // avoid needless reload
                         _pieceImg[sq].Visibility = Visibility.Visible;
                         _pieceHost[sq].Visibility = Visibility.Collapsed;
@@ -422,7 +432,124 @@ namespace LichessXbox.Controls
                 else _legalDot[m.To].Visibility = Visibility.Visible;
             }
 
+            TryAnimateLastMove();
             MaybePlayMoveSound();
+
+            // Snapshot the board so the next render can classify the move that produced it.
+            if (_prevSquares == null) _prevSquares = new char[64];
+            for (int i = 0; i < 64; i++) _prevSquares[i] = _position.PieceAt(i);
+            _prevLastMove = LastMove;
+        }
+
+        // --- Move animation ---------------------------------------------------
+
+        SvgImageSource SvgFor(char piece)
+        {
+            var src = PieceSets.SourceFor(_pieceSetOverride ?? BoardTheme.PieceSet, piece);
+            if (src == null) return null;
+            if (!_svgCache.TryGetValue(src.AbsoluteUri, out var img))
+            {
+                img = new SvgImageSource(src);
+                _svgCache[src.AbsoluteUri] = img;
+            }
+            return img;
+        }
+
+        // Slide the moved piece from its old square into place — but only for a plain forward
+        // move (the piece left From and now sits on To). Jumps, takebacks and the initial setup
+        // render instantly, which keeps navigation crisp and avoids nonsensical slides.
+        void TryAnimateLastMove()
+        {
+            CancelAnim();
+            if (!BoardTheme.Animations || !LastMove.HasValue || _prevSquares == null) return;
+            if (_prevLastMove.HasValue && LastMove.Value.Equals(_prevLastMove.Value)) return;  // same move (e.g. re-theme)
+            if (BoardGrid.ActualWidth <= 0 || BoardGrid.ActualHeight <= 0) return;
+
+            int from = LastMove.Value.From, to = LastMove.Value.To;
+            if (from < 0 || from > 63 || to < 0 || to > 63 || from == to) return;
+            // Forward move: From was occupied before, From is empty now, To is occupied now.
+            if (_prevSquares[from] == '.' || _position.PieceAt(from) != '.' || _position.PieceAt(to) == '.') return;
+
+            AnimateMove(from, to, _position.PieceAt(to));
+        }
+
+        void AnimateMove(int from, int to, char piece)
+        {
+            double cw = BoardGrid.ActualWidth / 8.0, ch = BoardGrid.ActualHeight / 8.0;
+            if (cw <= 0 || ch <= 0) return;
+
+            SquareToVisual(from, out int fr, out int fc);
+            SquareToVisual(to, out int tr, out int tc);
+
+            var fly = BuildFlyingPiece(piece, cw, ch);
+            Canvas.SetLeft(fly, tc * cw);
+            Canvas.SetTop(fly, tr * ch);
+            var tt = new TranslateTransform { X = (fc - tc) * cw, Y = (fr - tr) * ch };
+            fly.RenderTransform = tt;
+            AnimLayer.Children.Add(fly);
+
+            // Hide the real piece sitting on the destination until the slide lands.
+            _pieceImg[to].Opacity = 0;
+            _pieceHost[to].Opacity = 0;
+            _animSquare = to;
+            _animFly = fly;
+
+            var ease = new CubicEase { EasingMode = EasingMode.EaseOut };
+            var dur = new Duration(TimeSpan.FromMilliseconds(160));
+            var ax = new DoubleAnimation { To = 0, Duration = dur, EasingFunction = ease };
+            Storyboard.SetTarget(ax, tt);
+            Storyboard.SetTargetProperty(ax, "X");
+            var ay = new DoubleAnimation { To = 0, Duration = dur, EasingFunction = ease };
+            Storyboard.SetTarget(ay, tt);
+            Storyboard.SetTargetProperty(ay, "Y");
+
+            var sb = new Storyboard();
+            sb.Children.Add(ax);
+            sb.Children.Add(ay);
+            sb.Completed += (s, e) => CancelAnim();
+            _animStoryboard = sb;
+            sb.Begin();
+        }
+
+        // Stop any in-flight slide, drop the flying piece and restore the real one.
+        void CancelAnim()
+        {
+            if (_animStoryboard != null) { try { _animStoryboard.Stop(); } catch { } _animStoryboard = null; }
+            if (_animFly != null) { AnimLayer.Children.Remove(_animFly); _animFly = null; }
+            if (_animSquare >= 0)
+            {
+                _pieceImg[_animSquare].Opacity = 1;
+                _pieceHost[_animSquare].Opacity = 1;
+                _animSquare = -1;
+            }
+        }
+
+        // A piece visual sized to one cell, mirroring how the board draws the piece (SVG set or glyph).
+        FrameworkElement BuildFlyingPiece(char piece, double cw, double ch)
+        {
+            var container = new Grid { Width = cw, Height = ch };
+            var svg = SvgFor(piece);
+            if (svg != null)
+            {
+                container.Children.Add(new Image { Source = svg, Stretch = Stretch.Uniform, Margin = new Thickness(6) });
+            }
+            else
+            {
+                string g = GlyphFor(piece);
+                bool white = char.IsUpper(piece);
+                var outline = MakeGlyph();
+                outline.Text = g;
+                outline.Foreground = new SolidColorBrush(white ? WhiteOutline : BlackOutline);
+                outline.RenderTransform = new TranslateTransform { X = 0, Y = 2 };
+                var fill = MakeGlyph();
+                fill.Text = g;
+                fill.Foreground = new SolidColorBrush(white ? WhiteFill : BlackFill);
+                var pg = new Grid();
+                pg.Children.Add(outline);
+                pg.Children.Add(fill);
+                container.Children.Add(new Viewbox { Child = pg, Stretch = Stretch.Uniform, Margin = new Thickness(8) });
+            }
+            return container;
         }
 
         void MaybePlayMoveSound()

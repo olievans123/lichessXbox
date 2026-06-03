@@ -50,6 +50,9 @@ namespace LichessXbox.Helpers
         /// toggle and the actual ElementSoundPlayer state always agree. Off by default.</summary>
         public static bool UiSounds { get; private set; }
 
+        /// <summary>Slide pieces to their square when a move is played (lichess-style). On by default.</summary>
+        public static bool Animations { get; private set; } = true;
+
         public static string CurrentName { get; private set; } = "Green";
 
         /// <summary>Selected piece set ("Native" = the built-in Unicode glyphs, else a lichess SVG set).
@@ -92,6 +95,12 @@ namespace LichessXbox.Helpers
             Save("UiSounds", on ? "1" : "0");
         }
 
+        public static void SetAnimations(bool on)
+        {
+            Animations = on;
+            Save("Animations", on ? "1" : "0");
+        }
+
         public static void SetPieceSet(string set)
         {
             PieceSet = string.IsNullOrEmpty(set) ? PieceSets.Native : set;
@@ -112,6 +121,7 @@ namespace LichessXbox.Helpers
                 if (s.TryGetValue("OutlinePieces", out var o) && o is string os) OutlinePieces = os == "1";
                 if (s.TryGetValue("MoveSounds", out var m) && m is string ms) MoveSounds = ms == "1";
                 if (s.TryGetValue("UiSounds", out var u) && u is string us) UiSounds = us == "1";
+                if (s.TryGetValue("Animations", out var a) && a is string ans) Animations = ans == "1";
                 if (s.TryGetValue("PieceSet", out var pv) && pv is string ps && !string.IsNullOrEmpty(ps)) PieceSet = ps;
             }
             catch { /* first run */ }

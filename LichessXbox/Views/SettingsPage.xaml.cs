@@ -46,6 +46,7 @@ namespace LichessXbox.Views
             OutlineToggle.IsOn = BoardTheme.OutlinePieces;
             SoundToggle.IsOn = BoardTheme.UiSounds;
             MoveSoundToggle.IsOn = BoardTheme.MoveSounds;
+            AnimToggle.IsOn = BoardTheme.Animations;
 
             PieceGrid.ItemsSource = _pieceItems;
             PopulatePieces(false);
@@ -197,6 +198,11 @@ namespace LichessXbox.Views
         void MoveSound_Toggled(object sender, RoutedEventArgs e)
         {
             if (_loaded) BoardTheme.SetMoveSounds(MoveSoundToggle.IsOn);
+        }
+
+        void Anim_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_loaded) BoardTheme.SetAnimations(AnimToggle.IsOn);
         }
     }
 }
