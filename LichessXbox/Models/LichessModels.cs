@@ -266,6 +266,7 @@ namespace LichessXbox.Models
         public bool IsMyTurn { get; set; }
         public string Fen { get; set; }
         public bool WhiteAtBottom { get; set; }   // true = the user plays white
-        public string Status { get; set; }        // e.g. "Rapid · your move"
+        public string TypeText { get; set; }       // e.g. "Rapid", "Correspondence"
+        public string TurnText { get; set; }       // "Your move" / "Their move"
     }
 }

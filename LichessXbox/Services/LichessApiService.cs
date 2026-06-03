@@ -93,7 +93,8 @@ namespace LichessXbox.Services
                         IsMyTurn = myTurn,
                         Fen = g.Value<string>("fen"),
                         WhiteAtBottom = (g.Value<string>("color") ?? "white") == "white",
-                        Status = (speed.Length > 0 ? speed + " · " : "") + (myTurn ? "your move" : "their move"),
+                        TypeText = speed.Length > 0 ? speed : "Game",
+                        TurnText = myTurn ? "Your move" : "Their move",
                     });
                 }
             }

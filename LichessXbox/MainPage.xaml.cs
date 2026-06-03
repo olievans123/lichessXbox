@@ -20,6 +20,10 @@ namespace LichessXbox
     {
         string _pendingAnalysisParam;
         string _currentTag = "home";
+        // Pages with a full-height right-side panel: the floating ongoing-games tab would
+        // overlap their bottom-right content, so it's suppressed there.
+        static readonly System.Collections.Generic.HashSet<string> _noOngoingTabPages =
+            new System.Collections.Generic.HashSet<string> { "play", "analysis", "tournaments", "games", "settings" };
         readonly ObservableCollection<OngoingGame> _ongoing = new ObservableCollection<OngoingGame>();
         readonly DispatcherTimer _ongoingTimer = new DispatcherTimer();
         bool _ongoingExpanded;   // tab (collapsed) vs cards (expanded)
@@ -165,7 +169,7 @@ namespace LichessXbox
         // the Play page (which has its own lobby/board and would be overlapped).
         void UpdateOngoingVisibility()
         {
-            bool show = _currentTag != "play" && _ongoing.Count > 0;
+            bool show = !_noOngoingTabPages.Contains(_currentTag) && _ongoing.Count > 0;
             OngoingTab.Visibility = (show && !_ongoingExpanded) ? Visibility.Visible : Visibility.Collapsed;
             OngoingPanel.Visibility = (show && _ongoingExpanded) ? Visibility.Visible : Visibility.Collapsed;
         }
@@ -189,7 +193,7 @@ namespace LichessXbox
         void OnOngoingPanelClosed(object sender, object e)
         {
             OngoingPanel.Visibility = Visibility.Collapsed;
-            if (_currentTag != "play" && _ongoing.Count > 0)
+            if (!_noOngoingTabPages.Contains(_currentTag) && _ongoing.Count > 0)
             {
                 OngoingTab.Visibility = Visibility.Visible;
                 ((Storyboard)Resources["OngoingTabIn"]).Begin();
