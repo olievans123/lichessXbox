@@ -215,5 +215,12 @@ namespace LichessXbox.Views
             await AppState.Current.SignOutAsync();
             await RefreshAsync();
         }
+
+        // Clicking a rating opens your games + rating graph (the Games tab).
+        void Rating_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var shell = (Window.Current.Content as Frame)?.Content as LichessXbox.MainPage;
+            shell?.NavigateTo("games");
+        }
     }
 }

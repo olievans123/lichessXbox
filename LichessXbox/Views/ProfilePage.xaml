@@ -100,13 +100,9 @@
 
             <TextBlock Text="Ratings" FontSize="{StaticResource SubtitleSize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
             <TextBlock x:Name="NoRatings" Text="No rated games yet." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
-            <GridView x:Name="RatingsGrid" SelectionMode="None" IsItemClickEnabled="False" IsHitTestVisible="False">
-                <!-- Read-only stat tiles: keep gamepad focus from parking on them between actions. -->
-                <GridView.ItemContainerStyle>
-                    <Style TargetType="GridViewItem">
-                        <Setter Property="IsTabStop" Value="False" />
-                    </Style>
-                </GridView.ItemContainerStyle>
+            <TextBlock Text="Select a rating to see your games and rating graph." FontSize="{StaticResource CaptionSize}"
+                       Foreground="{StaticResource TextSecondaryBrush}" />
+            <GridView x:Name="RatingsGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Rating_ItemClick">
                 <GridView.ItemTemplate>
                     <DataTemplate>
                         <Border Width="150" Height="100" CornerRadius="16"
