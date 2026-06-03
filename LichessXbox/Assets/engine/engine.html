@@ -11,6 +11,7 @@
   function notify(s) { try { window.external.notify(s); } catch (e) {} }
 
   function attach(worker) {
+    if (engine) return;                 // never attach twice (guards against a late failover)
     engine = worker;
     engine.onmessage = function (e) {
       var line = (typeof e.data === 'string') ? e.data : (e.data && e.data.data) || '';
@@ -29,24 +30,32 @@
     else queue.push(cmd);
   }
 
-  // Try a bundled engine first (offline), then a CDN fallback (online).
+  // Bundled engine first (offline), then a CDN fallback (online) if it's ever missing.
   var sources = [
     'stockfish.js',
-    'https://cdn.jsdelivr.net/npm/stockfish@10.0.2/stockfish.js'
+    'https://cdn.jsdelivr.net/npm/stockfish@10.0.2/src/stockfish.asm.js'
   ];
 
+  // Only attach once a worker has PROVEN it loaded: probe with "uci" and wait for the
+  // engine's first reply. A load failure (404 / CSP / cross-origin) fires onerror, so we
+  // fall through to the next source instead of telling C# the engine is ready and then
+  // going silent. A safety timeout attaches best-effort in case a live engine doesn't echo.
   (function boot(i) {
+    if (engine) return;
     if (i >= sources.length) { notify('engineerror no-engine-source'); return; }
-    try {
-      var w = new Worker(sources[i]);
-      // If the script fails to load, onerror fires — try the next source.
-      var failed = false;
-      w.onerror = function () { if (!failed) { failed = true; w.terminate && w.terminate(); boot(i + 1); } };
-      // Give it a moment; if no error, treat as attached.
-      attach(w);
-    } catch (err) {
-      boot(i + 1);
-    }
+
+    var w;
+    try { w = new Worker(sources[i]); }
+    catch (err) { boot(i + 1); return; }
+
+    var settled = false;
+    function next() { if (!settled) { settled = true; try { w.terminate(); } catch (e) {} boot(i + 1); } }
+    function ok() { if (!settled) { settled = true; attach(w); } }
+
+    w.onerror = next;                  // couldn't load this source — try the next
+    w.onmessage = ok;                  // first reply proves it's alive — attach for real
+    try { w.postMessage('uci'); } catch (e) {}
+    setTimeout(function () { if (!settled && !engine) ok(); }, 4000);  // best-effort fallback
   })(0);
 </script>
 </body>
