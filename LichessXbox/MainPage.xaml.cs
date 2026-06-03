@@ -62,7 +62,11 @@ namespace LichessXbox
         void SetPane(bool open)
         {
             NavSplit.IsPaneOpen = open;
-            if (open) FocusActiveNav();
+            if (open)
+            {
+                NavScroller.ChangeView(null, 0, null, true);   // always open scrolled to the top
+                (NavItems.Children.OfType<Button>().FirstOrDefault())?.Focus(FocusState.Programmatic);
+            }
             else MenuButton.Focus(FocusState.Programmatic);
         }
 
@@ -70,14 +74,6 @@ namespace LichessXbox
         {
             NavSplit.IsPaneOpen = false;
             MenuButton.Focus(FocusState.Programmatic);
-        }
-
-        // When the pane opens, land focus on the current page's nav item.
-        void FocusActiveNav()
-        {
-            var btn = NavItems.Children.OfType<Button>().FirstOrDefault(b => (b.Tag as string) == _currentTag)
-                      ?? NavItems.Children.OfType<Button>().FirstOrDefault();
-            btn?.Focus(FocusState.Programmatic);
         }
 
         void Nav_Click(object sender, RoutedEventArgs e)

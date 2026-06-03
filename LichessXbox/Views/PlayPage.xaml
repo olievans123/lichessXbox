@@ -219,13 +219,13 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Button Grid.Column="0" x:Name="MoveFirstButton" Style="{StaticResource TileButton}" Padding="0,8" Click="MoveFirst_Click"
-                                    Content="⏮" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                    FontFamily="Segoe MDL2 Assets" Content="&#xE892;" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
                             <Button Grid.Column="1" x:Name="MovePrevButton" Style="{StaticResource TileButton}" Padding="0,8" Click="MovePrev_Click"
-                                    Content="◀" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                    FontFamily="Segoe MDL2 Assets" Content="&#xE76B;" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
                             <Button Grid.Column="2" x:Name="MoveNextButton" Style="{StaticResource TileButton}" Padding="0,8" Click="MoveNext_Click"
-                                    Content="▶" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                    FontFamily="Segoe MDL2 Assets" Content="&#xE76C;" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
                             <Button Grid.Column="3" x:Name="MoveLastButton" Style="{StaticResource TileButton}" Padding="0,8" Click="MoveLast_Click"
-                                    Content="⏭" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                    FontFamily="Segoe MDL2 Assets" Content="&#xE893;" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
                         </Grid>
                         <TextBlock x:Name="MovePositionText" Text="" FontSize="{StaticResource CaptionSize}"
                                    Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" />

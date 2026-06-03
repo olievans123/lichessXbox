@@ -33,7 +33,7 @@
         <SplitView x:Name="NavSplit" DisplayMode="Overlay" OpenPaneLength="252"
                    IsPaneOpen="False" PaneBackground="{StaticResource AppSurfaceBrush}">
             <SplitView.Pane>
-                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
+                <ScrollViewer x:Name="NavScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel x:Name="NavItems" Padding="12,16,12,16" Spacing="3">
                         <StackPanel Orientation="Horizontal" Spacing="12" Margin="6,2,6,6">
                             <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource AccentGradientBrush}">
@@ -185,15 +185,15 @@
                         VerticalAlignment="Top" HorizontalAlignment="Center"
                         Width="44" Height="44" Margin="0,12,0,0" CornerRadius="22"
                         Background="#59000000"
-                        FontFamily="Segoe UI Symbol" FontSize="20"
-                        Content="☰" ToolTipService.ToolTip="Menu (Menu button)" />
+                        FontFamily="Segoe MDL2 Assets" FontSize="18"
+                        Content="&#xE700;" ToolTipService.ToolTip="Menu (Menu button)" />
 
                 <Frame x:Name="ContentFrame" Grid.Column="1" />
 
                 <!-- "Continue playing": collapsed to a small tab on the right edge by default so it
                      isn't always over the content; selecting it expands the in-progress game cards. -->
                 <Button x:Name="OngoingTab" Grid.Column="1" Visibility="Collapsed" Style="{StaticResource TileButton}"
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,24,24"
+                        HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,24,16"
                         Background="{StaticResource AppSurfaceBrush}" Padding="14,10" HorizontalContentAlignment="Center"
                         Click="ExpandOngoing_Click" ToolTipService.ToolTip="Games in progress">
                     <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
@@ -208,7 +208,7 @@
                 </Button>
 
                 <Border x:Name="OngoingPanel" Grid.Column="1" Visibility="Collapsed"
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,24,24" MaxWidth="320"
+                        HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,24,16" MaxWidth="320"
                         CornerRadius="18" Padding="14,12" Background="{StaticResource AppSurfaceBrush}"
                         BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1" RenderTransformOrigin="1,1">
                     <Border.RenderTransform>

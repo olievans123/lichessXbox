@@ -436,8 +436,9 @@ namespace LichessXbox.Controls
             if (_soundReady && moveChanged)
             {
                 bool capture = _lastPieceCount >= 0 && pieceCount < _lastPieceCount;
-                if (_position.IsInCheck(_position.WhiteToMove)) SoundService.Check();
-                else if (capture) SoundService.Capture();
+                // Like lichess's standard theme: a checking move just plays the move/capture
+                // sound (no separate check "ding" — that read as a checkmate/notify sound).
+                if (capture) SoundService.Capture();
                 else SoundService.Move();
             }
 

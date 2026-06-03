@@ -67,11 +67,11 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Style="{StaticResource TileButton}" Click="First_Click" Content="⏮" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                    <Button Grid.Column="1" x:Name="BackButton" Style="{StaticResource TileButton}" Click="Back_Click" Content="◀" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                    <Button Grid.Column="2" Style="{StaticResource TileButton}" Click="Forward_Click" Content="▶" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                    <Button Grid.Column="3" Style="{StaticResource TileButton}" Click="Last_Click" Content="⏭" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                    <Button Grid.Column="4" Style="{StaticResource TileButton}" Click="Flip_Click" Content="⇅" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                    <Button Grid.Column="0" Style="{StaticResource TileButton}" Click="First_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE892;" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                    <Button Grid.Column="1" x:Name="BackButton" Style="{StaticResource TileButton}" Click="Back_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE76B;" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                    <Button Grid.Column="2" Style="{StaticResource TileButton}" Click="Forward_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE76C;" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                    <Button Grid.Column="3" Style="{StaticResource TileButton}" Click="Last_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE893;" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                    <Button Grid.Column="4" Style="{StaticResource TileButton}" Click="Flip_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE8AB;" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
                 </Grid>
 
                 <!-- Opening explorer -->
