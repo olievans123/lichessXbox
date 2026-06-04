@@ -55,6 +55,14 @@ namespace LichessXbox.Views
 
         protected override async void OnNavigatedTo(NavigationEventArgs e) => await LoadCurrentAsync();
 
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            // Otherwise a pending reply/auto-advance tick fires on the detached page —
+            // a wasted puzzle fetch and a focus attempt on an off-tree board.
+            _replyTimer.Stop();
+            _advanceTimer.Stop();
+        }
+
         // ------------------------------------------------------------- modes
 
         // Active mode = filled green (like the nav active state) so it's clearly distinct

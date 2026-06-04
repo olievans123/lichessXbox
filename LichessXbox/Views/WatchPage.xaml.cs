@@ -92,19 +92,32 @@ namespace LichessXbox.Views
             // Clear the previous channel's game so it doesn't linger until the first frame arrives.
             TopName.Text = ""; BottomName.Text = ""; TopRating.Text = ""; BottomRating.Text = "";
             TopClock.Text = "--:--"; BottomClock.Text = "--:--";
+            Board.LastMove = null;
+            Board.Position = ChessPosition.Starting();   // neutral board until the first frame lands
             _ = RunAsync(key, attempt, ct);
         }
 
         async Task RunAsync(string key, int attempt, CancellationToken ct)
         {
-            try
+            // Keep the stream alive across transient drops (sleep/resume, Wi-Fi blips): when it
+            // ends without being cancelled, reconnect after a backoff. Stops the moment the user
+            // switches channels (attempt changes) or leaves the page (ct cancelled).
+            void Frame(JObject f) => OnFrame(f, attempt);
+            int delayMs = 1000;
+            while (!ct.IsCancellationRequested && attempt == _streamAttempt)
             {
-                void Frame(JObject f) => OnFrame(f, attempt);
-                if (key == "best") await AppState.Current.Api.StreamTvFeedAsync(Frame, ct);
-                else await AppState.Current.Api.StreamTvChannelAsync(key, Frame, ct);
+                try
+                {
+                    if (key == "best") await AppState.Current.Api.StreamTvFeedAsync(Frame, ct);
+                    else await AppState.Current.Api.StreamTvChannelAsync(key, Frame, ct);
+                }
+                catch (OperationCanceledException) { return; }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine("Watch stream dropped: " + ex.Message); }
+
+                if (ct.IsCancellationRequested || attempt != _streamAttempt) return;
+                try { await Task.Delay(delayMs, ct); } catch (OperationCanceledException) { return; }
+                delayMs = Math.Min(delayMs * 2, 15000);   // exponential backoff, capped at 15s
             }
-            catch (OperationCanceledException) { }
-            catch (Exception ex) { System.Diagnostics.Debug.WriteLine("Watch stream ended: " + ex.Message); }
         }
 
         void OnFrame(JObject frame, int attempt)

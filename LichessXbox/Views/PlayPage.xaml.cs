@@ -183,7 +183,8 @@ namespace LichessXbox.Views
             _eventCts?.Cancel();
             _eventCts = new CancellationTokenSource();
             var ct = _eventCts.Token;
-            _ = RunStreamAsync(() => AppState.Current.Api.StreamEventsAsync(OnAccountEvent, ct), ct);
+            // The event feed is subscribed for the whole time we're on this page — always reconnect.
+            _ = RunStreamAsync(() => AppState.Current.Api.StreamEventsAsync(OnAccountEvent, ct), ct, () => true);
         }
 
         void OnAccountEvent(JObject ev)
@@ -247,9 +248,11 @@ namespace LichessXbox.Views
             SeekingText.Text = $"Starting a game vs Stockfish level {lvl.Level}…";
             ShowOnly(SeekingPanel);
             // Casual, no-clock game vs the AI for a relaxed couch experience.
-            _seekCts = new CancellationTokenSource();
+            var cts = new CancellationTokenSource();
+            _seekCts = cts;
             string gameId = await AppState.Current.Api.CreateAiChallengeAsync(lvl.Level, null, Variant);
-            if (_seekCts != null && _seekCts.IsCancellationRequested) return;
+            // Bail if THIS seek was cancelled or superseded by a newer one while we awaited.
+            if (cts.IsCancellationRequested || _seekCts != cts) return;
             if (!string.IsNullOrEmpty(gameId)) StartGame(gameId);
             else if (!_gameActive) ShowOnly(LobbyPanel);
         }
@@ -384,7 +387,11 @@ namespace LichessXbox.Views
             TopCaptured.Text = ""; BottomCaptured.Text = "";
             TopAdvantage.Text = ""; BottomAdvantage.Text = "";
 
-            _ = RunStreamAsync(() => AppState.Current.Api.StreamBoardGameAsync(gameId, OnGameState, ct), ct);
+            // Reconnect the board stream only while THIS game is still live (not after the result
+            // card shows, and not once a different game has started).
+            string gid = gameId;
+            _ = RunStreamAsync(() => AppState.Current.Api.StreamBoardGameAsync(gameId, OnGameState, ct), ct,
+                               () => _gameId == gid && !_resultShown);
         }
 
         void OnGameState(JObject msg)
@@ -892,15 +899,35 @@ namespace LichessXbox.Views
         async void Rematch_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(_opponentName)) return;
-            // Reuse the finished game's time control + variant + rated-ness (fall back to 5+3 if it
-            // had no real-time clock, e.g. a correspondence game).
-            int limit = _gameClockLimitSec > 0 ? _gameClockLimitSec : 300;
-            int inc = _gameClockLimitSec > 0 ? _gameClockIncSec : 3;
-            var clock = new TimeControlPreset("Rematch", limit, inc, "⚡", _gameRated);
+            // Reuse the finished game's exact terms. A correspondence game (days per move, no
+            // real-time clock) must rematch as correspondence — not silently become a 5+3 blitz.
+            TimeControlPreset clock = _gameDays > 0
+                ? new TimeControlPreset("Rematch", 0, 0, "📅", _gameRated, _gameDays)
+                : new TimeControlPreset("Rematch",
+                    _gameClockLimitSec > 0 ? _gameClockLimitSec : 300,
+                    _gameClockLimitSec > 0 ? _gameClockIncSec : 3, "⚡", _gameRated);
+
             _autoOpen = true;
+            ChallengeErrorText.Visibility = Visibility.Collapsed;
             SeekingText.Text = $"Rematch — waiting for {_opponentName}…";
             ShowOnly(SeekingPanel);
-            await AppState.Current.Api.ChallengeUserAsync(_opponentName, clock, _gameVariantKey ?? "standard");
+
+            // Arm the seek token so the Seeking screen's Cancel button can actually back out, and
+            // surface a failure instead of stranding on "waiting…" forever.
+            var cts = new CancellationTokenSource();
+            _seekCts = cts;
+            bool ok;
+            try { ok = await AppState.Current.Api.ChallengeUserAsync(_opponentName, clock, _gameVariantKey ?? "standard"); }
+            catch { ok = false; }
+            if (cts.IsCancellationRequested || _seekCts != cts) return;   // cancelled / superseded
+            if (!ok && !_gameActive)
+            {
+                _autoOpen = false;
+                ChallengeErrorText.Text = $"Couldn't send a rematch to {_opponentName}.";
+                ChallengeErrorText.Visibility = Visibility.Visible;
+                ShowOnly(LobbyPanel);
+            }
+            // On success the rematch starts via the gameStart event; Cancel exits the wait meanwhile.
         }
 
         void NewGame_Click(object sender, RoutedEventArgs e)
@@ -914,11 +941,22 @@ namespace LichessXbox.Views
 
         // ----------------------------------------------------- stream runner
 
-        static async Task RunStreamAsync(Func<Task> start, CancellationToken ct)
+        // Run a stream, reconnecting with backoff when it drops — until cancelled or reconnect() says
+        // stop. Lichess streams die on any transient blip (console sleep/resume, Wi-Fi hiccup); without
+        // this the live board (or the event feed that delivers gameStart/challenges) silently freezes.
+        static async Task RunStreamAsync(Func<Task> start, CancellationToken ct, Func<bool> reconnect)
         {
-            try { await start(); }
-            catch (OperationCanceledException) { }
-            catch (Exception ex) { System.Diagnostics.Debug.WriteLine("Stream ended: " + ex.Message); }
+            int delayMs = 1000;
+            while (!ct.IsCancellationRequested)
+            {
+                try { await start(); }
+                catch (OperationCanceledException) { return; }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine("Stream dropped: " + ex.Message); }
+
+                if (ct.IsCancellationRequested || !reconnect()) return;
+                try { await Task.Delay(delayMs, ct); } catch (OperationCanceledException) { return; }
+                delayMs = Math.Min(delayMs * 2, 10000);   // exponential backoff, capped at 10s
+            }
         }
     }
 }

@@ -55,7 +55,9 @@ namespace LichessXbox.Chess
             {
                 if (ch == '/') { rank--; file = 0; }
                 else if (char.IsDigit(ch)) file += ch - '0';
-                else { p.Squares[rank * 8 + file] = ch; file++; }
+                // Clamp the write: a malformed FEN (over-long rank / too many ranks) must not
+                // index past the 64-square board and throw out of OnNavigatedTo.
+                else { if (rank >= 0 && rank < 8 && file >= 0 && file < 8) p.Squares[rank * 8 + file] = ch; file++; }
             }
 
             p.WhiteToMove = parts.Length < 2 || parts[1] != "b";

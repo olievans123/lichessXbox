@@ -361,8 +361,18 @@ namespace LichessXbox.Views
             _history.Clear();
             _moves.Clear();
             _sans.Clear();
-            var pos = string.IsNullOrEmpty(initialFen) || initialFen == "startpos"
-                ? ChessPosition.Starting() : ChessPosition.FromFen(initialFen);
+            ChessPosition pos;
+            try
+            {
+                pos = string.IsNullOrEmpty(initialFen) || initialFen == "startpos"
+                    ? ChessPosition.Starting() : ChessPosition.FromFen(initialFen);
+            }
+            catch
+            {
+                // A malformed/variant FEN must never crash the page on navigation.
+                pos = ChessPosition.Starting();
+                BestLineText.Text = "Couldn't read that position — starting from the initial board.";
+            }
             _history.Add(pos);
             if (!string.IsNullOrWhiteSpace(moves))
             {
@@ -416,7 +426,8 @@ namespace LichessXbox.Views
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             _analysisCts?.Cancel();
-            _engine?.Stop();
+            _engine?.Shutdown();   // free the Stockfish WASM heap, don't just halt the search
+            _engine = null;
         }
     }
 }

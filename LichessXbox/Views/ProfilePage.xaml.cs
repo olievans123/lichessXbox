@@ -167,7 +167,9 @@ namespace LichessXbox.Views
                 if (attempt != _pairAttempt) return;   // superseded (toggled/navigated)
                 _qrExpiry.Stop();
 
-                if (result.TryGetValue("state", out var st) && st != _state)
+                // Require the state to be present AND match the one we sent (CSRF / mix-up guard).
+                // We always send a state, so a missing one is as suspect as a wrong one.
+                if (!result.TryGetValue("state", out var st) || st != _state)
                 {
                     QrStatus.Text = "Security check failed — please try again.";
                     return;
@@ -262,6 +264,7 @@ namespace LichessXbox.Views
         {
             RatingDetailTitle.Text = perf + " rating";
             RatingDetailPanel.Visibility = Visibility.Visible;
+            RatingDetailPanel.StartBringIntoView();   // scroll the freshly revealed detail into view
 
             var account = await AppState.Current.EnsureAccountAsync();
             if (account == null) return;
@@ -291,6 +294,11 @@ namespace LichessXbox.Views
                 }
                 finally { ProfileGamesBusy.IsActive = false; }
             }
+
+            // Move focus onto the revealed content so the reveal reads clearly at 10 feet —
+            // focusing the games list both signals "something happened" and scrolls it on-screen.
+            if (ProfileGames.Items.Count > 0) ProfileGames.Focus(FocusState.Programmatic);
+            else RatingDetailPanel.StartBringIntoView();
         }
 
         void ProfileGame_ItemClick(object sender, ItemClickEventArgs e)

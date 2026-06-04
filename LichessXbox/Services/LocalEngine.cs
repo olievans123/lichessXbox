@@ -51,6 +51,23 @@ namespace LichessXbox.Services
 
         public void Stop() { if (_ready) Send("stop"); }
 
+        /// <summary>
+        /// Fully tear the engine down: halt the search, stop listening for notifications,
+        /// and navigate the WebView to a blank page so the Stockfish WASM heap is released.
+        /// Without this the asm.js heap stays resident — costly under Xbox's hard memory cap.
+        /// </summary>
+        public void Shutdown()
+        {
+            try
+            {
+                if (_ready) Send("stop");
+                _ready = false;
+                _web.ScriptNotify -= OnScriptNotify;
+                _web.Navigate(new Uri("about:blank"));
+            }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine("Engine shutdown failed: " + ex.Message); }
+        }
+
         void OnScriptNotify(object sender, NotifyEventArgs e)
         {
             string line = e.Value ?? "";

@@ -38,12 +38,24 @@ namespace LichessXbox.Services
             return req;
         }
 
+        // The shared HttpClient uses an infinite timeout so the long-lived NDJSON streams aren't
+        // cut off. Plain request/response calls must therefore impose their OWN deadline, or a
+        // stalled socket (e.g. a move POST mid-game) hangs forever with no error. The default
+        // completion option buffers the whole response before SendAsync returns, so the body is
+        // already in memory by the time we dispose the token source — safe for these short calls.
+        async Task<HttpResponseMessage> SendBufferedAsync(HttpRequestMessage req, CancellationToken ct = default, int timeoutSeconds = 15)
+        {
+            using (var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds)))
+            using (var linked = CancellationTokenSource.CreateLinkedTokenSource(ct, timeout.Token))
+                return await _http.SendAsync(req, linked.Token);
+        }
+
         // ----------------------------------------------------------- account
 
         public async Task<LichessAccount> GetAccountAsync()
         {
             using (var req = Build(HttpMethod.Get, "/api/account"))
-            using (var resp = await _http.SendAsync(req))
+            using (var resp = await SendBufferedAsync(req))
             {
                 if (!resp.IsSuccessStatusCode) return null;
                 var json = await resp.Content.ReadAsStringAsync();
@@ -69,7 +81,7 @@ namespace LichessXbox.Services
         {
             var list = new List<OngoingGame>();
             using (var req = Build(HttpMethod.Get, "/api/account/playing"))
-            using (var resp = await _http.SendAsync(req))
+            using (var resp = await SendBufferedAsync(req))
             {
                 if (!resp.IsSuccessStatusCode) return list;
                 var o = JObject.Parse(await resp.Content.ReadAsStringAsync());
@@ -146,38 +158,38 @@ namespace LichessXbox.Services
         public async Task<bool> MakeBoardMoveAsync(string gameId, string uci)
         {
             using (var req = Build(HttpMethod.Post, $"/api/board/game/{gameId}/move/{uci}"))
-            using (var resp = await _http.SendAsync(req))
+            using (var resp = await SendBufferedAsync(req))
                 return resp.IsSuccessStatusCode;
         }
 
         public async Task ResignAsync(string gameId)
         {
             using (var req = Build(HttpMethod.Post, $"/api/board/game/{gameId}/resign"))
-                await _http.SendAsync(req);
+            using (await SendBufferedAsync(req)) { }
         }
 
         public async Task AbortAsync(string gameId)
         {
             using (var req = Build(HttpMethod.Post, $"/api/board/game/{gameId}/abort"))
-                await _http.SendAsync(req);
+            using (await SendBufferedAsync(req)) { }
         }
 
         public async Task OfferDrawAsync(string gameId, bool accept)
         {
             using (var req = Build(HttpMethod.Post, $"/api/board/game/{gameId}/draw/{(accept ? "yes" : "no")}"))
-                await _http.SendAsync(req);
+            using (await SendBufferedAsync(req)) { }
         }
 
         public async Task TakebackAsync(string gameId, bool accept)
         {
             using (var req = Build(HttpMethod.Post, $"/api/board/game/{gameId}/takeback/{(accept ? "yes" : "no")}"))
-                await _http.SendAsync(req);
+            using (await SendBufferedAsync(req)) { }
         }
 
         public async Task ClaimVictoryAsync(string gameId)
         {
             using (var req = Build(HttpMethod.Post, $"/api/board/game/{gameId}/claim-victory"))
-                await _http.SendAsync(req);
+            using (await SendBufferedAsync(req)) { }
         }
 
         /// <summary>
@@ -259,7 +271,7 @@ namespace LichessXbox.Services
             }
             using (var content = new FormUrlEncodedContent(form))
             using (var req = Build(HttpMethod.Post, "/api/challenge/ai", content))
-            using (var resp = await _http.SendAsync(req))
+            using (var resp = await SendBufferedAsync(req))
             {
                 if (!resp.IsSuccessStatusCode) return null;
                 var o = JObject.Parse(await resp.Content.ReadAsStringAsync());
@@ -273,26 +285,34 @@ namespace LichessXbox.Services
             var form = new Dictionary<string, string>
             {
                 ["rated"] = clock != null && clock.Rated ? "true" : "false",
-                ["clock.limit"] = (clock?.ClockLimitSeconds ?? 300).ToString(),
-                ["clock.increment"] = (clock?.ClockIncrementSeconds ?? 3).ToString(),
                 ["variant"] = variant,
             };
+            // Honour correspondence (days-per-turn) instead of silently forcing a real-time clock.
+            if (clock != null && clock.IsCorrespondence)
+            {
+                form["days"] = clock.Days.ToString();
+            }
+            else
+            {
+                form["clock.limit"] = (clock?.ClockLimitSeconds ?? 300).ToString();
+                form["clock.increment"] = (clock?.ClockIncrementSeconds ?? 3).ToString();
+            }
             using (var content = new FormUrlEncodedContent(form))
             using (var req = Build(HttpMethod.Post, $"/api/challenge/{username}", content))
-            using (var resp = await _http.SendAsync(req))
+            using (var resp = await SendBufferedAsync(req))
                 return resp.IsSuccessStatusCode;
         }
 
         public async Task AcceptChallengeAsync(string id)
         {
             using (var req = Build(HttpMethod.Post, $"/api/challenge/{id}/accept"))
-                await _http.SendAsync(req);
+            using (await SendBufferedAsync(req)) { }
         }
 
         public async Task DeclineChallengeAsync(string id)
         {
             using (var req = Build(HttpMethod.Post, $"/api/challenge/{id}/decline"))
-                await _http.SendAsync(req);
+            using (await SendBufferedAsync(req)) { }
         }
 
         // ------------------------------------------------------------ puzzles
@@ -311,7 +331,7 @@ namespace LichessXbox.Services
             using (var req = new HttpRequestMessage(HttpMethod.Get, Base + path))
             {
                 req.Headers.Accept.ParseAdd("application/json");
-                using (var resp = await _http.SendAsync(req))
+                using (var resp = await SendBufferedAsync(req))
                 {
                     if (!resp.IsSuccessStatusCode) return null;
                     var o = JObject.Parse(await resp.Content.ReadAsStringAsync());
@@ -342,7 +362,7 @@ namespace LichessXbox.Services
                 req.Headers.Accept.ParseAdd("application/json");
                 if (_auth.IsAuthenticated && url.StartsWith(Base))
                     req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _auth.Token);
-                using (var resp = await _http.SendAsync(req, ct))
+                using (var resp = await SendBufferedAsync(req, ct))
                 {
                     if (!resp.IsSuccessStatusCode) return null;
                     return await resp.Content.ReadAsStringAsync();
@@ -572,7 +592,7 @@ namespace LichessXbox.Services
                 {
                     req.Headers.Accept.Clear();
                     req.Headers.Accept.ParseAdd("application/json");
-                    using (var resp = await _http.SendAsync(req))
+                    using (var resp = await SendBufferedAsync(req))
                     {
                         if (!resp.IsSuccessStatusCode) return null;
                         var o = JObject.Parse(await resp.Content.ReadAsStringAsync());
@@ -684,7 +704,7 @@ namespace LichessXbox.Services
         public async Task<bool> JoinTournamentAsync(string id)
         {
             using (var req = Build(HttpMethod.Post, $"/api/tournament/{id}/join"))
-            using (var resp = await _http.SendAsync(req))
+            using (var resp = await SendBufferedAsync(req))
                 return resp.IsSuccessStatusCode;
         }
 
@@ -729,7 +749,7 @@ namespace LichessXbox.Services
             {
                 req.Headers.Accept.Clear();
                 req.Headers.Accept.ParseAdd("application/x-chess-pgn");
-                using (var resp = await _http.SendAsync(req))
+                using (var resp = await SendBufferedAsync(req, default, 25))
                 {
                     if (!resp.IsSuccessStatusCode) return null;
                     return await resp.Content.ReadAsStringAsync();
