@@ -83,6 +83,11 @@
     <!-- ============ Page frame: one TV-safe margin so titles align across every tab ============ -->
     <Thickness x:Key="PagePadding">40,28</Thickness>
 
+    <!-- TV title-safe inset applied once at the shell. Many TVs overscan more than the console
+         reports, clipping content near the edges; this keeps everything inside the safe area.
+         Tune in one place if a set still clips (raise) or looks too inset (lower). -->
+    <Thickness x:Key="SafeArea">48,32,48,32</Thickness>
+
     <!-- ============ Semantic tokens promoted from one-off literals ============ -->
     <SolidColorBrush x:Key="BoardFrameBrush" Color="#0E0C09" />
     <SolidColorBrush x:Key="SurfaceSunkenBrush" Color="#16130F" />   <!-- graph/well backdrops -->

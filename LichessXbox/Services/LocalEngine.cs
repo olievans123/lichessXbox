@@ -19,8 +19,8 @@ namespace LichessXbox.Services
         bool _ready;
         ChessPosition _context = ChessPosition.Starting();
 
-        /// <summary>Fires with (depth, evalText, pvSan) as analysis deepens.</summary>
-        public event Action<int, string, string> Info;
+        /// <summary>Fires with (depth, evalText, pvSan, bestMoveUci) as analysis deepens.</summary>
+        public event Action<int, string, string, string> Info;
         public event Action<bool> ReadyChanged;
 
         public bool IsReady => _ready;
@@ -134,7 +134,10 @@ namespace LichessXbox.Services
             }
 
             string pvSan = string.IsNullOrWhiteSpace(pvUci) ? "" : _context.LineToSan(pvUci.Split(' '));
-            Info?.Invoke(depth, evalText, pvSan);
+            string bestUci = pvUci ?? "";
+            int sp = bestUci.IndexOf(' ');
+            if (sp > 0) bestUci = bestUci.Substring(0, sp);   // first PV move = the best move
+            Info?.Invoke(depth, evalText, pvSan, bestUci);
         }
     }
 }

@@ -134,6 +134,7 @@ namespace LichessXbox.Views
                         DepthText.Text = "depth " + eval.Depth;
                         BestLineText.Text = string.IsNullOrEmpty(eval.PvUci) ? "" : pos.LineToSan(eval.PvUci.Split(' '));
                         SetEvalBar(eval.WhiteAdvantage);
+                        ShowBestArrow(eval.BestMoveUci);
                     }
                     else
                     {
@@ -308,13 +309,22 @@ namespace LichessXbox.Views
             _engine.Analyze(Current);
         }
 
-        void OnEngineInfo(int depth, string evalText, string pvSan)
+        void OnEngineInfo(int depth, string evalText, string pvSan, string bestUci)
         {
             if (!_useLocalEngine) return;
             EvalText.Text = evalText;
             DepthText.Text = $"depth {depth} · local";
             if (!string.IsNullOrEmpty(pvSan)) BestLineText.Text = pvSan;
             SetEvalBar(AdvantageFromEval(evalText));
+            ShowBestArrow(bestUci);
+        }
+
+        // Draw the engine's top move as an arrow on the board (cleared automatically on the next move).
+        void ShowBestArrow(string uci)
+        {
+            if (string.IsNullOrEmpty(uci)) return;
+            var bm = ChessMove.FromUci(uci);
+            if (bm.From >= 0 && bm.From < 64 && bm.To >= 0 && bm.To < 64) Board.SetBestArrow(bm.From, bm.To);
         }
 
         static double AdvantageFromEval(string evalText)

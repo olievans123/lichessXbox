@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using LichessXbox.Chess;
 using LichessXbox.Helpers;
 using LichessXbox.Services;
+using Windows.Foundation;
 using Windows.UI;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
@@ -85,6 +86,7 @@ namespace LichessXbox.Controls
         readonly Action _reTheme;
         EventHandler<object> _focusRetryHandler;   // single pending FocusBoard retry (never stack them)
         int _focusRetryTries;
+        int _arrowFrom = -1, _arrowTo = -1;         // best-move arrow squares (−1 = none)
 
         public ChessBoardControl()
         {
@@ -109,7 +111,9 @@ namespace LichessXbox.Controls
         public ChessPosition Position
         {
             get => _position;
-            set { _position = value ?? ChessPosition.Starting(); ClearSelection(); Render(); }
+            // A new position invalidates any best-move arrow; the page re-sets it when the
+            // fresh eval arrives.
+            set { _position = value ?? ChessPosition.Starting(); ClearSelection(); ClearArrows(); Render(); }
         }
 
         /// <summary>Bindable FEN — sets the position from a FEN string (for snapshot/thumbnail boards).</summary>
@@ -129,8 +133,9 @@ namespace LichessXbox.Controls
         public static readonly DependencyProperty WhiteAtBottomProperty =
             DependencyProperty.Register(nameof(WhiteAtBottom), typeof(bool), typeof(ChessBoardControl),
                 // Clear any in-progress selection first: a flip moves every cell, so a stale
-                // selection highlight + legal-dots would desync from the gamepad cursor.
-                new PropertyMetadata(true, (d, e) => { var b = (ChessBoardControl)d; b.ClearSelection(); b.Render(); }));
+                // selection highlight + legal-dots would desync from the gamepad cursor. The arrow
+                // survives the flip, so redraw it in the new orientation.
+                new PropertyMetadata(true, (d, e) => { var b = (ChessBoardControl)d; b.ClearSelection(); b.Render(); b.DrawArrows(); }));
         public bool WhiteAtBottom
         {
             get => (bool)GetValue(WhiteAtBottomProperty);
@@ -557,6 +562,61 @@ namespace LichessXbox.Controls
                 _pieceHost[_animSquare].Opacity = 1;
                 _animSquare = -1;
             }
+        }
+
+        // -------------------------------------------------------------- arrows
+
+        /// <summary>Show a best-move arrow between two squares (e.g. the engine's top move).</summary>
+        public void SetBestArrow(int from, int to)
+        {
+            _arrowFrom = from; _arrowTo = to;
+            DrawArrows();
+        }
+
+        public void ClearArrows()
+        {
+            _arrowFrom = _arrowTo = -1;
+            ArrowLayer?.Children.Clear();
+        }
+
+        // The board root is a fixed 720x720 scaled by the Viewbox, so arrow geometry uses fixed
+        // coordinates (704 inner / 8 = 88 per cell) — no dependence on ActualWidth / layout timing.
+        void DrawArrows()
+        {
+            if (ArrowLayer == null) return;
+            ArrowLayer.Children.Clear();
+            if (_arrowFrom < 0 || _arrowFrom > 63 || _arrowTo < 0 || _arrowTo > 63 || _arrowFrom == _arrowTo) return;
+
+            const double cell = 88.0;
+            SquareToVisual(_arrowFrom, out int fr, out int fc);
+            SquareToVisual(_arrowTo, out int tr, out int tc);
+            double x1 = fc * cell + cell / 2, y1 = fr * cell + cell / 2;
+            double x2 = tc * cell + cell / 2, y2 = tr * cell + cell / 2;
+
+            double dx = x2 - x1, dy = y2 - y1;
+            double len = Math.Sqrt(dx * dx + dy * dy);
+            if (len < 1) return;
+            double ux = dx / len, uy = dy / len;
+            double px = -uy, py = ux;   // unit perpendicular
+
+            const double head = 34, halfW = 19, shaft = 15;
+            double sx = x1 + ux * 22, sy = y1 + uy * 22;   // start just out of the from-square
+            double bx = x2 - ux * head, by = y2 - uy * head;   // shaft stops at the arrowhead base
+
+            var brush = new SolidColorBrush(Color.FromArgb(0xCC, 0x8F, 0xCB, 0x3F));   // semi-transparent accent green
+
+            ArrowLayer.Children.Add(new Line
+            {
+                X1 = sx, Y1 = sy, X2 = bx, Y2 = by,
+                Stroke = brush, StrokeThickness = shaft,
+                StrokeStartLineCap = PenLineCap.Round, StrokeEndLineCap = PenLineCap.Round,
+            });
+
+            var headPoly = new Polygon { Fill = brush };
+            headPoly.Points.Add(new Point(x2, y2));                            // tip
+            headPoly.Points.Add(new Point(bx + px * halfW, by + py * halfW));   // back corner
+            headPoly.Points.Add(new Point(bx - px * halfW, by - py * halfW));   // back corner
+            ArrowLayer.Children.Add(headPoly);
         }
 
         // A piece visual sized to one cell, mirroring how the board draws the piece (SVG set or glyph).

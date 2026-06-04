@@ -31,6 +31,7 @@
         <!-- Collapsible navigation. The pane is hidden by default so the board/content
              gets the full width; the hamburger (and the gamepad Menu button) reveal it. -->
         <SplitView x:Name="NavSplit" DisplayMode="Overlay" OpenPaneLength="252"
+                   Margin="{StaticResource SafeArea}"
                    IsPaneOpen="False" PaneBackground="{StaticResource AppSurfaceBrush}">
             <SplitView.Pane>
                 <ScrollViewer x:Name="NavScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">

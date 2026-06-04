@@ -20,6 +20,9 @@
                 </Grid.ColumnDefinitions>
             </Grid>
 
+            <!-- Best-move arrows: drawn over the pieces, below the sliding piece + picker. -->
+            <Canvas x:Name="ArrowLayer" Margin="8" Width="704" Height="704" IsHitTestVisible="False" />
+
             <!-- Animation layer: a single piece slides across here, on top of the squares
                  but below the promotion picker. Never a hit-test / focus target. -->
             <Canvas x:Name="AnimLayer" Margin="8" IsHitTestVisible="False" />
