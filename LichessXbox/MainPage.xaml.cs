@@ -141,15 +141,16 @@ namespace LichessXbox
             GoTo(tag);
         }
 
-        /// <summary>Open the analysis board pre-loaded with a game ("initialFen|movesUci").</summary>
+        /// <summary>Open the analysis board pre-loaded with a game ("initialFen|movesUci"). This is a
+        /// contextual drill-in (from Games/Profile/Review), so it keeps a Back target.</summary>
         public void OpenAnalysis(string param)
         {
             _pendingAnalysisParam = param;
             NavSplit.IsPaneOpen = false;
-            GoTo("analysis");
+            GoTo("analysis", drillIn: true);
         }
 
-        void GoTo(string tag)
+        void GoTo(string tag, bool drillIn = false)
         {
             switch (tag)
             {
@@ -169,7 +170,12 @@ namespace LichessXbox
                 case "coords": ContentFrame.Navigate(typeof(CoordinatesPage)); break;
                 case "settings": ContentFrame.Navigate(typeof(SettingsPage)); break;
             }
-            // ContentFrame_Navigated syncs _currentTag, nav highlight, ongoing tab and Back button.
+            // A top-level menu/section switch is lateral navigation (the menu IS the nav), so it
+            // leaves no Back trail. Only contextual drill-ins (e.g. a game -> analysis) keep one.
+            if (!drillIn) ContentFrame.BackStack.Clear();
+            // ContentFrame_Navigated (fired during Navigate) already synced state; refresh the Back
+            // button now that the stack may have been cleared.
+            BackButton.Visibility = ContentFrame.CanGoBack ? Visibility.Visible : Visibility.Collapsed;
         }
 
         // ----------------------------------------------------- in-progress games
