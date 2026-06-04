@@ -49,6 +49,8 @@
                 <Button Style="{StaticResource TileButton}" Click="Start_Click" Content="Start pos" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
                 <Button Style="{StaticResource TileButton}" Click="Clear_Click" Content="Clear" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
             </StackPanel>
+            <TextBlock x:Name="EditorStatus" Visibility="Collapsed" TextWrapping="Wrap"
+                       FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource ErrorBrush}" />
         </StackPanel>
         </ScrollViewer>
     </Grid>

@@ -258,8 +258,17 @@ namespace LichessXbox.Views
 
         void Analyze_Click(object sender, RoutedEventArgs e)
         {
-            var shell = (Window.Current.Content as Frame)?.Content as MainPage;
-            shell?.OpenAnalysis(FenBox.Text + "|");
+            // Analysis needs a legal-ish position; the most common foot-gun is the wrong king count.
+            int wk = 0, bk = 0;
+            for (int i = 0; i < 64; i++) { if (_squares[i] == 'K') wk++; else if (_squares[i] == 'k') bk++; }
+            if (wk != 1 || bk != 1)
+            {
+                EditorStatus.Text = "Add exactly one white king and one black king before analysing.";
+                EditorStatus.Visibility = Visibility.Visible;
+                return;
+            }
+            EditorStatus.Visibility = Visibility.Collapsed;
+            ((Window.Current.Content as Frame)?.Content as MainPage)?.OpenAnalysis(FenBox.Text + "|");
         }
 
         static string PieceGlyph(char piece)

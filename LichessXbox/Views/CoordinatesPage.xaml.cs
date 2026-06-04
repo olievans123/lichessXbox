@@ -69,6 +69,7 @@ namespace LichessXbox.Views
             StartButton.Content = "Restart";
             NextTarget();
             _timer.Start();
+            _cells[28]?.Focus(FocusState.Programmatic);   // land on a central square (e4), not the target
         }
 
         void Cell_Click(object sender, RoutedEventArgs e)
@@ -100,7 +101,9 @@ namespace LichessXbox.Views
 
         void NextTarget()
         {
-            _target = _rng.Next(0, 64);
+            int next;
+            do { next = _rng.Next(0, 64); } while (next == _target);   // never repeat the same square twice
+            _target = next;
             TargetText.Text = ChessMove.SquareName(_target);
         }
 

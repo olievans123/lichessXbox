@@ -53,9 +53,6 @@ namespace LichessXbox.Views
             finally { Busy.IsActive = false; }
         }
 
-        // Standings rows are read-only; click-enabled only so a gamepad can focus and scroll them.
-        void Standings_ItemClick(object sender, ItemClickEventArgs e) { }
-
         async void Tournament_ItemClick(object sender, ItemClickEventArgs e)
         {
             if (!(e.ClickedItem is TournamentItem t)) return;
@@ -72,6 +69,7 @@ namespace LichessXbox.Views
             try
             {
                 var (title, players) = await AppState.Current.Api.GetTournamentStandingsAsync(t.Id);
+                if (_selectedId != t.Id) return;   // a newer selection won the race — don't clobber it
                 if (!string.IsNullOrEmpty(title)) DetailTitle.Text = title;
                 StandingsList.ItemsSource = players;
                 bool anyStandings = players != null && players.Count > 0;
@@ -80,6 +78,7 @@ namespace LichessXbox.Views
             }
             catch
             {
+                if (_selectedId != t.Id) return;
                 DetailStatus.Text = "Standings unavailable.";
                 DetailStatus.Visibility = Visibility.Visible;
             }
@@ -87,10 +86,25 @@ namespace LichessXbox.Views
 
         async void Join_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(_selectedId)) return;
-            bool ok = await AppState.Current.Api.JoinTournamentAsync(_selectedId);
-            JoinButton.Content = ok ? "Joined ✓" : "Join failed";
-            JoinButton.IsEnabled = !ok;
+            if (string.IsNullOrEmpty(_selectedId) || !JoinButton.IsEnabled) return;   // guard double-press
+            string id = _selectedId;
+            JoinButton.IsEnabled = false;
+            JoinButton.Content = "Joining…";
+            bool ok;
+            try { ok = await AppState.Current.Api.JoinTournamentAsync(id); }
+            catch { ok = false; }
+            if (_selectedId != id) return;   // user moved to another tournament while joining
+            if (ok)
+            {
+                JoinButton.Content = "Joined ✓";   // arena game will surface via the continue-playing tab
+            }
+            else
+            {
+                JoinButton.Content = "Join";
+                JoinButton.IsEnabled = true;
+                DetailStatus.Text = "Couldn't join — try again.";
+                DetailStatus.Visibility = Visibility.Visible;
+            }
         }
     }
 }
