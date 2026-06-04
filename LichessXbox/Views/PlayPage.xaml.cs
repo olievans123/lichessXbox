@@ -85,6 +85,15 @@ namespace LichessXbox.Views
             Board.MoveRequested += Board_MoveRequested;
             _clockTimer.Interval = TimeSpan.FromMilliseconds(200);
             _clockTimer.Tick += ClockTick;
+
+            // Deterministic rail <-> detail focus loop (a GridView/TextBox otherwise swallows D-pad
+            // Left, so the rail could become unreachable). Wire both directions explicitly.
+            PresetGrid.XYFocusLeft = OnlineModeButton;
+            LevelGrid.XYFocusLeft = ComputerModeButton;
+            FriendBox.XYFocusLeft = FriendModeButton;
+            OnlineModeButton.XYFocusRight = PresetGrid;
+            ComputerModeButton.XYFocusRight = LevelGrid;
+            FriendModeButton.XYFocusRight = FriendBox;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -138,15 +147,11 @@ namespace LichessXbox.Views
             PlayOnlinePanel.Visibility = online ? Visibility.Visible : Visibility.Collapsed;
             ComputerPanel.Visibility = computer ? Visibility.Visible : Visibility.Collapsed;
             FriendPanel.Visibility = friend ? Visibility.Visible : Visibility.Collapsed;
-            StyleRail(OnlineModeButton, online);
-            StyleRail(ComputerModeButton, computer);
-            StyleRail(FriendModeButton, friend);
-        }
-
-        static void StyleRail(Button b, bool active)
-        {
-            if (active) b.Background = new SolidColorBrush(Color.FromArgb(0x33, 0x8F, 0xCB, 0x3F));
-            else b.ClearValue(Control.BackgroundProperty);
+            // Mark the active lane with a green left bar — a different visual channel from the
+            // green focus ring, so "selected" and "focused" never blur together.
+            OnlineModeAccent.Visibility = online ? Visibility.Visible : Visibility.Collapsed;
+            ComputerModeAccent.Visibility = computer ? Visibility.Visible : Visibility.Collapsed;
+            FriendModeAccent.Visibility = friend ? Visibility.Visible : Visibility.Collapsed;
         }
 
         void Mode_Click(object sender, RoutedEventArgs e)

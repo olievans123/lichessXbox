@@ -48,31 +48,46 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <!-- ===== MODE RAIL ===== -->
+                <!-- ===== MODE RAIL (active lane marked by a green left bar — distinct from the focus ring) ===== -->
                 <StackPanel Grid.Column="0" Spacing="12">
                     <Button x:Name="OnlineModeButton" Style="{StaticResource TileButton}" Tag="online" Click="Mode_Click"
-                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="16,14">
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="🌐" FontSize="24" />
-                            <TextBlock Text="Play online" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
-                            <TextBlock Text="Human · ranked" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                        </StackPanel>
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="14,14">
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                            <Border x:Name="OnlineModeAccent" Grid.Column="0" Width="4" CornerRadius="2" Margin="0,0,12,0"
+                                    Background="{StaticResource AccentGreenLightBrush}" Visibility="Collapsed" />
+                            <StackPanel Grid.Column="1" Spacing="4">
+                                <TextBlock Text="🌐" FontSize="24" />
+                                <TextBlock Text="Play online" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                                <TextBlock Text="Human · ranked" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                            </StackPanel>
+                        </Grid>
                     </Button>
                     <Button x:Name="ComputerModeButton" Style="{StaticResource TileButton}" Tag="computer" Click="Mode_Click"
-                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="16,14">
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="🤖" FontSize="24" />
-                            <TextBlock Text="vs Computer" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
-                            <TextBlock Text="Stockfish" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                        </StackPanel>
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="14,14">
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                            <Border x:Name="ComputerModeAccent" Grid.Column="0" Width="4" CornerRadius="2" Margin="0,0,12,0"
+                                    Background="{StaticResource AccentGreenLightBrush}" Visibility="Collapsed" />
+                            <StackPanel Grid.Column="1" Spacing="4">
+                                <TextBlock Text="🤖" FontSize="24" />
+                                <TextBlock Text="vs Computer" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                                <TextBlock Text="Stockfish" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                            </StackPanel>
+                        </Grid>
                     </Button>
                     <Button x:Name="FriendModeButton" Style="{StaticResource TileButton}" Tag="friend" Click="Mode_Click"
-                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="16,14">
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="⚔️" FontSize="24" />
-                            <TextBlock Text="Challenge" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
-                            <TextBlock Text="By username" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                        </StackPanel>
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="14,14">
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                            <Border x:Name="FriendModeAccent" Grid.Column="0" Width="4" CornerRadius="2" Margin="0,0,12,0"
+                                    Background="{StaticResource AccentGreenLightBrush}" Visibility="Collapsed" />
+                            <StackPanel Grid.Column="1" Spacing="4">
+                                <TextBlock Text="⚔️" FontSize="24" />
+                                <TextBlock Text="Challenge" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                                <TextBlock Text="By username" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                            </StackPanel>
+                        </Grid>
                     </Button>
                 </StackPanel>
 
@@ -90,7 +105,7 @@
                         <StackPanel Spacing="8">
                             <TextBlock Text="Incoming challenge" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimaryBrush}" />
-                            <ScrollViewer MaxHeight="200" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+                            <ScrollViewer MaxHeight="132" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
                                 <ItemsControl x:Name="ChallengesList">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
@@ -121,14 +136,19 @@
 
                     <!-- Content (one panel visible at a time) -->
                     <Grid Grid.Row="1">
-                        <!-- (a) Play online -->
-                        <StackPanel x:Name="PlayOnlinePanel" Spacing="10">
-                            <TextBlock Text="Find a human opponent online" FontSize="{StaticResource BodySize}"
+                        <!-- (a) Play online — GridView owns a * row so its own scroll engages if needed -->
+                        <Grid x:Name="PlayOnlinePanel">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Find a human opponent online" Margin="0,0,0,10" FontSize="{StaticResource BodySize}"
                                        FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                            <GridView x:Name="PresetGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Preset_ItemClick">
+                            <GridView Grid.Row="1" x:Name="PresetGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Preset_ItemClick"
+                                      ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollMode="Disabled">
                                 <GridView.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Width="196" Height="108" CornerRadius="16"
+                                        <Border Width="180" Height="104" CornerRadius="16"
                                                 Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                             <StackPanel Margin="16,12" VerticalAlignment="Center" Spacing="2">
                                                 <TextBlock Text="{Binding Glyph}" FontSize="24" />
@@ -141,13 +161,19 @@
                                     </DataTemplate>
                                 </GridView.ItemTemplate>
                             </GridView>
-                        </StackPanel>
+                        </Grid>
 
                         <!-- (b) vs Computer -->
-                        <StackPanel x:Name="ComputerPanel" Spacing="10" Visibility="Collapsed">
-                            <TextBlock Text="Choose a Stockfish level" FontSize="{StaticResource BodySize}"
+                        <Grid x:Name="ComputerPanel" Visibility="Collapsed">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Choose a Stockfish level" Margin="0,0,0,10" FontSize="{StaticResource BodySize}"
                                        FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                            <GridView x:Name="LevelGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Ai_ItemClick">
+                            <GridView Grid.Row="1" x:Name="LevelGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Ai_ItemClick"
+                                      ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollMode="Disabled">
                                 <GridView.ItemTemplate>
                                     <DataTemplate>
                                         <Border Width="108" Height="96" CornerRadius="16"
@@ -161,9 +187,9 @@
                                     </DataTemplate>
                                 </GridView.ItemTemplate>
                             </GridView>
-                            <TextBlock Text="1 = easiest · 8 = strongest" FontSize="{StaticResource CaptionSize}"
+                            <TextBlock Grid.Row="2" Text="1 = easiest · 8 = strongest" Margin="0,10,0,0" FontSize="{StaticResource CaptionSize}"
                                        Foreground="{StaticResource TextSecondaryBrush}" />
-                        </StackPanel>
+                        </Grid>
 
                         <!-- (c) Challenge a friend -->
                         <StackPanel x:Name="FriendPanel" Spacing="14" Visibility="Collapsed">
