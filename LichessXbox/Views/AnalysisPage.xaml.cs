@@ -154,20 +154,20 @@ namespace LichessXbox.Views
                 }
             }
 
-            // Opening explorer — offline book (replayed with our engine; needs no network, since the
-            // online explorer host isn't reachable from the Xbox).
+            // Opening explorer, layered: (1) the offline book shows the opening name + named lines
+            // instantly with no network; (2) we then try the online masters DB and, if it answers,
+            // enrich with real win/draw/loss stats and frequency-ordered moves. If the online call
+            // fails, the offline book stays.
             try
             {
                 await OpeningBook.Instance.EnsureLoadedAsync();
                 if (cts.IsCancellationRequested) return;
                 _explorer.Clear();
 
-                // Name the opening in the prominent spot under the title.
                 string opening = OpeningBook.Instance.Name(pos);
                 OpeningNameText.Text = opening ?? "";
                 OpeningNameText.Visibility = string.IsNullOrEmpty(opening) ? Visibility.Collapsed : Visibility.Visible;
 
-                // List the named continuations from here (clickable; no online stats, so no bars).
                 var book = OpeningBook.Instance.Moves(pos);
                 if (book != null && book.Count > 0)
                 {
@@ -188,6 +188,26 @@ namespace LichessXbox.Views
                 ExplorerEmpty.Visibility = Visibility.Visible;
                 OpeningNameText.Visibility = Visibility.Collapsed;
             }
+
+            // Enrich with the live masters database when it's reachable (it serves real users; my
+            // sandbox IP is blocked, but a residential console should get through).
+            try
+            {
+                var exp = await AppState.Current.Api.GetExplorerAsync(fen);
+                if (cts.IsCancellationRequested) return;
+                if (exp != null && exp.Moves.Count > 0)
+                {
+                    _explorer.Clear();
+                    foreach (var m in exp.Moves) _explorer.Add(m);   // includes win/draw/loss bars
+                    ExplorerEmpty.Visibility = Visibility.Collapsed;
+                    if (!string.IsNullOrEmpty(exp.OpeningName))
+                    {
+                        OpeningNameText.Text = exp.OpeningName;
+                        OpeningNameText.Visibility = Visibility.Visible;
+                    }
+                }
+            }
+            catch { /* offline book already populated — leave it */ }
 
             // Tablebase (only for <= 7 pieces)
             try
