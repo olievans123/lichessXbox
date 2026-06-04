@@ -27,6 +27,7 @@ namespace LichessXbox.Views
         readonly ObservableCollection<ExplorerMoveRow> _explorer = new ObservableCollection<ExplorerMoveRow>();
         readonly ObservableCollection<TablebaseRow> _tablebase = new ObservableCollection<TablebaseRow>();
         readonly ObservableCollection<MoveRowVM> _moveRows = new ObservableCollection<MoveRowVM>();
+        readonly List<string> _sans = new List<string>();   // cached SAN per ply (ToSan runs legal-move gen)
         CancellationTokenSource _analysisCts;
         LocalEngine _engine;
         bool _useLocalEngine;
@@ -76,6 +77,8 @@ namespace LichessXbox.Views
             {
                 _history.RemoveRange(_ply + 1, _history.Count - _ply - 1);
                 _moves.RemoveRange(_ply, _moves.Count - _ply);
+                // The move at _ply changes with the new variation, so drop its (now stale) SAN too.
+                if (_sans.Count > _ply) _sans.RemoveRange(_ply, _sans.Count - _ply);
             }
             _history.Add(next);
             _moves.Add(move);
@@ -241,11 +244,13 @@ namespace LichessXbox.Views
         void RebuildAnalysisMoves()
         {
             int n = _moves.Count;
-            var sans = new string[n];
-            for (int i = 0; i < n; i++)
+            // Cache SAN incrementally — ToSan runs the legal-move generator, so never re-derive the
+            // whole game on a navigation step. SAN doesn't depend on _ply, so this is append-only.
+            if (_sans.Count > n) _sans.RemoveRange(n, _sans.Count - n);
+            for (int i = _sans.Count; i < n; i++)
             {
-                try { sans[i] = _history[i].ToSan(_moves[i]); }
-                catch { sans[i] = "…"; }
+                try { _sans.Add(_history[i].ToSan(_moves[i])); }
+                catch { _sans.Add("…"); }
             }
 
             int rowCount = (n + 1) / 2;
@@ -256,9 +261,9 @@ namespace LichessXbox.Views
                 int i = r * 2;
                 var row = _moveRows[r];
                 row.No = (r + 1) + ".";
-                row.White = sans[i];
+                row.White = _sans[i];
                 bool hasBlack = i + 1 < n;
-                row.Black = hasBlack ? sans[i + 1] : "";
+                row.Black = hasBlack ? _sans[i + 1] : "";
                 row.BlackVisible = hasBlack ? Visibility.Visible : Visibility.Collapsed;
                 row.WhitePly = i + 1;   // jump to the position after white's move on this row
                 row.BlackPly = i + 2;
@@ -328,6 +333,7 @@ namespace LichessXbox.Views
         {
             _history.Clear();
             _moves.Clear();
+            _sans.Clear();
             _history.Add(pos);
             _ply = 0;
             Sync();
@@ -338,6 +344,7 @@ namespace LichessXbox.Views
         {
             _history.Clear();
             _moves.Clear();
+            _sans.Clear();
             var pos = string.IsNullOrEmpty(initialFen) || initialFen == "startpos"
                 ? ChessPosition.Starting() : ChessPosition.FromFen(initialFen);
             _history.Add(pos);
