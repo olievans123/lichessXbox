@@ -71,22 +71,37 @@ namespace LichessXbox.Controls
         static Style CellStyle()
         {
             // The app-level indexer traverses the merged Theme.xaml (same pattern MainPage
-            // uses for its brushes), so this resolves the style defined there.
-            return _cellStyle ?? (_cellStyle = Application.Current.Resources["BoardCellButton"] as Style);
+            // uses for its brushes), so this resolves the style defined there. Don't cache a
+            // null: a board built before Theme.xaml is merged must keep retrying, not get
+            // stuck with gray default buttons for the app's lifetime.
+            if (_cellStyle != null) return _cellStyle;
+            var s = Application.Current.Resources["BoardCellButton"] as Style;
+            if (s != null) _cellStyle = s;
+            return s;
         }
 
         public event EventHandler<ChessMove> MoveRequested;
+
+        readonly Action _reTheme;
+        EventHandler<object> _focusRetryHandler;   // single pending FocusBoard retry (never stack them)
+        int _focusRetryTries;
 
         public ChessBoardControl()
         {
             this.InitializeComponent();
             BuildBoard();
             ApplyInteractivity();
-            this.Loaded += async (s, e) => { Render(); await EnsurePieceSetAsync(); };
-
-            Action reTheme = () => ReTheme();
-            BoardTheme.Changed += reTheme;
-            this.Unloaded += (s, e) => BoardTheme.Changed -= reTheme;
+            _reTheme = () => ReTheme();
+            this.Loaded += async (s, e) =>
+            {
+                // Pair the theme subscription with Loaded/Unloaded (not the ctor) so a recycled
+                // board — e.g. a thumbnail in a virtualized list — re-subscribes when it returns.
+                BoardTheme.Changed -= _reTheme;
+                BoardTheme.Changed += _reTheme;
+                Render();
+                await EnsurePieceSetAsync();
+            };
+            this.Unloaded += (s, e) => { BoardTheme.Changed -= _reTheme; DetachFocusRetry(); };
         }
 
         #region public properties
@@ -113,7 +128,9 @@ namespace LichessXbox.Controls
 
         public static readonly DependencyProperty WhiteAtBottomProperty =
             DependencyProperty.Register(nameof(WhiteAtBottom), typeof(bool), typeof(ChessBoardControl),
-                new PropertyMetadata(true, (d, e) => ((ChessBoardControl)d).Render()));
+                // Clear any in-progress selection first: a flip moves every cell, so a stale
+                // selection highlight + legal-dots would desync from the gamepad cursor.
+                new PropertyMetadata(true, (d, e) => { var b = (ChessBoardControl)d; b.ClearSelection(); b.Render(); }));
         public bool WhiteAtBottom
         {
             get => (bool)GetValue(WhiteAtBottomProperty);
@@ -481,6 +498,13 @@ namespace LichessXbox.Controls
             // Forward move: From was occupied before, From is empty now, To is occupied now.
             if (_prevSquares[from] == '.' || _position.PieceAt(from) != '.' || _position.PieceAt(to) == '.') return;
 
+            // A real single move changes at most 4 squares (castling). A larger diff means the board
+            // jumped to an unrelated position — a TV game switch or a replay scrub — which must not
+            // animate as one gliding piece.
+            int changed = 0;
+            for (int i = 0; i < 64; i++) if (_prevSquares[i] != _position.PieceAt(i)) changed++;
+            if (changed > 4) return;
+
             AnimateMove(from, to, _position.PieceAt(to));
         }
 
@@ -642,11 +666,21 @@ namespace LichessXbox.Controls
         public void FocusBoard()
         {
             if (!Interactive) return;
+            DetachFocusRetry();          // never stack retry handlers across repeated calls
             if (TryFocusCell()) return;
-            int tries = 0;
-            EventHandler<object> h = null;
-            h = (s, e) => { if (TryFocusCell() || ++tries > 30) LayoutUpdated -= h; };
-            LayoutUpdated += h;
+            _focusRetryTries = 0;
+            _focusRetryHandler = (s, e) =>
+            {
+                // Stop once it sticks, if interactivity was revoked, or after a generous budget
+                // (a slow cold start can burn many layout passes before the board is ready).
+                if (!Interactive || TryFocusCell() || ++_focusRetryTries > 90) DetachFocusRetry();
+            };
+            LayoutUpdated += _focusRetryHandler;
+        }
+
+        void DetachFocusRetry()
+        {
+            if (_focusRetryHandler != null) { LayoutUpdated -= _focusRetryHandler; _focusRetryHandler = null; }
         }
 
         bool TryFocusCell()

@@ -24,7 +24,7 @@ namespace LichessXbox
         // Pages with a full-height right-side panel: the floating ongoing-games tab would
         // overlap their bottom-right content, so it's suppressed there.
         static readonly System.Collections.Generic.HashSet<string> _noOngoingTabPages =
-            new System.Collections.Generic.HashSet<string> { "play", "analysis", "tournaments", "games", "settings" };
+            new System.Collections.Generic.HashSet<string> { "play", "analysis", "tournaments", "games", "settings", "watch" };
         readonly ObservableCollection<OngoingGame> _ongoing = new ObservableCollection<OngoingGame>();
         readonly DispatcherTimer _ongoingTimer = new DispatcherTimer();
         bool _ongoingExpanded;   // tab (collapsed) vs cards (expanded)

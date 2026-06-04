@@ -359,6 +359,21 @@
         <Setter Property="FocusVisualSecondaryBrush" Value="#99000000" />
     </Style>
 
+    <!-- Dropdown (ComboBox popup) items: green focus ring + green selection/hover tint instead of
+         the default gray Xbox highlight, so the one ComboBox (puzzle themes) matches the app idiom.
+         The ComboBoxItem*-keyed brushes are overridden app-wide; any key not looked up is ignored. -->
+    <Style TargetType="ComboBoxItem">
+        <Setter Property="UseSystemFocusVisuals" Value="True" />
+        <Setter Property="FocusVisualPrimaryBrush" Value="{StaticResource AccentGreenLightBrush}" />
+        <Setter Property="FocusVisualSecondaryBrush" Value="#99000000" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+    </Style>
+    <SolidColorBrush x:Key="ComboBoxItemBackgroundPointerOver" Color="#446FA630" />
+    <SolidColorBrush x:Key="ComboBoxItemBackgroundPressed" Color="#886FA630" />
+    <SolidColorBrush x:Key="ComboBoxItemBackgroundSelected" Color="#666FA630" />
+    <SolidColorBrush x:Key="ComboBoxItemBackgroundSelectedPointerOver" Color="#886FA630" />
+    <SolidColorBrush x:Key="ComboBoxItemBackgroundSelectedPressed" Color="#886FA630" />
+
     <!-- List/grid item containers get the SAME rounded green focus ring as the tiles
          and nav buttons (not the thin system reveal rect). The container owns the
          spacing margin so the ring hugs each row/tile; item DataTemplates with their

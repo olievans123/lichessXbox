@@ -410,6 +410,9 @@ namespace LichessXbox.Views
             }
             else { _whiteName = _blackName = null; }
             ShowPlayers();
+            // Back-nav (drill-in from Games/Studies) reuses OnNavigatedTo but not Loaded, so land
+            // gamepad focus on the board here too — otherwise focus is stranded on the back button.
+            Board.FocusBoard();
         }
 
         void ShowPlayers()

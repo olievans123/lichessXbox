@@ -26,7 +26,7 @@
                 <Border Style="{StaticResource CardBorder}" Padding="20,16" HorizontalAlignment="Stretch">
                     <StackPanel HorizontalAlignment="Center" Spacing="4">
                         <TextBlock Text="Find" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" />
-                        <TextBlock x:Name="TargetText" Text="—" FontSize="60" FontWeight="Bold"
+                        <TextBlock x:Name="TargetText" Text="—" FontSize="{StaticResource DisplaySize}" FontWeight="Bold"
                                    Foreground="{StaticResource AccentGreenLightBrush}" HorizontalAlignment="Center" />
                     </StackPanel>
                 </Border>

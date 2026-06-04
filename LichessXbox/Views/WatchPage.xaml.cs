@@ -162,8 +162,14 @@ namespace LichessXbox.Views
         {
             if (string.IsNullOrEmpty(fen)) return;
             if (!fen.Contains(" ")) fen = fen + " w - - 0 1";
-            Board.LastMove = string.IsNullOrEmpty(lastMoveUci) ? (ChessMove?)null : ChessMove.FromUci(lastMoveUci);
-            Board.Position = ChessPosition.FromFen(fen);
+            try
+            {
+                // TV frames are untrusted: a malformed fen/lm must be ignored, not throw out to the
+                // global handler and pop an error dialog over the board. (Play/Analysis already guard.)
+                Board.LastMove = string.IsNullOrEmpty(lastMoveUci) ? (ChessMove?)null : ChessMove.FromUci(lastMoveUci);
+                Board.Position = ChessPosition.FromFen(fen);
+            }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine("Bad TV frame ignored: " + ex.Message); }
         }
 
         void ApplyPlayers()
