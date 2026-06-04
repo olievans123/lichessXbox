@@ -14,7 +14,11 @@
 
         <!-- Eval bar -->
         <Border Grid.Column="0" Width="22" Margin="0,4,12,4" CornerRadius="11" Background="#161310">
-            <Grid>
+            <Grid RenderTransformOrigin="0.5,0.5">
+                <!-- Flipped (ScaleY = -1) together with the board so White's share stays on White's side. -->
+                <Grid.RenderTransform>
+                    <ScaleTransform x:Name="EvalBarFlip" ScaleY="1" />
+                </Grid.RenderTransform>
                 <Grid.RowDefinitions>
                     <RowDefinition x:Name="BlackShare" Height="1*" />
                     <RowDefinition x:Name="WhiteShare" Height="1*" />

@@ -47,6 +47,10 @@ namespace LichessXbox.Views
         bool _playerIsWhite = true;
         bool _resultShown;   // guards the game-over overlay against repeated terminal states
         string _initialFen = ChessPosition.StartFen;
+        // Captured from gameFull so a rematch reuses the same time control / variant / rated-ness.
+        int _gameClockLimitSec = 300, _gameClockIncSec = 3, _gameDays;
+        bool _gameRated;
+        string _gameVariantKey = "standard";
         readonly DispatcherTimer _clockTimer = new DispatcherTimer();
 
         long _whiteMs, _blackMs;
@@ -402,6 +406,14 @@ namespace LichessXbox.Views
 
                 string variantKey = msg["variant"]?.Value<string>("key") ?? "standard";
                 Board.Permissive = variantKey != "standard";
+
+                // Remember this game's time control etc. for a faithful rematch.
+                var gclock = msg["clock"];
+                _gameClockLimitSec = (gclock?.Value<int?>("initial") ?? 300000) / 1000;   // ms → s
+                _gameClockIncSec = (gclock?.Value<int?>("increment") ?? 0) / 1000;
+                _gameDays = msg.Value<int?>("daysPerTurn") ?? 0;
+                _gameRated = msg.Value<bool?>("rated") ?? false;
+                _gameVariantKey = variantKey;
 
                 Board.WhiteAtBottom = _playerIsWhite;
                 Board.PlayerIsWhite = _playerIsWhite;
@@ -880,11 +892,15 @@ namespace LichessXbox.Views
         async void Rematch_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(_opponentName)) return;
-            var clock = new TimeControlPreset("Rematch", 300, 3, "⚡");
+            // Reuse the finished game's time control + variant + rated-ness (fall back to 5+3 if it
+            // had no real-time clock, e.g. a correspondence game).
+            int limit = _gameClockLimitSec > 0 ? _gameClockLimitSec : 300;
+            int inc = _gameClockLimitSec > 0 ? _gameClockIncSec : 3;
+            var clock = new TimeControlPreset("Rematch", limit, inc, "⚡", _gameRated);
             _autoOpen = true;
             SeekingText.Text = $"Rematch — waiting for {_opponentName}…";
             ShowOnly(SeekingPanel);
-            await AppState.Current.Api.ChallengeUserAsync(_opponentName, clock, Variant);
+            await AppState.Current.Api.ChallengeUserAsync(_opponentName, clock, _gameVariantKey ?? "standard");
         }
 
         void NewGame_Click(object sender, RoutedEventArgs e)

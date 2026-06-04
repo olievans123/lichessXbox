@@ -28,7 +28,7 @@
                 <StackPanel Spacing="12" MaxWidth="560" HorizontalAlignment="Stretch">
                     <Button x:Name="PlayButton" Style="{StaticResource TileButton}" Click="Play_Click" HorizontalAlignment="Stretch">
                         <StackPanel Orientation="Horizontal" Spacing="18">
-                            <TextBlock Text="♟" FontFamily="Segoe UI Symbol" FontSize="28" Foreground="{StaticResource AccentGreenLightBrush}" />
+                            <TextBlock Text="&#x265F;&#xFE0F;" FontSize="28" />
                             <StackPanel>
                                 <TextBlock Text="Play online" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
                                 <TextBlock Text="Bullet · Blitz · Rapid · Classical" FontSize="{StaticResource CaptionSize}"

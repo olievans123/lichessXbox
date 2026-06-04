@@ -240,7 +240,11 @@ namespace LichessXbox.Views
         void Back_Click(object sender, RoutedEventArgs e) { if (_ply > 0) { _ply--; Sync(); } }
         void Forward_Click(object sender, RoutedEventArgs e) { if (_ply < _history.Count - 1) { _ply++; Sync(); } }
         void Last_Click(object sender, RoutedEventArgs e) { _ply = _history.Count - 1; Sync(); }
-        void Flip_Click(object sender, RoutedEventArgs e) { Board.WhiteAtBottom = !Board.WhiteAtBottom; }
+        void Flip_Click(object sender, RoutedEventArgs e)
+        {
+            Board.WhiteAtBottom = !Board.WhiteAtBottom;
+            EvalBarFlip.ScaleY = Board.WhiteAtBottom ? 1 : -1;   // keep White's share on White's side
+        }
 
         // -------------------------------------------------------- local engine
 
