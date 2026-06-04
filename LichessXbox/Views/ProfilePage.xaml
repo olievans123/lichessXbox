@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Background="Transparent">
 
-    <Grid Padding="32,24">
+    <Grid Padding="{StaticResource PagePadding}">
 
         <!-- Top-level loading state (shown while EnsureAccountAsync runs on entry) -->
         <StackPanel x:Name="LoadingPanel" Orientation="Horizontal" Spacing="14"
@@ -115,7 +115,7 @@
                 </StackPanel>
             </StackPanel>
 
-            <TextBlock Text="Ratings" FontSize="{StaticResource SubtitleSize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+            <TextBlock Text="Ratings" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
             <TextBlock x:Name="NoRatings" Text="No rated games yet." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
             <TextBlock Text="Select a rating to see your games and rating graph." FontSize="{StaticResource CaptionSize}"
                        Foreground="{StaticResource TextSecondaryBrush}" />
@@ -139,14 +139,14 @@
                     <StackPanel Spacing="10">
                         <TextBlock x:Name="RatingDetailTitle" Text="Rating" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                    Foreground="{StaticResource AccentGreenLightBrush}" />
-                        <Border Height="170" CornerRadius="10" Background="#16130F">
+                        <Border Height="170" CornerRadius="10" Background="{StaticResource SurfaceSunkenBrush}">
                             <Canvas x:Name="ProfileGraph" />
                         </Border>
                         <TextBlock x:Name="ProfileRatingRange" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                     </StackPanel>
                 </Border>
 
-                <TextBlock Text="Recent games" FontSize="{StaticResource SubtitleSize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                <TextBlock Text="Recent games" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
                 <ProgressRing x:Name="ProfileGamesBusy" IsActive="False" Width="26" Height="26"
                               Foreground="{StaticResource AccentGreenLightBrush}" HorizontalAlignment="Left" />
                 <TextBlock x:Name="ProfileNoGames" Text="" FontSize="{StaticResource CaptionSize}"

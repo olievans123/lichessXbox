@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Background="Transparent">
 
-    <Grid Padding="32,24">
+    <Grid Padding="{StaticResource PagePadding}">
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
         <StackPanel Spacing="18" MaxWidth="720" HorizontalAlignment="Left">
             <TextBlock Text="Studies" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />

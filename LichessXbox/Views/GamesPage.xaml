@@ -5,7 +5,7 @@
     xmlns:controls="using:LichessXbox.Controls"
     Background="Transparent">
 
-    <Grid Padding="40,28">
+    <Grid Padding="{StaticResource PagePadding}">
 
         <!-- Signed out -->
         <StackPanel x:Name="SignInPrompt" Visibility="Collapsed"
@@ -70,7 +70,7 @@
                         <StackPanel Spacing="10">
                             <TextBlock x:Name="RatingTitle" Text="Blitz rating" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                        Foreground="{StaticResource AccentGreenLightBrush}" />
-                            <Border Height="170" CornerRadius="10" Background="#16130F">
+                            <Border Height="170" CornerRadius="10" Background="{StaticResource SurfaceSunkenBrush}">
                                 <Canvas x:Name="GraphCanvas" />
                             </Border>
                             <TextBlock x:Name="RatingRange" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />

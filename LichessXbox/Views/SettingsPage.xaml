@@ -12,7 +12,7 @@
         </Grid.ColumnDefinitions>
 
         <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-            <StackPanel Padding="32,24" Spacing="20">
+            <StackPanel Padding="{StaticResource PagePadding}" Spacing="20">
                 <TextBlock Text="Settings" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
                 <TextBlock Text="Board theme" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />

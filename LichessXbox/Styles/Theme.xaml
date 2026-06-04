@@ -75,13 +75,38 @@
     <x:Double x:Key="BodySize">20</x:Double>
     <x:Double x:Key="CaptionSize">16</x:Double>
 
+    <!-- ============ Radius scale (3 steps; was 7 ad-hoc values) ============ -->
+    <CornerRadius x:Key="RadiusSm">10</CornerRadius>
+    <CornerRadius x:Key="RadiusMd">14</CornerRadius>
+    <CornerRadius x:Key="RadiusLg">18</CornerRadius>
+
+    <!-- ============ Page frame: one TV-safe margin so titles align across every tab ============ -->
+    <Thickness x:Key="PagePadding">40,28</Thickness>
+
+    <!-- ============ Semantic tokens promoted from one-off literals ============ -->
+    <SolidColorBrush x:Key="BoardFrameBrush" Color="#0E0C09" />
+    <SolidColorBrush x:Key="SurfaceSunkenBrush" Color="#16130F" />   <!-- graph/well backdrops -->
+    <SolidColorBrush x:Key="WarningBrush" Color="#F2D26B" />          <!-- amber: challenge / draw -->
+    <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#33F2D26B" />
+    <SolidColorBrush x:Key="WarningSurfaceStrongBrush" Color="#88F2D26B" />
+    <SolidColorBrush x:Key="ScrimBrush" Color="#B3000000" />          <!-- one overlay dim -->
+
     <!-- ============ Card style ============ -->
     <Style x:Key="CardBorder" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource AppSurfaceBrush}" />
-        <Setter Property="CornerRadius" Value="18" />
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusLg}" />
         <Setter Property="Padding" Value="28" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="BorderBrush" Value="{StaticResource HairlineBrush}" />
+    </Style>
+
+    <!-- ============ Shared list-row / grid tile surface (was hand-rolled ~14x) ============ -->
+    <Style x:Key="SurfaceTileBorder" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource AppSurfaceHighBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource HairlineBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}" />
+        <Setter Property="Padding" Value="18,14" />
     </Style>
 
     <!-- ============ Big focusable menu/action button ============ -->
@@ -108,16 +133,16 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="16" />
+                                CornerRadius="{StaticResource RadiusMd}" />
                         <!-- Hover tint: animate opacity, not a shared brush's colour -->
-                        <Border x:Name="HoverTint" CornerRadius="16" Opacity="0">
+                        <Border x:Name="HoverTint" CornerRadius="{StaticResource RadiusMd}" Opacity="0">
                             <Border.Background>
                                 <SolidColorBrush Color="#FFFFFF" Opacity="0.10" />
                             </Border.Background>
                         </Border>
                         <!-- Focus ring: its own brush, materialised per templated instance.
                              Green to match the rest of the app's focus visuals. -->
-                        <Border x:Name="FocusRing" CornerRadius="16" Opacity="0" BorderThickness="3">
+                        <Border x:Name="FocusRing" CornerRadius="{StaticResource RadiusMd}" Opacity="0" BorderThickness="3">
                             <Border.BorderBrush>
                                 <SolidColorBrush Color="{StaticResource AccentGreenLightColor}" />
                             </Border.BorderBrush>

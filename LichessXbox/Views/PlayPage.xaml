@@ -18,7 +18,7 @@
         </Storyboard>
     </Page.Resources>
 
-    <Grid Padding="40,16">
+    <Grid Padding="{StaticResource PagePadding}">
 
         <!-- ============ SIGN-IN REQUIRED ============ -->
         <StackPanel x:Name="SignInPrompt" Visibility="Collapsed"
@@ -101,7 +101,7 @@
 
                     <!-- Incoming-challenge banner (amber; collapsed → no focus stops when empty) -->
                     <Border x:Name="ChallengeBanner" Grid.Row="0" Visibility="Collapsed" Margin="0,0,0,14"
-                            CornerRadius="16" Padding="16,12" Background="#33F2D26B" BorderBrush="#88F2D26B" BorderThickness="1">
+                            CornerRadius="16" Padding="16,12" Background="{StaticResource WarningSurfaceBrush}" BorderBrush="{StaticResource WarningSurfaceStrongBrush}" BorderThickness="1">
                         <StackPanel Spacing="8">
                             <TextBlock Text="Incoming challenge" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimaryBrush}" />
@@ -284,9 +284,9 @@
 
             <!-- Game-over result, revealed over the (dimmed) board -->
             <Grid x:Name="ResultOverlay" Grid.Column="0" Visibility="Collapsed">
-                <Rectangle Fill="#B3000000" />
+                <Rectangle Fill="{StaticResource ScrimBrush}" />
                 <Border MaxWidth="340" VerticalAlignment="Center" HorizontalAlignment="Center"
-                        CornerRadius="20" Background="{StaticResource AppSurfaceBrush}"
+                        CornerRadius="{StaticResource RadiusLg}" Background="{StaticResource AppSurfaceBrush}"
                         BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1"
                         RenderTransformOrigin="0.5,0.5">
                     <Border.RenderTransform>
@@ -426,7 +426,7 @@
 
                 <!-- Incoming draw offer -->
                 <Border x:Name="DrawOfferBanner" Visibility="Collapsed" CornerRadius="16" Padding="16,12"
-                        Background="#33F2D26B" BorderBrush="#88F2D26B" BorderThickness="1">
+                        Background="{StaticResource WarningSurfaceBrush}" BorderBrush="{StaticResource WarningSurfaceStrongBrush}" BorderThickness="1">
                     <StackPanel Spacing="10">
                         <TextBlock Text="Opponent offers a draw" FontSize="{StaticResource BodySize}" TextWrapping="Wrap"
                                    Foreground="{StaticResource TextPrimaryBrush}" />

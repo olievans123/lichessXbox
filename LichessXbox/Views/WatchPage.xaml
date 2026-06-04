@@ -5,7 +5,7 @@
     xmlns:controls="using:LichessXbox.Controls"
     Background="Transparent">
 
-    <Grid Padding="32,24">
+    <Grid Padding="{StaticResource PagePadding}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="300" />
