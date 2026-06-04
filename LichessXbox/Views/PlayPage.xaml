@@ -324,7 +324,7 @@
             </Grid>
 
             <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-            <StackPanel Margin="20,0,0,0" Spacing="10">
+            <StackPanel Margin="20,0,0,0" Spacing="8">
                 <!-- Opponent (top) -->
                 <Border Style="{StaticResource CardBorder}" Padding="12">
                     <Grid>
@@ -355,7 +355,7 @@
                         <TextBlock x:Name="StatusBanner" Text="Your move" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                    Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
                         <!-- Move history in algebraic notation (SAN); bounded, scrollable, current move highlighted. -->
-                        <ScrollViewer x:Name="MoveScroller" MaxHeight="96" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+                        <ScrollViewer x:Name="MoveScroller" MaxHeight="84" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
                             <ItemsControl x:Name="MoveRows">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
