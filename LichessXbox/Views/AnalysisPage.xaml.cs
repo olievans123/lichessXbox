@@ -41,7 +41,6 @@ namespace LichessXbox.Views
             AnalysisMoveRows.ItemsSource = _moveRows;
             Board.MoveRequested += Board_MoveRequested;
             this.KeyDown += Page_KeyDown;
-            _ = OpeningBook.Instance.EnsureLoadedAsync();   // warm the offline opening book
             // Default to the cloud eval (instant for common positions, no engine to boot). The user
             // can flip to the local engine for positions the cloud hasn't cached.
             LocalEngineToggle.IsOn = false;
@@ -154,60 +153,31 @@ namespace LichessXbox.Views
                 }
             }
 
-            // Opening explorer, layered: (1) the offline book shows the opening name + named lines
-            // instantly with no network; (2) we then try the online masters DB and, if it answers,
-            // enrich with real win/draw/loss stats and frequency-ordered moves. If the online call
-            // fails, the offline book stays.
+            // Opening explorer (lichess masters DB). It moved to explorer.lichess.org and now
+            // requires an OAuth token, which GetExplorerAsync sends — so it needs the user signed in.
             try
             {
-                await OpeningBook.Instance.EnsureLoadedAsync();
+                var exp = await AppState.Current.Api.GetExplorerAsync(fen);
                 if (cts.IsCancellationRequested) return;
                 _explorer.Clear();
+                bool any = exp != null && exp.Moves.Count > 0;
+                if (exp != null) foreach (var m in exp.Moves) _explorer.Add(m);   // San + win/draw/loss bars
 
-                string opening = OpeningBook.Instance.Name(pos);
+                string opening = exp?.OpeningName;
                 OpeningNameText.Text = opening ?? "";
                 OpeningNameText.Visibility = string.IsNullOrEmpty(opening) ? Visibility.Collapsed : Visibility.Visible;
 
-                var book = OpeningBook.Instance.Moves(pos);
-                if (book != null && book.Count > 0)
-                {
-                    foreach (var bm in book) _explorer.Add(new ExplorerMoveRow { San = bm.San, Uci = bm.Uci, Stats = bm.Name });
-                    ExplorerEmpty.Visibility = Visibility.Collapsed;
-                }
-                else
-                {
-                    ExplorerEmpty.Text = "Out of book — no named lines from this position.";
-                    ExplorerEmpty.Visibility = Visibility.Visible;
-                }
+                ExplorerEmpty.Text = AppState.Current.IsSignedIn ? "No opening data for this position." : "Sign in to load the opening explorer.";
+                ExplorerEmpty.Visibility = any ? Visibility.Collapsed : Visibility.Visible;
             }
             catch
             {
                 if (cts.IsCancellationRequested) return;
                 _explorer.Clear();
-                ExplorerEmpty.Text = "Opening book unavailable.";
+                ExplorerEmpty.Text = AppState.Current.IsSignedIn ? "Opening explorer unavailable." : "Sign in to load the opening explorer.";
                 ExplorerEmpty.Visibility = Visibility.Visible;
                 OpeningNameText.Visibility = Visibility.Collapsed;
             }
-
-            // Enrich with the live masters database when it's reachable (it serves real users; my
-            // sandbox IP is blocked, but a residential console should get through).
-            try
-            {
-                var exp = await AppState.Current.Api.GetExplorerAsync(fen);
-                if (cts.IsCancellationRequested) return;
-                if (exp != null && exp.Moves.Count > 0)
-                {
-                    _explorer.Clear();
-                    foreach (var m in exp.Moves) _explorer.Add(m);   // includes win/draw/loss bars
-                    ExplorerEmpty.Visibility = Visibility.Collapsed;
-                    if (!string.IsNullOrEmpty(exp.OpeningName))
-                    {
-                        OpeningNameText.Text = exp.OpeningName;
-                        OpeningNameText.Visibility = Visibility.Visible;
-                    }
-                }
-            }
-            catch { /* offline book already populated — leave it */ }
 
             // Tablebase (only for <= 7 pieces)
             try

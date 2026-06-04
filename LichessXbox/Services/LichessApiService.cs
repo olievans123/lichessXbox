@@ -392,16 +392,18 @@ namespace LichessXbox.Services
         /// <summary>Opening explorer over Lichess games for a FEN.</summary>
         public async Task<ExplorerResult> GetExplorerAsync(string fen)
         {
-            // The "masters" opening book reliably returns data for standard positions and needs
-            // no speeds/ratings filters (the /lichess DB returns nothing without them). Own timeout
-            // (the shared client is infinite) and THROW on failure, so the caller can distinguish
-            // "couldn't reach the database" from "no data for this position".
-            string url = "https://explorer.lichess.ovh/masters?fen=" + Uri.EscapeDataString(fen) + "&moves=12&topGames=0";
+            // The opening explorer moved to explorer.lichess.ORG and now requires an OAuth2 token
+            // (the spec marks it `security: OAuth2`; anonymous requests get an nginx 401). We send
+            // the signed-in user's bearer token. Own timeout (the shared client is infinite) and
+            // THROW on failure so the caller can fall back to the offline book.
+            string url = "https://explorer.lichess.org/masters?fen=" + Uri.EscapeDataString(fen) + "&moves=12&topGames=0";
             string json;
             using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(8)))
             using (var req = new HttpRequestMessage(HttpMethod.Get, url))
             {
                 req.Headers.Accept.ParseAdd("application/json");
+                if (_auth.IsAuthenticated)
+                    req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _auth.Token);
                 using (var resp = await _http.SendAsync(req, cts.Token))
                 {
                     if (!resp.IsSuccessStatusCode)
