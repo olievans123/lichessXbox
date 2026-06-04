@@ -17,6 +17,7 @@ namespace LichessXbox.Views
     public sealed partial class WatchPage : Page
     {
         CancellationTokenSource _streamCts;
+        int _streamAttempt;   // guards OnFrame against late frames from a channel we've switched away from
         bool _orientationWhite = true;
         string _whiteName = "—", _blackName = "—", _whiteRating = "", _blackRating = "";
         string _currentChannel = "best";
@@ -84,25 +85,31 @@ namespace LichessXbox.Views
         {
             _streamCts?.Cancel();
             _streamCts = new CancellationTokenSource();
+            int attempt = ++_streamAttempt;   // late frames from the old stream are stamped with a stale id
             var ct = _streamCts.Token;
             _currentChannel = key;
             HeaderText.Text = title;
-            _ = RunAsync(key, ct);
+            // Clear the previous channel's game so it doesn't linger until the first frame arrives.
+            TopName.Text = ""; BottomName.Text = ""; TopRating.Text = ""; BottomRating.Text = "";
+            TopClock.Text = "--:--"; BottomClock.Text = "--:--";
+            _ = RunAsync(key, attempt, ct);
         }
 
-        async Task RunAsync(string key, CancellationToken ct)
+        async Task RunAsync(string key, int attempt, CancellationToken ct)
         {
             try
             {
-                if (key == "best") await AppState.Current.Api.StreamTvFeedAsync(OnFrame, ct);
-                else await AppState.Current.Api.StreamTvChannelAsync(key, OnFrame, ct);
+                void Frame(JObject f) => OnFrame(f, attempt);
+                if (key == "best") await AppState.Current.Api.StreamTvFeedAsync(Frame, ct);
+                else await AppState.Current.Api.StreamTvChannelAsync(key, Frame, ct);
             }
             catch (OperationCanceledException) { }
             catch (Exception ex) { System.Diagnostics.Debug.WriteLine("Watch stream ended: " + ex.Message); }
         }
 
-        void OnFrame(JObject frame)
+        void OnFrame(JObject frame, int attempt)
         {
+            if (attempt != _streamAttempt) return;   // a late frame from a channel we've since left
             string t = frame.Value<string>("t");
             var d = frame["d"];
             if (d == null) return;

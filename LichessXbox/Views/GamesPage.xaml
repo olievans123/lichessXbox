@@ -82,13 +82,17 @@
                             <TextBlock Text="Following" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
                             <TextBlock x:Name="NoFollowing" Text="Not following anyone yet." FontSize="{StaticResource CaptionSize}"
                                        Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
-                            <ItemsControl x:Name="FollowingList">
-                                <ItemsControl.ItemTemplate>
+                            <!-- ListView (not ItemsControl) so its rows are gamepad focus stops — that's
+                                 what makes the right column reachable/scrollable at 10 feet. Inner scroll
+                                 disabled so the outer card ScrollViewer does the scrolling. -->
+                            <ListView x:Name="FollowingList" SelectionMode="None" IsItemClickEnabled="False"
+                                      ScrollViewer.VerticalScrollMode="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                                <ListView.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,4" />
+                                        <TextBlock Text="{Binding}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,2" />
                                     </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                                </ListView.ItemTemplate>
+                            </ListView>
                         </StackPanel>
                     </Border>
                 </StackPanel>

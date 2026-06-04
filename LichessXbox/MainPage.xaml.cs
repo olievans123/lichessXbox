@@ -40,6 +40,12 @@ namespace LichessXbox
             ((Storyboard)Resources["OngoingPanelClose"]).Completed += OnOngoingPanelClosed;
             _ongoingTimer.Interval = TimeSpan.FromSeconds(15);
             _ongoingTimer.Tick += async (s, e) => await RefreshOngoingAsync();
+            // Pause the poll while the app is suspended/backgrounded; resume + refresh on return.
+            Window.Current.VisibilityChanged += (s, e) =>
+            {
+                if (e.Visible) { if (!_ongoingTimer.IsEnabled) { _ongoingTimer.Start(); _ = RefreshOngoingAsync(); } }
+                else _ongoingTimer.Stop();
+            };
             // Pane stays closed at launch so the content gets full width; the page
             // focuses its own first control.
             this.Loaded += async (s, e) =>
@@ -180,6 +186,8 @@ namespace LichessXbox
 
         // ----------------------------------------------------- in-progress games
 
+        bool _refreshingOngoing;   // guards against overlapping timer/navigation refreshes
+
         async Task RefreshOngoingAsync()
         {
             if (!AppState.Current.IsSignedIn)
@@ -188,6 +196,14 @@ namespace LichessXbox
                 OngoingPanel.Visibility = Visibility.Collapsed;
                 return;
             }
+            if (_refreshingOngoing) return;   // a refresh is already in flight
+            _refreshingOngoing = true;
+            try { await RefreshOngoingCoreAsync(); }
+            finally { _refreshingOngoing = false; }
+        }
+
+        async Task RefreshOngoingCoreAsync()
+        {
             List<OngoingGame> games;
             try { games = await AppState.Current.Api.GetOngoingGamesAsync(); }
             catch { return; }
