@@ -41,6 +41,7 @@ namespace LichessXbox.Views
             AnalysisMoveRows.ItemsSource = _moveRows;
             Board.MoveRequested += Board_MoveRequested;
             this.KeyDown += Page_KeyDown;
+            _ = OpeningBook.Instance.EnsureLoadedAsync();   // warm the offline opening book
             // Default to the cloud eval (instant for common positions, no engine to boot). The user
             // can flip to the local engine for positions the cloud hasn't cached.
             LocalEngineToggle.IsOn = false;
@@ -153,28 +154,37 @@ namespace LichessXbox.Views
                 }
             }
 
-            // Opening explorer
+            // Opening explorer — offline book (replayed with our engine; needs no network, since the
+            // online explorer host isn't reachable from the Xbox).
             try
             {
-                var exp = await AppState.Current.Api.GetExplorerAsync(fen);
+                await OpeningBook.Instance.EnsureLoadedAsync();
                 if (cts.IsCancellationRequested) return;
                 _explorer.Clear();
-                bool any = exp != null && exp.Moves.Count > 0;
-                foreach (var m in exp?.Moves ?? new System.Collections.Generic.List<ExplorerMoveRow>()) _explorer.Add(m);
-                ExplorerEmpty.Text = "No opening data for this position.";
-                ExplorerEmpty.Visibility = any ? Visibility.Collapsed : Visibility.Visible;
 
-                // Surface the opening name in a prominent spot near the title (not buried in the card).
-                string opening = exp?.OpeningName;
+                // Name the opening in the prominent spot under the title.
+                string opening = OpeningBook.Instance.Name(pos);
                 OpeningNameText.Text = opening ?? "";
                 OpeningNameText.Visibility = string.IsNullOrEmpty(opening) ? Visibility.Collapsed : Visibility.Visible;
+
+                // List the named continuations from here (clickable; no online stats, so no bars).
+                var book = OpeningBook.Instance.Moves(pos);
+                if (book != null && book.Count > 0)
+                {
+                    foreach (var bm in book) _explorer.Add(new ExplorerMoveRow { San = bm.San, Uci = bm.Uci, Stats = bm.Name });
+                    ExplorerEmpty.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    ExplorerEmpty.Text = "Out of book — no named lines from this position.";
+                    ExplorerEmpty.Visibility = Visibility.Visible;
+                }
             }
             catch
             {
                 if (cts.IsCancellationRequested) return;
                 _explorer.Clear();
-                // Distinguish "couldn't reach the database" from "no data for this position".
-                ExplorerEmpty.Text = "Opening explorer unavailable — couldn't reach the database.";
+                ExplorerEmpty.Text = "Opening book unavailable.";
                 ExplorerEmpty.Visibility = Visibility.Visible;
                 OpeningNameText.Visibility = Visibility.Collapsed;
             }
