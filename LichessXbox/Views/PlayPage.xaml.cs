@@ -159,7 +159,9 @@ namespace LichessXbox.Views
             if (!((sender as FrameworkElement)?.Tag is string mode)) return;
             SetMode(mode);
             // Move focus into the chosen panel's primary control.
-            Control target = mode == "computer" ? (Control)LevelGrid : mode == "friend" ? FriendBox : PresetGrid;
+            Control target = mode == "computer" ? (Control)LevelGrid
+                           : mode == "friend" ? (Control)FriendBox
+                           : PresetGrid;
             target?.Focus(FocusState.Programmatic);
         }
 
