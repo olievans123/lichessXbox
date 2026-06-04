@@ -148,10 +148,10 @@
                                       ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollMode="Disabled">
                                 <GridView.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Width="180" Height="104" CornerRadius="16"
+                                        <Border Width="180" Height="92" CornerRadius="14"
                                                 Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
-                                            <StackPanel Margin="16,12" VerticalAlignment="Center" Spacing="2">
-                                                <TextBlock Text="{Binding Glyph}" FontSize="24" />
+                                            <StackPanel Margin="14,8" VerticalAlignment="Center" Spacing="1">
+                                                <TextBlock Text="{Binding Glyph}" FontSize="22" />
                                                 <TextBlock Text="{Binding Label}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                                            Foreground="{StaticResource TextPrimaryBrush}" />
                                                 <TextBlock Text="{Binding RatedLabel}" FontSize="{StaticResource CaptionSize}"
