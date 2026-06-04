@@ -274,15 +274,29 @@ namespace LichessXbox.Views
         {
             if (!(e.ClickedItem is TimeControlPreset preset)) return;
             _autoOpen = true;
+            ChallengeErrorText.Visibility = Visibility.Collapsed;
             SeekingText.Text = $"Finding a {preset.Label} game…";
             ShowOnly(SeekingPanel);
 
             _seekCts = new CancellationTokenSource();
             try { await AppState.Current.Api.CreateSeekAsync(preset, _seekCts.Token, Variant); }
-            catch { /* cancelled or matched */ }
+            catch (OperationCanceledException) { /* withdrawn */ }
+            catch (Exception ex)
+            {
+                _autoOpen = false;
+                ShowOnly(LobbyPanel);
+                ChallengeErrorText.Text = ex.Message;
+                ChallengeErrorText.Visibility = Visibility.Visible;
+                return;
+            }
 
-            // If a game started, StartGame already switched the view. Otherwise return to lobby.
-            if (!_gameActive && SeekingPanel.Visibility == Visibility.Visible) ShowOnly(LobbyPanel);
+            // The seek stream closed. If it matched, the gameStart event opens the board — give it
+            // a moment to arrive before falling back to the lobby (avoids a false bounce/flicker).
+            if (!_gameActive && SeekingPanel.Visibility == Visibility.Visible)
+            {
+                await Task.Delay(700);
+                if (!_gameActive && SeekingPanel.Visibility == Visibility.Visible) ShowOnly(LobbyPanel);
+            }
         }
 
         void CancelSeek_Click(object sender, RoutedEventArgs e)

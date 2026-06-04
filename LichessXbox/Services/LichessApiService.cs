@@ -207,16 +207,39 @@ namespace LichessXbox.Services
                 try
                 {
                     using (var resp = await _http.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, ct))
-                    using (var stream = await resp.Content.ReadAsStreamAsync())
-                    using (var reader = new StreamReader(stream))
                     {
-                        // Drain until matched or cancelled. Use async ReadLineAsync only —
-                        // reader.EndOfStream blocks the UI thread synchronously.
-                        while (!ct.IsCancellationRequested && await reader.ReadLineAsync() != null) { }
+                        // Surface a refusal (e.g. an unsupported time control) instead of silently
+                        // bouncing back to the lobby with no explanation.
+                        if (!resp.IsSuccessStatusCode)
+                        {
+                            string body = "";
+                            try { body = await resp.Content.ReadAsStringAsync(); } catch { }
+                            throw new InvalidOperationException(ExtractApiError(body, (int)resp.StatusCode));
+                        }
+                        using (var stream = await resp.Content.ReadAsStreamAsync())
+                        using (var reader = new StreamReader(stream))
+                        {
+                            // Drain until matched or cancelled. Use async ReadLineAsync only —
+                            // reader.EndOfStream blocks the UI thread synchronously.
+                            while (!ct.IsCancellationRequested && await reader.ReadLineAsync() != null) { }
+                        }
                     }
                 }
                 catch (OperationCanceledException) { /* withdrawn */ }
             }
+        }
+
+        // Pull lichess's {"error":"…"} message out of a failed response body.
+        static string ExtractApiError(string body, int status)
+        {
+            try
+            {
+                var o = JObject.Parse(body);
+                var msg = o.Value<string>("error");
+                if (!string.IsNullOrWhiteSpace(msg)) return msg;
+            }
+            catch { }
+            return $"Lichess wouldn't start that game (HTTP {status}).";
         }
 
         // --------------------------------------------------- computer & friends
