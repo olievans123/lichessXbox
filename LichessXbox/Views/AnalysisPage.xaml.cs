@@ -41,8 +41,9 @@ namespace LichessXbox.Views
             AnalysisMoveRows.ItemsSource = _moveRows;
             Board.MoveRequested += Board_MoveRequested;
             this.KeyDown += Page_KeyDown;
-            // Default to the local engine — it evaluates any position (the cloud only has cached ones).
-            LocalEngineToggle.IsOn = true;
+            // Default to the cloud eval (instant for common positions, no engine to boot). The user
+            // can flip to the local engine for positions the cloud hasn't cached.
+            LocalEngineToggle.IsOn = false;
             this.Loaded += (s, e) =>
             {
                 _useLocalEngine = LocalEngineToggle.IsOn;
