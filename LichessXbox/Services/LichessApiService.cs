@@ -393,9 +393,22 @@ namespace LichessXbox.Services
         public async Task<ExplorerResult> GetExplorerAsync(string fen)
         {
             // The "masters" opening book reliably returns data for standard positions and needs
-            // no speeds/ratings filters (the /lichess DB returns nothing without them).
-            string json = await GetAbsoluteAsync("https://explorer.lichess.ovh/masters?fen=" + Uri.EscapeDataString(fen) + "&moves=12&topGames=0");
-            if (json == null) return null;
+            // no speeds/ratings filters (the /lichess DB returns nothing without them). Own timeout
+            // (the shared client is infinite) and THROW on failure, so the caller can distinguish
+            // "couldn't reach the database" from "no data for this position".
+            string url = "https://explorer.lichess.ovh/masters?fen=" + Uri.EscapeDataString(fen) + "&moves=12&topGames=0";
+            string json;
+            using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(8)))
+            using (var req = new HttpRequestMessage(HttpMethod.Get, url))
+            {
+                req.Headers.Accept.ParseAdd("application/json");
+                using (var resp = await _http.SendAsync(req, cts.Token))
+                {
+                    if (!resp.IsSuccessStatusCode)
+                        throw new InvalidOperationException("explorer HTTP " + (int)resp.StatusCode);
+                    json = await resp.Content.ReadAsStringAsync();
+                }
+            }
             var o = JObject.Parse(json);
             var result = new ExplorerResult { OpeningName = o["opening"]?.Value<string>("name") };
             foreach (var m in o["moves"] as JArray ?? new JArray())

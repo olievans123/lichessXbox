@@ -104,6 +104,7 @@ namespace LichessXbox.Views
             BestLineText.Text = "Evaluating…";
             _explorer.Clear();
             OpeningText.Text = "Opening explorer";
+            OpeningNameText.Visibility = Visibility.Collapsed;
             ExplorerEmpty.Visibility = Visibility.Collapsed;
             _ = RefreshAnalysisAsync(cur);
         }
@@ -158,15 +159,25 @@ namespace LichessXbox.Views
                 var exp = await AppState.Current.Api.GetExplorerAsync(fen);
                 if (cts.IsCancellationRequested) return;
                 _explorer.Clear();
-                int n = exp?.Moves.Count ?? 0;
-                ExplorerEmpty.Visibility = n == 0 ? Visibility.Visible : Visibility.Collapsed;
-                if (exp != null)
-                {
-                    OpeningText.Text = string.IsNullOrEmpty(exp.OpeningName) ? "Opening explorer" : exp.OpeningName;
-                    foreach (var m in exp.Moves) _explorer.Add(m);
-                }
+                bool any = exp != null && exp.Moves.Count > 0;
+                foreach (var m in exp?.Moves ?? new System.Collections.Generic.List<ExplorerMoveRow>()) _explorer.Add(m);
+                ExplorerEmpty.Text = "No opening data for this position.";
+                ExplorerEmpty.Visibility = any ? Visibility.Collapsed : Visibility.Visible;
+
+                // Surface the opening name in a prominent spot near the title (not buried in the card).
+                string opening = exp?.OpeningName;
+                OpeningNameText.Text = opening ?? "";
+                OpeningNameText.Visibility = string.IsNullOrEmpty(opening) ? Visibility.Collapsed : Visibility.Visible;
             }
-            catch { _explorer.Clear(); ExplorerEmpty.Visibility = Visibility.Visible; }
+            catch
+            {
+                if (cts.IsCancellationRequested) return;
+                _explorer.Clear();
+                // Distinguish "couldn't reach the database" from "no data for this position".
+                ExplorerEmpty.Text = "Opening explorer unavailable — couldn't reach the database.";
+                ExplorerEmpty.Visibility = Visibility.Visible;
+                OpeningNameText.Visibility = Visibility.Collapsed;
+            }
 
             // Tablebase (only for <= 7 pieces)
             try
