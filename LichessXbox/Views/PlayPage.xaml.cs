@@ -78,7 +78,7 @@ namespace LichessXbox.Views
             VariantGrid.SelectedIndex = 0;
 
             _challenges.CollectionChanged += (s, e) =>
-                NoChallengesText.Visibility = _challenges.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+                ChallengeBanner.Visibility = _challenges.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
             ChallengesList.ItemsSource = _challenges;
 
             MoveRows.ItemsSource = _moveRows;
@@ -118,13 +118,44 @@ namespace LichessXbox.Views
             SeekingPanel.Visibility = panel == SeekingPanel ? Visibility.Visible : Visibility.Collapsed;
             GamePanel.Visibility = panel == GamePanel ? Visibility.Visible : Visibility.Collapsed;
 
+            if (panel == LobbyPanel) SetMode("online");   // reset the rail to the default mode
+
             // Give the newly shown panel a sensible initial gamepad focus.
             Control target = null;
             if (panel == SignInPrompt) target = GoSignInButton;
-            else if (panel == LobbyPanel) target = PresetGrid;
+            else if (panel == LobbyPanel) target = PresetGrid;   // land on the hero (quick-pair)
             else if (panel == SeekingPanel) target = CancelSeekButton;
             if (panel == GamePanel) Board.FocusBoard();
             else target?.Focus(FocusState.Programmatic);
+        }
+
+        // --------------------------------------------------- lobby mode rail
+
+        // The left rail picks a mode; the matching detail panel shows and the active lane tints.
+        void SetMode(string mode)
+        {
+            bool online = mode == "online", computer = mode == "computer", friend = mode == "friend";
+            PlayOnlinePanel.Visibility = online ? Visibility.Visible : Visibility.Collapsed;
+            ComputerPanel.Visibility = computer ? Visibility.Visible : Visibility.Collapsed;
+            FriendPanel.Visibility = friend ? Visibility.Visible : Visibility.Collapsed;
+            StyleRail(OnlineModeButton, online);
+            StyleRail(ComputerModeButton, computer);
+            StyleRail(FriendModeButton, friend);
+        }
+
+        static void StyleRail(Button b, bool active)
+        {
+            if (active) b.Background = new SolidColorBrush(Color.FromArgb(0x33, 0x8F, 0xCB, 0x3F));
+            else b.ClearValue(Control.BackgroundProperty);
+        }
+
+        void Mode_Click(object sender, RoutedEventArgs e)
+        {
+            if (!((sender as FrameworkElement)?.Tag is string mode)) return;
+            SetMode(mode);
+            // Move focus into the chosen panel's primary control.
+            Control target = mode == "computer" ? (Control)LevelGrid : mode == "friend" ? FriendBox : PresetGrid;
+            target?.Focus(FocusState.Programmatic);
         }
 
         void GoSignIn_Click(object sender, RoutedEventArgs e)
@@ -266,7 +297,9 @@ namespace LichessXbox.Views
             {
                 _selectedVariant = v;
                 VariantGrid.SelectedItem = v;
+                VariantValueText.Text = v.Name;
                 VariantNote.Visibility = v.Key == "standard" ? Visibility.Collapsed : Visibility.Visible;
+                VariantFlyout.Hide();
             }
         }
 

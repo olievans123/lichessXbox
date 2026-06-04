@@ -32,121 +32,208 @@
                     HorizontalAlignment="Center" Content="Sign in with Lichess" />
         </StackPanel>
 
-        <!-- ============ LOBBY ============ -->
-        <ScrollViewer x:Name="LobbyPanel" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-            <StackPanel Spacing="22" Padding="0,0,12,24">
-                <TextBlock Text="New game" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+        <!-- ============ LOBBY — master-detail "Pairing Board" ============ -->
+        <Grid x:Name="LobbyPanel">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-                <!-- Quick pairing -->
-                <TextBlock Text="Quick pairing" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                <TextBlock Text="Find a human opponent online (this searches until someone is matched)." FontSize="{StaticResource BodySize}"
-                           Foreground="{StaticResource TextSecondaryBrush}" />
-                <GridView x:Name="PresetGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Preset_ItemClick">
-                    <GridView.ItemTemplate>
-                        <DataTemplate>
-                            <Border Width="240" Height="162" CornerRadius="16"
-                                    Background="{StaticResource AppSurfaceHighBrush}"
-                                    BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
-                                <StackPanel Margin="16" VerticalAlignment="Center" Spacing="4">
-                                    <TextBlock Text="{Binding Glyph}" FontSize="30" />
-                                    <TextBlock Text="{Binding Label}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
-                                               TextWrapping="Wrap" Foreground="{StaticResource TextPrimaryBrush}" />
-                                    <TextBlock Text="{Binding RatedLabel}" FontSize="{StaticResource CaptionSize}"
-                                               Foreground="{StaticResource TextSecondaryBrush}" />
-                                </StackPanel>
-                            </Border>
-                        </DataTemplate>
-                    </GridView.ItemTemplate>
-                </GridView>
+            <TextBlock Grid.Row="0" Text="New game" FontSize="{StaticResource TitleSize}" FontWeight="Bold"
+                       Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,16" />
 
-                <!-- Play the computer -->
-                <TextBlock Text="Play the computer" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
-                           Foreground="{StaticResource AccentGreenLightBrush}" Margin="0,8,0,0" />
-                <TextBlock Text="Choose a Stockfish difficulty (1 = easiest, 8 = strongest)." FontSize="{StaticResource BodySize}"
-                           Foreground="{StaticResource TextSecondaryBrush}" />
-                <GridView x:Name="LevelGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Ai_ItemClick">
-                    <GridView.ItemTemplate>
-                        <DataTemplate>
-                            <Border Width="110" Height="100" CornerRadius="16"
-                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="🤖" FontSize="26" HorizontalAlignment="Center" />
-                                    <TextBlock Text="{Binding Label}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
-                                               Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" />
-                                </StackPanel>
-                            </Border>
-                        </DataTemplate>
-                    </GridView.ItemTemplate>
-                </GridView>
+            <Grid Grid.Row="1" ColumnSpacing="24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="216" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-                <!-- Challenge a player -->
-                <TextBlock Text="Challenge a player" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
-                           Foreground="{StaticResource AccentGreenLightBrush}" Margin="0,8,0,0" />
-                <StackPanel Orientation="Horizontal" Spacing="14">
-                    <TextBox x:Name="FriendBox" PlaceholderText="Lichess username" Width="300" Height="56"
-                             FontSize="{StaticResource BodySize}" VerticalContentAlignment="Center"
-                             FocusVisualPrimaryBrush="{StaticResource AccentGreenLightBrush}" />
-                    <Button x:Name="ChallengeButton" Style="{StaticResource PrimaryButton}" Click="Challenge_Click"
-                            Content="Challenge" MinWidth="180" />
+                <!-- ===== MODE RAIL ===== -->
+                <StackPanel Grid.Column="0" Spacing="12">
+                    <Button x:Name="OnlineModeButton" Style="{StaticResource TileButton}" Tag="online" Click="Mode_Click"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="16,14">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="🌐" FontSize="24" />
+                            <TextBlock Text="Play online" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                            <TextBlock Text="Human · ranked" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="ComputerModeButton" Style="{StaticResource TileButton}" Tag="computer" Click="Mode_Click"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="16,14">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="🤖" FontSize="24" />
+                            <TextBlock Text="vs Computer" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                            <TextBlock Text="Stockfish" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="FriendModeButton" Style="{StaticResource TileButton}" Tag="friend" Click="Mode_Click"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="16,14">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="⚔️" FontSize="24" />
+                            <TextBlock Text="Challenge" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                            <TextBlock Text="By username" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
-                <TextBlock x:Name="ChallengeErrorText" Visibility="Collapsed" TextWrapping="Wrap"
-                           FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource ErrorBrush}" />
 
-                <!-- Variant (Standard by default; choose before pairing) -->
-                <TextBlock Text="Variant" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" Margin="0,8,0,0" />
-                <GridView x:Name="VariantGrid" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Variant_ItemClick">
-                    <GridView.ItemTemplate>
-                        <DataTemplate>
-                            <Border Width="132" Height="88" CornerRadius="16"
-                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
-                                <StackPanel VerticalAlignment="Center" Spacing="2">
-                                    <TextBlock Text="{Binding Glyph}" FontSize="20" HorizontalAlignment="Center" />
-                                    <TextBlock Text="{Binding Name}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold" TextAlignment="Center"
-                                               Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
-                                </StackPanel>
-                            </Border>
-                        </DataTemplate>
-                    </GridView.ItemTemplate>
-                </GridView>
-                <TextBlock x:Name="VariantNote" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
-                           Visibility="Collapsed" TextWrapping="Wrap"
-                           Text="Variant games are played with server-validated moves; some inputs (Crazyhouse drops, Chess960 castling) aren't fully supported on the board yet." />
+                <!-- ===== DETAIL ===== -->
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                <!-- Incoming challenges -->
-                <TextBlock Text="Challenges" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
-                           Foreground="{StaticResource AccentGreenLightBrush}" Margin="0,8,0,0" />
-                <TextBlock x:Name="NoChallengesText" Text="No incoming challenges." FontSize="{StaticResource BodySize}"
-                           Foreground="{StaticResource TextSecondaryBrush}" />
-                <ItemsControl x:Name="ChallengesList">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border CornerRadius="16" Margin="0,0,0,10" Padding="20,14"
-                                    Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding ChallengerName}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
-                                                   TextTrimming="CharacterEllipsis"
-                                                   Foreground="{StaticResource TextPrimaryBrush}" />
-                                        <TextBlock Text="{Binding Description}" FontSize="{StaticResource CaptionSize}"
-                                                   Foreground="{StaticResource TextSecondaryBrush}" />
-                                    </StackPanel>
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                        <Button Style="{StaticResource PrimaryButton}" Content="Accept"
-                                                Tag="{Binding Id}" Click="AcceptChallenge_Click" MinWidth="120" />
-                                        <Button Style="{StaticResource TileButton}" Content="Decline" HorizontalContentAlignment="Center"
-                                                Tag="{Binding Id}" Click="DeclineChallenge_Click" MinWidth="120" />
-                                    </StackPanel>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
-        </ScrollViewer>
+                    <!-- Incoming-challenge banner (amber; collapsed → no focus stops when empty) -->
+                    <Border x:Name="ChallengeBanner" Grid.Row="0" Visibility="Collapsed" Margin="0,0,0,14"
+                            CornerRadius="16" Padding="16,12" Background="#33F2D26B" BorderBrush="#88F2D26B" BorderThickness="1">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Incoming challenge" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimaryBrush}" />
+                            <ScrollViewer MaxHeight="200" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+                                <ItemsControl x:Name="ChallengesList">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Padding="0,6" ColumnSpacing="12">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding ChallengerName}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
+                                                               TextTrimming="CharacterEllipsis" Foreground="{StaticResource TextPrimaryBrush}" />
+                                                    <TextBlock Text="{Binding Description}" FontSize="{StaticResource CaptionSize}"
+                                                               Foreground="{StaticResource TextSecondaryBrush}" />
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                                    <Button Style="{StaticResource PrimaryButton}" Content="Accept"
+                                                            Tag="{Binding Id}" Click="AcceptChallenge_Click" MinWidth="120" />
+                                                    <Button Style="{StaticResource TileButton}" Content="Decline" HorizontalContentAlignment="Center"
+                                                            Tag="{Binding Id}" Click="DeclineChallenge_Click" MinWidth="120" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Content (one panel visible at a time) -->
+                    <Grid Grid.Row="1">
+                        <!-- (a) Play online -->
+                        <StackPanel x:Name="PlayOnlinePanel" Spacing="10">
+                            <TextBlock Text="Find a human opponent online" FontSize="{StaticResource BodySize}"
+                                       FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                            <GridView x:Name="PresetGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Preset_ItemClick">
+                                <GridView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Width="196" Height="108" CornerRadius="16"
+                                                Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
+                                            <StackPanel Margin="16,12" VerticalAlignment="Center" Spacing="2">
+                                                <TextBlock Text="{Binding Glyph}" FontSize="24" />
+                                                <TextBlock Text="{Binding Label}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
+                                                           Foreground="{StaticResource TextPrimaryBrush}" />
+                                                <TextBlock Text="{Binding RatedLabel}" FontSize="{StaticResource CaptionSize}"
+                                                           Foreground="{StaticResource TextSecondaryBrush}" />
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </GridView.ItemTemplate>
+                            </GridView>
+                        </StackPanel>
+
+                        <!-- (b) vs Computer -->
+                        <StackPanel x:Name="ComputerPanel" Spacing="10" Visibility="Collapsed">
+                            <TextBlock Text="Choose a Stockfish level" FontSize="{StaticResource BodySize}"
+                                       FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                            <GridView x:Name="LevelGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Ai_ItemClick">
+                                <GridView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Width="108" Height="96" CornerRadius="16"
+                                                Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="🤖" FontSize="22" HorizontalAlignment="Center" />
+                                                <TextBlock Text="{Binding Label}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
+                                                           Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </GridView.ItemTemplate>
+                            </GridView>
+                            <TextBlock Text="1 = easiest · 8 = strongest" FontSize="{StaticResource CaptionSize}"
+                                       Foreground="{StaticResource TextSecondaryBrush}" />
+                        </StackPanel>
+
+                        <!-- (c) Challenge a friend -->
+                        <StackPanel x:Name="FriendPanel" Spacing="14" Visibility="Collapsed">
+                            <TextBlock Text="Challenge a Lichess player" FontSize="{StaticResource BodySize}"
+                                       FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                            <TextBox x:Name="FriendBox" PlaceholderText="Lichess username" Width="420" Height="56" HorizontalAlignment="Left"
+                                     FontSize="{StaticResource BodySize}" VerticalContentAlignment="Center"
+                                     FocusVisualPrimaryBrush="{StaticResource AccentGreenLightBrush}" />
+                            <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                                <Button x:Name="ChallengeButton" Style="{StaticResource PrimaryButton}" Click="Challenge_Click"
+                                        Content="Send challenge" MinWidth="200" />
+                                <TextBlock Text="Blitz 5+3 · casual" FontSize="{StaticResource CaptionSize}"
+                                           Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <TextBlock x:Name="ChallengeErrorText" Visibility="Collapsed" TextWrapping="Wrap"
+                                       FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource ErrorBrush}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Footer: variant selector (opens the existing VariantGrid in a flyout) -->
+                    <Grid Grid.Row="2" Margin="0,14,0,0" Padding="0,14,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.ColumnSpan="2" VerticalAlignment="Top" Height="1" Margin="0,-14,0,0"
+                                Background="{StaticResource HairlineBrush}" />
+                        <Button x:Name="VariantButton" Grid.Column="0" Style="{StaticResource TileButton}" Padding="16,10">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="Variant:" Foreground="{StaticResource TextSecondaryBrush}" FontWeight="Normal" VerticalAlignment="Center" />
+                                <TextBlock x:Name="VariantValueText" Text="Standard" VerticalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}" />
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE70D;" FontSize="12" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
+                            </StackPanel>
+                            <Button.Flyout>
+                                <Flyout x:Name="VariantFlyout" Placement="Top">
+                                    <Flyout.FlyoutPresenterStyle>
+                                        <Style TargetType="FlyoutPresenter">
+                                            <Setter Property="Background" Value="{StaticResource AppSurfaceBrush}" />
+                                            <Setter Property="BorderBrush" Value="{StaticResource HairlineBrush}" />
+                                            <Setter Property="CornerRadius" Value="16" />
+                                            <Setter Property="Padding" Value="16" />
+                                            <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled" />
+                                        </Style>
+                                    </Flyout.FlyoutPresenterStyle>
+                                    <GridView x:Name="VariantGrid" SelectionMode="Single" IsItemClickEnabled="True"
+                                              ItemClick="Variant_ItemClick" MaxWidth="448">
+                                        <GridView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Width="132" Height="88" CornerRadius="16"
+                                                        Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
+                                                    <StackPanel VerticalAlignment="Center" Spacing="2">
+                                                        <TextBlock Text="{Binding Glyph}" FontSize="20" HorizontalAlignment="Center" />
+                                                        <TextBlock Text="{Binding Name}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold" TextAlignment="Center"
+                                                                   Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </GridView.ItemTemplate>
+                                    </GridView>
+                                </Flyout>
+                            </Button.Flyout>
+                        </Button>
+                        <TextBlock x:Name="VariantNote" Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center"
+                                   FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
+                                   Visibility="Collapsed" TextWrapping="Wrap"
+                                   Text="Variant games use server-validated moves; some inputs (Crazyhouse drops, Chess960 castling) aren't fully supported on the board yet." />
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
 
         <!-- ============ SEEKING ============ -->
         <StackPanel x:Name="SeekingPanel" Visibility="Collapsed"
