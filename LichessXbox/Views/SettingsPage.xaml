@@ -46,7 +46,8 @@
                 <TextBlock Text="Open-source lichess sets, downloaded on first use. Move the highlight to preview a set on the right; press A to apply it."
                            FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
                 <GridView x:Name="PieceGrid" SelectionMode="Single" IsItemClickEnabled="True"
-                          ItemClick="PieceSet_ItemClick" SelectionChanged="PieceSet_SelectionChanged">
+                          ItemClick="PieceSet_ItemClick" SelectionChanged="PieceSet_SelectionChanged"
+                          GotFocus="PieceGrid_GotFocus">
                     <GridView.ItemTemplate>
                         <DataTemplate>
                             <Border Width="128" Height="100" CornerRadius="14"

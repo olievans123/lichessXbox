@@ -123,12 +123,21 @@ namespace LichessXbox.Views
             if (e.ClickedItem is BoardTheme.Preset p) BoardTheme.Apply(p.Name);
         }
 
-        // Live-preview the highlighted piece set on the side board without applying it.
-        // On Xbox the highlight follows gamepad focus, so this updates as the user browses.
+        // Live-preview a piece set on the side board without applying it. On a GridView the D-pad
+        // moves FOCUS (not selection), so we preview from GotFocus — selection only changes on A.
+        void PieceGrid_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if ((e.OriginalSource as FrameworkElement)?.DataContext is PieceSetItem item) PreviewSet(item.Name);
+        }
+
         void PieceSet_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!(PieceGrid.SelectedItem is PieceSetItem item)) return;
-            string set = item.Name;
+            if (PieceGrid.SelectedItem is PieceSetItem item) PreviewSet(item.Name);
+        }
+
+        void PreviewSet(string set)
+        {
+            if (string.IsNullOrEmpty(set) || PreviewBoard.PieceSetOverride == set) return;
             PreviewBoard.PieceSetOverride = set;   // "Native" → Unicode glyphs; else the SVG set
             PreviewLabel.Text = set == PieceSets.Native ? "Native — Unicode glyphs" : set;
 
