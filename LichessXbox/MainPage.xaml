@@ -188,6 +188,15 @@
                         FontFamily="Segoe MDL2 Assets" FontSize="18"
                         Content="&#xE700;" ToolTipService.ToolTip="Menu (Menu button)" />
 
+                <!-- Back: appears when there's somewhere to return to (also the B button). -->
+                <Button x:Name="BackButton" Grid.Column="0" Click="Back_Click"
+                        Style="{StaticResource IconButton}"
+                        VerticalAlignment="Top" HorizontalAlignment="Center"
+                        Width="44" Height="44" Margin="0,64,0,0" CornerRadius="22"
+                        Background="#59000000"
+                        FontFamily="Segoe MDL2 Assets" FontSize="16"
+                        Content="&#xE72B;" Visibility="Collapsed" ToolTipService.ToolTip="Back (B)" />
+
                 <Frame x:Name="ContentFrame" Grid.Column="1" />
 
                 <!-- "Continue playing": collapsed to a small tab on the right edge by default so it

@@ -629,7 +629,10 @@ namespace LichessXbox.Views
         {
             ResultOverlay.Visibility = Visibility.Collapsed;
             string fen = string.IsNullOrEmpty(_initialFen) ? "startpos" : _initialFen;
-            string param = fen + "|" + string.Join(" ", _plies);
+            string opp = string.IsNullOrEmpty(_opponentName) ? "Opponent" : _opponentName;
+            string white = _playerIsWhite ? "You" : opp;
+            string black = _playerIsWhite ? opp : "You";
+            string param = fen + "|" + string.Join(" ", _plies) + "|" + white + "|" + black;
             ((Window.Current.Content as Frame)?.Content as LichessXbox.MainPage)?.OpenAnalysis(param);
         }
 

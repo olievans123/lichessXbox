@@ -297,7 +297,7 @@ namespace LichessXbox.Views
         {
             if (!(e.ClickedItem is GameSummary g)) return;
             var shell = (Window.Current.Content as Frame)?.Content as LichessXbox.MainPage;
-            shell?.OpenAnalysis((g.InitialFen ?? "startpos") + "|" + (g.Moves ?? ""));
+            shell?.OpenAnalysis((g.InitialFen ?? "startpos") + "|" + (g.Moves ?? "") + "|" + (g.WhiteName ?? "White") + "|" + (g.BlackName ?? "Black"));
         }
 
         // Simple rating sparkline (same style as the Games page graph).

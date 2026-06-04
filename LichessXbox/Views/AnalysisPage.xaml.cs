@@ -26,18 +26,37 @@ namespace LichessXbox.Views
 
         readonly ObservableCollection<ExplorerMoveRow> _explorer = new ObservableCollection<ExplorerMoveRow>();
         readonly ObservableCollection<TablebaseRow> _tablebase = new ObservableCollection<TablebaseRow>();
+        readonly ObservableCollection<MoveRowVM> _moveRows = new ObservableCollection<MoveRowVM>();
         CancellationTokenSource _analysisCts;
         LocalEngine _engine;
         bool _useLocalEngine;
+        string _whiteName, _blackName;
 
         public AnalysisPage()
         {
             this.InitializeComponent();
             ExplorerList.ItemsSource = _explorer;
             TablebaseList.ItemsSource = _tablebase;
+            AnalysisMoveRows.ItemsSource = _moveRows;
             Board.MoveRequested += Board_MoveRequested;
             this.KeyDown += Page_KeyDown;
-            this.Loaded += (s, e) => { Sync(); Board.FocusBoard(); };
+            // Default to the local engine — it evaluates any position (the cloud only has cached ones).
+            LocalEngineToggle.IsOn = true;
+            this.Loaded += (s, e) =>
+            {
+                _useLocalEngine = LocalEngineToggle.IsOn;
+                if (_useLocalEngine) EnsureEngine();
+                Sync();
+                Board.FocusBoard();
+            };
+        }
+
+        void EnsureEngine()
+        {
+            if (_engine != null) return;
+            _engine = new LocalEngine(EngineWeb);
+            _engine.Info += OnEngineInfo;
+            _engine.ReadyChanged += OnEngineReady;
         }
 
         ChessPosition Current => _history[_ply];
@@ -73,6 +92,8 @@ namespace LichessXbox.Views
             // the slide animation), which needs the new move already in place to detect it.
             Board.LastMove = _ply > 0 ? (ChessMove?)_moves[_ply - 1] : null;
             Board.Position = cur;
+
+            RebuildAnalysisMoves();
 
             EvalText.Text = "…";
             DepthText.Text = "";
@@ -211,14 +232,50 @@ namespace LichessXbox.Views
         void LocalEngine_Toggled(object sender, RoutedEventArgs e)
         {
             _useLocalEngine = LocalEngineToggle.IsOn;
-            if (_useLocalEngine && _engine == null)
-            {
-                _engine = new LocalEngine(EngineWeb);
-                _engine.Info += OnEngineInfo;
-                _engine.ReadyChanged += OnEngineReady;
-            }
-            if (!_useLocalEngine) _engine?.Stop();
+            if (_useLocalEngine) EnsureEngine();
+            else _engine?.Stop();
             Sync();
+        }
+
+        // Pair the SAN moves into numbered, clickable rows; highlight the position on the board.
+        void RebuildAnalysisMoves()
+        {
+            int n = _moves.Count;
+            var sans = new string[n];
+            for (int i = 0; i < n; i++)
+            {
+                try { sans[i] = _history[i].ToSan(_moves[i]); }
+                catch { sans[i] = "…"; }
+            }
+
+            int rowCount = (n + 1) / 2;
+            while (_moveRows.Count < rowCount) _moveRows.Add(new MoveRowVM());
+            while (_moveRows.Count > rowCount) _moveRows.RemoveAt(_moveRows.Count - 1);
+            for (int r = 0; r < rowCount; r++)
+            {
+                int i = r * 2;
+                var row = _moveRows[r];
+                row.No = (r + 1) + ".";
+                row.White = sans[i];
+                bool hasBlack = i + 1 < n;
+                row.Black = hasBlack ? sans[i + 1] : "";
+                row.BlackVisible = hasBlack ? Visibility.Visible : Visibility.Collapsed;
+                row.WhitePly = i + 1;   // jump to the position after white's move on this row
+                row.BlackPly = i + 2;
+                row.WhiteCurrent = _ply == i + 1;
+                row.BlackCurrent = _ply == i + 2;
+            }
+            MovesCard.Visibility = n > 0 ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        // Click a move to jump the board to that position.
+        void Move_Click(object sender, RoutedEventArgs e)
+        {
+            if ((sender as FrameworkElement)?.Tag is int ply)
+            {
+                _ply = Math.Max(0, Math.Min(ply, _history.Count - 1));
+                Sync();
+            }
         }
 
         // The engine boots asynchronously inside the WebView; once it's up, analyse the
@@ -310,12 +367,27 @@ namespace LichessXbox.Views
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            // Optionally arrive with a game to replay: "initialFen|movesUci".
+            // Optionally arrive with a game to replay: "initialFen|moves[|whiteName|blackName]".
             if (e.Parameter is string param && param.Contains("|"))
             {
-                var parts = param.Split(new[] { '|' }, 2);
-                LoadGame(parts[0], parts[1]);
+                var parts = param.Split('|');   // FEN/SAN never contain '|', so a full split is safe
+                LoadGame(parts[0], parts.Length > 1 ? parts[1] : "");
+                _whiteName = parts.Length > 2 ? parts[2] : null;
+                _blackName = parts.Length > 3 ? parts[3] : null;
             }
+            else { _whiteName = _blackName = null; }
+            ShowPlayers();
+        }
+
+        void ShowPlayers()
+        {
+            if (string.IsNullOrWhiteSpace(_whiteName) && string.IsNullOrWhiteSpace(_blackName))
+            {
+                PlayersText.Visibility = Visibility.Collapsed;
+                return;
+            }
+            PlayersText.Text = (_whiteName ?? "White") + "  vs  " + (_blackName ?? "Black");
+            PlayersText.Visibility = Visibility.Visible;
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)

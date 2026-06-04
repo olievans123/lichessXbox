@@ -369,7 +369,9 @@ namespace LichessXbox.Services
         /// <summary>Opening explorer over Lichess games for a FEN.</summary>
         public async Task<ExplorerResult> GetExplorerAsync(string fen)
         {
-            string json = await GetAbsoluteAsync("https://explorer.lichess.ovh/lichess?variant=standard&fen=" + Uri.EscapeDataString(fen) + "&moves=12&topGames=0&recentGames=0");
+            // The "masters" opening book reliably returns data for standard positions and needs
+            // no speeds/ratings filters (the /lichess DB returns nothing without them).
+            string json = await GetAbsoluteAsync("https://explorer.lichess.ovh/masters?fen=" + Uri.EscapeDataString(fen) + "&moves=12&topGames=0");
             if (json == null) return null;
             var o = JObject.Parse(json);
             var result = new ExplorerResult { OpeningName = o["opening"]?.Value<string>("name") };
@@ -495,6 +497,8 @@ namespace LichessXbox.Services
                 FinalFen = ComputeFinalFen(initialFen, moves),
                 PlayerWhite = iAmWhite,
                 Outcome = outcome,
+                WhiteName = whiteName,
+                BlackName = blackName,
             };
         }
 

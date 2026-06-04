@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.System;
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -33,6 +34,9 @@ namespace LichessXbox
             this.InitializeComponent();
             this.KeyDown += Page_KeyDown;
             OngoingList.ItemsSource = _ongoing;
+            // Keep nav state in sync on every navigation (forward AND Back); drive the Back button.
+            ContentFrame.Navigated += ContentFrame_Navigated;
+            SystemNavigationManager.GetForCurrentView().BackRequested += OnBackRequested;
             ((Storyboard)Resources["OngoingPanelClose"]).Completed += OnOngoingPanelClosed;
             _ongoingTimer.Interval = TimeSpan.FromSeconds(15);
             _ongoingTimer.Tick += async (s, e) => await RefreshOngoingAsync();
@@ -80,6 +84,48 @@ namespace LichessXbox
             MenuButton.Focus(FocusState.Programmatic);
         }
 
+        // ----------------------------------------------------- back navigation
+
+        void Back_Click(object sender, RoutedEventArgs e)
+        {
+            if (ContentFrame.CanGoBack) ContentFrame.GoBack();
+        }
+
+        // The gamepad B button (and the system back chrome) route here.
+        void OnBackRequested(object sender, BackRequestedEventArgs e)
+        {
+            if (e.Handled) return;
+            if (NavSplit.IsPaneOpen) { ClosePane(); e.Handled = true; return; }
+            if (ContentFrame.CanGoBack) { ContentFrame.GoBack(); e.Handled = true; }
+        }
+
+        // Single source of truth for nav state — runs on forward navigation AND on Back.
+        void ContentFrame_Navigated(object sender, Windows.UI.Xaml.Navigation.NavigationEventArgs e)
+        {
+            _currentTag = TagForPage(e.SourcePageType);
+            HighlightNav(_currentTag);
+            _ongoingExpanded = false;
+            UpdateOngoingVisibility();
+            BackButton.Visibility = ContentFrame.CanGoBack ? Visibility.Visible : Visibility.Collapsed;
+            _ = RefreshOngoingAsync();
+        }
+
+        static string TagForPage(Type t)
+        {
+            if (t == typeof(PlayPage)) return "play";
+            if (t == typeof(WatchPage)) return "watch";
+            if (t == typeof(AnalysisPage)) return "analysis";
+            if (t == typeof(PuzzlesPage)) return "puzzles";
+            if (t == typeof(TournamentsPage)) return "tournaments";
+            if (t == typeof(StudiesPage)) return "studies";
+            if (t == typeof(GamesPage)) return "games";
+            if (t == typeof(ProfilePage)) return "profile";
+            if (t == typeof(BoardEditorPage)) return "editor";
+            if (t == typeof(CoordinatesPage)) return "coords";
+            if (t == typeof(SettingsPage)) return "settings";
+            return "home";
+        }
+
         void Nav_Click(object sender, RoutedEventArgs e)
         {
             var tag = (sender as FrameworkElement)?.Tag as string;
@@ -123,12 +169,7 @@ namespace LichessXbox
                 case "coords": ContentFrame.Navigate(typeof(CoordinatesPage)); break;
                 case "settings": ContentFrame.Navigate(typeof(SettingsPage)); break;
             }
-
-            _currentTag = tag;
-            HighlightNav(tag);
-            _ongoingExpanded = false;    // collapse on navigation so it never sits over the new page
-            UpdateOngoingVisibility();
-            _ = RefreshOngoingAsync();   // keep the "continue playing" panel current as you move around
+            // ContentFrame_Navigated syncs _currentTag, nav highlight, ongoing tab and Back button.
         }
 
         // ----------------------------------------------------- in-progress games
