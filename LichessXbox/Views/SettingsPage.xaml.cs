@@ -217,42 +217,21 @@ namespace LichessXbox.Views
             UpdateSpeedButtons();   // grey out / restore the speed picker to match
         }
 
-        void Speed_Click(object sender, RoutedEventArgs e)
+        void Speed_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (!_loaded) return;
-            if ((sender as Button)?.Tag is string tag)
-            {
+            if (SpeedBox.SelectedItem is ComboBoxItem item && item.Content is string tag)
                 BoardTheme.SetAnimationSpeed(tag);
-                UpdateSpeedButtons();
-            }
         }
 
-        // Highlight the selected speed (green, like the active nav) and dim the row when
-        // animations are off.
+        // Reflect the saved speed in the dropdown; dim + disable the row when animations are off.
         void UpdateSpeedButtons()
         {
             string sel = BoardTheme.AnimationSpeed;
-            StyleSpeed(SpeedSlow, sel == "Slow");
-            StyleSpeed(SpeedNormal, sel == "Normal");
-            StyleSpeed(SpeedFast, sel == "Fast");
-
+            SpeedBox.SelectedIndex = sel == "Slow" ? 0 : sel == "Fast" ? 2 : 1;
             bool on = AnimToggle.IsOn;
-            SpeedSlow.IsEnabled = SpeedNormal.IsEnabled = SpeedFast.IsEnabled = on;
+            SpeedBox.IsEnabled = on;
             SpeedRow.Opacity = on ? 1.0 : 0.45;
-        }
-
-        void StyleSpeed(Button b, bool selected)
-        {
-            if (selected)
-            {
-                b.Background = (Brush)Application.Current.Resources["AccentGreenBrush"];
-                b.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0x0E, 0x12, 0x07));
-            }
-            else
-            {
-                b.ClearValue(Control.BackgroundProperty);
-                b.ClearValue(Control.ForegroundProperty);
-            }
         }
     }
 }

@@ -130,11 +130,12 @@
                                 <TextBlock Text="Animation speed" FontSize="{StaticResource BodySize}" Foreground="{StaticResource TextPrimaryBrush}" />
                                 <TextBlock Text="How fast pieces slide." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
                             </StackPanel>
-                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                                <Button x:Name="SpeedSlow" Tag="Slow" Content="Slow" Click="Speed_Click" Style="{StaticResource TileButton}" Padding="16,8" MinWidth="76" HorizontalContentAlignment="Center" />
-                                <Button x:Name="SpeedNormal" Tag="Normal" Content="Normal" Click="Speed_Click" Style="{StaticResource TileButton}" Padding="16,8" MinWidth="76" HorizontalContentAlignment="Center" />
-                                <Button x:Name="SpeedFast" Tag="Fast" Content="Fast" Click="Speed_Click" Style="{StaticResource TileButton}" Padding="16,8" MinWidth="76" HorizontalContentAlignment="Center" />
-                            </StackPanel>
+                            <ComboBox x:Name="SpeedBox" Grid.Column="1" VerticalAlignment="Center" MinWidth="150"
+                                      Style="{StaticResource ThemedComboBox}" SelectionChanged="Speed_SelectionChanged">
+                                <ComboBoxItem Content="Slow" />
+                                <ComboBoxItem Content="Normal" />
+                                <ComboBoxItem Content="Fast" />
+                            </ComboBox>
                         </Grid>
                     </StackPanel>
                 </Border>
