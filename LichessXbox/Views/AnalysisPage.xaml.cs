@@ -104,7 +104,7 @@ namespace LichessXbox.Views
             BestLineText.Text = "Evaluating…";
             _explorer.Clear();
             OpeningText.Text = "Opening explorer";
-            OpeningNameText.Visibility = Visibility.Collapsed;
+            OpeningNameText.Text = "";
             ExplorerEmpty.Visibility = Visibility.Collapsed;
             _ = RefreshAnalysisAsync(cur);
         }
@@ -166,7 +166,6 @@ namespace LichessXbox.Views
 
                 string opening = exp?.OpeningName;
                 OpeningNameText.Text = opening ?? "";
-                OpeningNameText.Visibility = string.IsNullOrEmpty(opening) ? Visibility.Collapsed : Visibility.Visible;
 
                 ExplorerEmpty.Text = AppState.Current.IsSignedIn ? "No opening data for this position." : "Sign in to load the opening explorer.";
                 ExplorerEmpty.Visibility = any ? Visibility.Collapsed : Visibility.Visible;
@@ -177,7 +176,7 @@ namespace LichessXbox.Views
                 _explorer.Clear();
                 ExplorerEmpty.Text = AppState.Current.IsSignedIn ? "Opening explorer unavailable." : "Sign in to load the opening explorer.";
                 ExplorerEmpty.Visibility = Visibility.Visible;
-                OpeningNameText.Visibility = Visibility.Collapsed;
+                OpeningNameText.Text = "";
             }
 
             // Tablebase (only for <= 7 pieces)
@@ -287,7 +286,7 @@ namespace LichessXbox.Views
                 row.WhiteCurrent = _ply == i + 1;
                 row.BlackCurrent = _ply == i + 2;
             }
-            MovesCard.Visibility = n > 0 ? Visibility.Visible : Visibility.Collapsed;
+            MovesEmpty.Visibility = n > 0 ? Visibility.Collapsed : Visibility.Visible;
         }
 
         // Click a move to jump the board to that position.
