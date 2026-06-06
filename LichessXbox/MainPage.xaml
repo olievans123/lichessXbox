@@ -161,29 +161,33 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <!-- Gutter stack: hamburger, then Back (when applicable), then the games-in-progress
-                     tab — so the tab sits just below the hamburger, with Back above it when present.
-                     A vertical StackPanel so a collapsed Back closes the gap automatically. -->
-                <StackPanel Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,12,0,0" Spacing="10">
-                    <Button x:Name="MenuButton" Click="ToggleNav_Click" Style="{StaticResource IconButton}"
-                            Width="44" Height="44" CornerRadius="22" Background="#59000000"
-                            FontFamily="Segoe MDL2 Assets" FontSize="18"
-                            Content="&#xE700;" ToolTipService.ToolTip="Menu (Menu button)" />
+                <!-- Gutter: hamburger with Back to its right (when applicable), then the
+                     games-in-progress tab just below the hamburger. -->
+                <StackPanel Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="6,12,0,0" Spacing="10">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Button x:Name="MenuButton" Click="ToggleNav_Click" Style="{StaticResource IconButton}"
+                                Width="44" Height="44" CornerRadius="22" Background="#59000000"
+                                FontFamily="Segoe MDL2 Assets" FontSize="18"
+                                Content="&#xE700;" ToolTipService.ToolTip="Menu (Menu button)" />
+                        <Button x:Name="BackButton" Click="Back_Click" Style="{StaticResource IconButton}"
+                                Width="40" Height="40" CornerRadius="20" Background="#59000000" VerticalAlignment="Center"
+                                FontFamily="Segoe MDL2 Assets" FontSize="15"
+                                Content="&#xE72B;" Visibility="Collapsed" ToolTipService.ToolTip="Back (B)" />
+                    </StackPanel>
 
-                    <Button x:Name="BackButton" Click="Back_Click" Style="{StaticResource IconButton}"
-                            Width="44" Height="44" CornerRadius="22" Background="#59000000"
-                            FontFamily="Segoe MDL2 Assets" FontSize="16"
-                            Content="&#xE72B;" Visibility="Collapsed" ToolTipService.ToolTip="Back (B)" />
-
-                    <!-- Games in progress: glanceable count + your-move dot; opens the resume cards. -->
+                    <!-- Games in progress: pawn with an iOS-style count badge; opens the resume cards. -->
                     <Button x:Name="OngoingTab" Style="{StaticResource IconButton}" Visibility="Collapsed"
-                            Width="44" Height="44" CornerRadius="22" Background="#59000000"
+                            Width="44" Height="44" CornerRadius="22" Background="#59000000" HorizontalAlignment="Left"
                             ToolTipService.ToolTip="Games in progress">
                         <Grid>
                             <TextBlock Text="&#x265F;" FontFamily="Segoe UI Symbol" FontSize="24"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource AccentGreenLightBrush}" />
-                            <Ellipse x:Name="OngoingTabDot" Width="11" Height="11" HorizontalAlignment="Right" VerticalAlignment="Top"
-                                     Margin="0,-3,-3,0" Fill="{StaticResource AccentGreenLightBrush}" Visibility="Collapsed" />
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}" />
+                            <Border x:Name="OngoingBadge" MinWidth="20" Height="20" CornerRadius="10" Padding="5,0"
+                                    HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-6,-6,0"
+                                    Background="{StaticResource AccentGreenLightBrush}">
+                                <TextBlock x:Name="OngoingBadgeCount" Text="0" FontSize="12" FontWeight="Bold"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#0E1207" />
+                            </Border>
                         </Grid>
                         <Button.Flyout>
                             <Flyout Placement="Right">

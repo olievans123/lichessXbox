@@ -220,7 +220,15 @@ namespace LichessXbox
         void UpdateOngoingTab()
         {
             OngoingTab.Visibility = _ongoing.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-            OngoingTabDot.Visibility = _ongoing.Any(g => g.IsMyTurn) ? Visibility.Visible : Visibility.Collapsed;
+            OngoingBadgeCount.Text = _ongoing.Count.ToString();
+            // iOS-style count badge: green (your move somewhere) vs muted (waiting on opponents).
+            bool myTurn = _ongoing.Any(g => g.IsMyTurn);
+            OngoingBadge.Background = myTurn
+                ? (Brush)Application.Current.Resources["AccentGreenLightBrush"]
+                : new SolidColorBrush(Color.FromArgb(0xFF, 0x4D, 0x4A, 0x44));
+            OngoingBadgeCount.Foreground = myTurn
+                ? new SolidColorBrush(Color.FromArgb(0xFF, 0x0E, 0x12, 0x07))
+                : (Brush)Application.Current.Resources["TextPrimaryBrush"];
         }
 
         void OngoingGame_Click(object sender, RoutedEventArgs e)
