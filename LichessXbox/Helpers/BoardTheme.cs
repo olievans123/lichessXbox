@@ -215,9 +215,8 @@ namespace LichessXbox.Helpers
         {
             Native, "cburnett", "alpha", "maestro", "fresca", "cardinal", "staunty",
             "dubrovny", "pixel", "letter", "shapes", "chessnut", "companion", "leipzig",
-            "fantasy", "riohacha", "celtic", "chess7", "kosal", "pirouetti", "reillycraig",
-            "horsey", "anarcandy", "caliente", "cooke", "firi", "rhosgfx",
-            "shahi-ivory-brown", "xkcd",
+            "riohacha", "chess7", "kosal", "pirouetti", "horsey", "anarcandy",
+            "caliente", "firi", "rhosgfx", "shahi-ivory-brown", "xkcd",
         };
 
         // Native is handled by the explicit checks below, so it is never stored here.

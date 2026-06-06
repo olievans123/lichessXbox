@@ -180,8 +180,8 @@
                             Width="44" Height="44" CornerRadius="22" Background="#59000000"
                             ToolTipService.ToolTip="Games in progress">
                         <Grid>
-                            <TextBlock x:Name="OngoingTabCount" Text="0" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}" />
+                            <TextBlock Text="&#x265F;" FontFamily="Segoe UI Symbol" FontSize="24"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource AccentGreenLightBrush}" />
                             <Ellipse x:Name="OngoingTabDot" Width="11" Height="11" HorizontalAlignment="Right" VerticalAlignment="Top"
                                      Margin="0,-3,-3,0" Fill="{StaticResource AccentGreenLightBrush}" Visibility="Collapsed" />
                         </Grid>

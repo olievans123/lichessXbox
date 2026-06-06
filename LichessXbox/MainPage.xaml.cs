@@ -220,7 +220,6 @@ namespace LichessXbox
         void UpdateOngoingTab()
         {
             OngoingTab.Visibility = _ongoing.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-            OngoingTabCount.Text = _ongoing.Count.ToString();
             OngoingTabDot.Visibility = _ongoing.Any(g => g.IsMyTurn) ? Visibility.Visible : Visibility.Collapsed;
         }
 
