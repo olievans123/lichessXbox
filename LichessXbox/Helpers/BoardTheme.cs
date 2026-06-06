@@ -207,14 +207,17 @@ namespace LichessXbox.Helpers
         static readonly string[] Codes = { "wK", "wQ", "wR", "wB", "wN", "wP", "bK", "bQ", "bR", "bB", "bN", "bP" };
 
         /// <summary>Native first, then the lichess sets.</summary>
+        // Curated to sets whose SVGs normalize cleanly: square viewBox, no exotic units. Dropped
+        // ones with mm/pt/% width-height (merida, governor, gioco, tatiana, spatial, mpchess, totoy),
+        // no viewBox (icpieces, disguised, kiwen-suwi), a non-square viewBox (california), or that no
+        // longer exist upstream (mono, monarchy) — they rendered at the wrong size.
         public static readonly string[] All =
         {
-            Native, "cburnett", "merida", "alpha", "maestro", "fresca", "cardinal", "staunty",
-            "governor", "dubrovny", "gioco", "icpieces", "tatiana", "california", "pixel", "mono",
-            "letter", "shapes", "chessnut", "companion", "leipzig", "fantasy", "spatial", "riohacha",
-            "celtic", "chess7", "kosal", "pirouetti", "reillycraig", "horsey", "anarcandy", "caliente",
-            "cooke", "disguised", "firi", "kiwen-suwi", "monarchy", "mpchess", "rhosgfx",
-            "shahi-ivory-brown", "totoy", "xkcd",
+            Native, "cburnett", "alpha", "maestro", "fresca", "cardinal", "staunty",
+            "dubrovny", "pixel", "letter", "shapes", "chessnut", "companion", "leipzig",
+            "fantasy", "riohacha", "celtic", "chess7", "kosal", "pirouetti", "reillycraig",
+            "horsey", "anarcandy", "caliente", "cooke", "firi", "rhosgfx",
+            "shahi-ivory-brown", "xkcd",
         };
 
         // Native is handled by the explicit checks below, so it is never stored here.

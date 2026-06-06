@@ -86,7 +86,7 @@
                                   Foreground="{StaticResource AccentGreenLightBrush}" />
                 </StackPanel>
                 <GridView Grid.Row="3" x:Name="GamesList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Game_ItemClick"
-                          Padding="0,0,0,16" ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                          Padding="0,0,0,16" ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <GridView.ItemTemplate>
                         <DataTemplate>
                             <Border CornerRadius="14" Padding="10" Width="184"
