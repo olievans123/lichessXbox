@@ -287,6 +287,24 @@ namespace LichessXbox.Views
                 row.BlackCurrent = _ply == i + 2;
             }
             MovesEmpty.Visibility = n > 0 ? Visibility.Collapsed : Visibility.Visible;
+            ScrollCurrentMoveIntoView();
+        }
+
+        // Keep the compact move list scrolled to the current move. When a new move comes in the
+        // current ply is the latest, so this lands on the bottom row — the list "keeps up" on its own.
+        void ScrollCurrentMoveIntoView()
+        {
+            int rows = _moveRows.Count;
+            if (rows == 0) { AnalysisMoveScroller.ChangeView(null, 0d, null, true); return; }
+            // Force a layout pass so ExtentHeight/ScrollableHeight reflect the rows just rebuilt.
+            // (The board updates on a Canvas, not via layout, so this won't disturb its animation.)
+            AnalysisMoveScroller.UpdateLayout();
+            double extent = AnalysisMoveScroller.ExtentHeight;
+            if (extent <= 0) return;
+            double rowH = extent / rows;
+            int rowIndex = _ply <= 0 ? 0 : (_ply - 1) / 2;   // the row holding the current ply
+            double target = Math.Min(rowIndex * rowH, AnalysisMoveScroller.ScrollableHeight);
+            AnalysisMoveScroller.ChangeView(null, target, null, true);
         }
 
         // Click a move to jump the board to that position.

@@ -51,7 +51,7 @@
             </Grid.RowDefinitions>
 
             <!-- Header + FEN loader (behind a button) -->
-            <Grid Grid.Row="0" Margin="0,0,0,12">
+            <Grid Grid.Row="0" Margin="0,0,0,10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -82,30 +82,32 @@
                 </Button>
             </Grid>
 
-            <!-- Engine eval -->
-            <Border Grid.Row="1" Style="{StaticResource CardBorder}" Padding="16" Margin="0,0,0,12">
-                <StackPanel Spacing="8">
-                    <Grid>
+            <!-- Engine eval — compact: eval + depth + source toggle on one row, then a 1-line PV.
+                 Kept tight so the opening explorer below gets real, scrollable height. -->
+            <Border Grid.Row="1" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,10">
+                <StackPanel Spacing="6">
+                    <Grid ColumnSpacing="8">
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBlock x:Name="EvalText" Grid.Column="0" Text="—" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold"
-                                   Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                        <ToggleSwitch x:Name="LocalEngineToggle" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                      OffContent="Cloud" OnContent="Local" Toggled="LocalEngine_Toggled" />
+                                   Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                        <TextBlock x:Name="DepthText" Grid.Column="1" Text="" FontSize="{StaticResource CaptionSize}"
+                                   Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                        <ToggleSwitch x:Name="LocalEngineToggle" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                      MinWidth="0" OffContent="Cloud" OnContent="Local" Toggled="LocalEngine_Toggled" />
                     </Grid>
-                    <!-- Fixed 2-line height: the PV grows as the engine deepens; a fixed box keeps
-                         the panel from reflowing (which moved the nav buttons under your cursor). -->
+                    <!-- 1-line PV (ellipsis). Fixed height keeps the panel from reflowing as the engine deepens. -->
                     <TextBlock x:Name="BestLineText" Text="Evaluating…" FontSize="{StaticResource CaptionSize}"
-                               Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap"
-                               Height="42" MaxLines="2" TextTrimming="CharacterEllipsis" VerticalAlignment="Top" />
-                    <TextBlock x:Name="DepthText" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                               Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="NoWrap"
+                               Height="20" MaxLines="1" TextTrimming="CharacterEllipsis" VerticalAlignment="Top" />
                 </StackPanel>
             </Border>
 
             <!-- Navigation -->
-            <Grid Grid.Row="2" ColumnSpacing="6" Margin="0,0,0,12">
+            <Grid Grid.Row="2" ColumnSpacing="6" Margin="0,0,0,10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
@@ -121,10 +123,10 @@
             </Grid>
 
             <!-- Moves: clickable, jump the board to any position (like the Play board) -->
-            <Border Grid.Row="3" Style="{StaticResource CardBorder}" Padding="16" Margin="0,0,0,12">
-                <StackPanel Spacing="8">
+            <Border Grid.Row="3" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,10">
+                <StackPanel Spacing="6">
                     <TextBlock Text="Moves" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                    <Grid Height="84">
+                    <Grid Height="80">
                         <TextBlock x:Name="MovesEmpty" Text="No moves yet." FontSize="{StaticResource CaptionSize}"
                                    Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Top" />
                         <ScrollViewer x:Name="AnalysisMoveScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
@@ -153,7 +155,7 @@
             </Border>
 
             <!-- Opening explorer: fills the remaining height; the list scrolls internally. -->
-            <Border Grid.Row="4" Style="{StaticResource CardBorder}" Padding="16" Margin="0,0,0,12">
+            <Border Grid.Row="4" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,10">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
