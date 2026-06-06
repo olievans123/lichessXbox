@@ -145,7 +145,7 @@
                             <TextBlock Grid.Row="0" Text="Find a human opponent online" Margin="0,0,0,10" FontSize="{StaticResource BodySize}"
                                        FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
                             <GridView Grid.Row="1" x:Name="PresetGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Preset_ItemClick"
-                                      ScrollViewer.VerticalScrollMode="Disabled" ScrollViewer.HorizontalScrollMode="Disabled">
+                                      ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollMode="Disabled">
                                 <GridView.ItemTemplate>
                                     <DataTemplate>
                                         <Border Width="180" Height="92" CornerRadius="14"
@@ -173,7 +173,7 @@
                             <TextBlock Grid.Row="0" Text="Choose a Stockfish level" Margin="0,0,0,10" FontSize="{StaticResource BodySize}"
                                        FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
                             <GridView Grid.Row="1" x:Name="LevelGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Ai_ItemClick"
-                                      ScrollViewer.VerticalScrollMode="Disabled" ScrollViewer.HorizontalScrollMode="Disabled">
+                                      ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollMode="Disabled">
                                 <GridView.ItemTemplate>
                                     <DataTemplate>
                                         <Border Width="108" Height="96" CornerRadius="16"
