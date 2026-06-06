@@ -62,8 +62,28 @@ namespace LichessXbox.Views
             }
             finally { Busy.IsActive = false; Busy.Visibility = Visibility.Collapsed; }
 
+            await LoadInProgressAsync();
             await LoadRatingAsync(account.Username);
             await LoadFollowingAsync();
+        }
+
+        // Live games you can resume, shown at the top of the page (also reachable from the
+        // your-move dot in the menu). The reliable home for in-progress games.
+        async System.Threading.Tasks.Task LoadInProgressAsync()
+        {
+            try
+            {
+                var ongoing = await AppState.Current.Api.GetOngoingGamesAsync();
+                InProgressList.ItemsSource = ongoing;
+                InProgressSection.Visibility = (ongoing != null && ongoing.Count > 0) ? Visibility.Visible : Visibility.Collapsed;
+            }
+            catch { InProgressSection.Visibility = Visibility.Collapsed; }
+        }
+
+        void Resume_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            if (e.ClickedItem is OngoingGame g && !string.IsNullOrEmpty(g.GameId))
+                ((Window.Current.Content as Frame)?.Content as MainPage)?.OpenGame(g.GameId);
         }
 
         async System.Threading.Tasks.Task LoadRatingAsync(string username)

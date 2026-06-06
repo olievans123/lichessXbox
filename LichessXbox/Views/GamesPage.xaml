@@ -30,18 +30,62 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Text="Your games" FontSize="{StaticResource TitleSize}" FontWeight="Bold"
+
+                <!-- In progress: live games you can resume (shown only when you have some). The
+                     home for in-progress games, so they're not hidden behind a floating overlay. -->
+                <StackPanel Grid.Row="0" x:Name="InProgressSection" Spacing="10" Margin="0,0,0,20" Visibility="Collapsed">
+                    <TextBlock Text="In progress" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                    <ListView x:Name="InProgressList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Resume_ItemClick"
+                              ScrollViewer.HorizontalScrollMode="Enabled" ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                              ScrollViewer.VerticalScrollMode="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsStackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="14" Padding="10" Width="248" Margin="0,0,4,0"
+                                        Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
+                                    <Grid ColumnSpacing="12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Grid.Column="0" Width="76" Height="76" CornerRadius="8">
+                                            <controls:ChessBoardControl Fen="{Binding Fen}" WhiteAtBottom="{Binding WhiteAtBottom}"
+                                                                        Interactive="False" IsTabStop="False" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <Ellipse Width="10" Height="10" VerticalAlignment="Center" Fill="{StaticResource AccentGreenLightBrush}"
+                                                         Opacity="{Binding IsMyTurn, Converter={StaticResource BoolToOpacity}}" />
+                                                <TextBlock Text="{Binding OpponentName}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
+                                                           Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding TypeText}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding TurnText}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+
+                <TextBlock Grid.Row="1" Text="Your games" FontSize="{StaticResource TitleSize}" FontWeight="Bold"
                            Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,14" />
-                <StackPanel Grid.Row="1" Spacing="12" Margin="0,0,0,10">
+                <StackPanel Grid.Row="2" Spacing="12" Margin="0,0,0,10">
                     <TextBlock x:Name="NoGames" Text="No games yet." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
                     <Button x:Name="RetryGamesButton" Style="{StaticResource TileButton}" Click="Retry_Click"
                             Content="Refresh" HorizontalAlignment="Left" HorizontalContentAlignment="Center" MinWidth="160" Visibility="Collapsed" />
                     <ProgressRing x:Name="Busy" IsActive="False" Visibility="Collapsed" Width="34" Height="34" HorizontalAlignment="Left"
                                   Foreground="{StaticResource AccentGreenLightBrush}" />
                 </StackPanel>
-                <GridView Grid.Row="2" x:Name="GamesList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Game_ItemClick"
+                <GridView Grid.Row="3" x:Name="GamesList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Game_ItemClick"
                           Padding="0,0,0,16" ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <GridView.ItemTemplate>
                         <DataTemplate>

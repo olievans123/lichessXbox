@@ -4,25 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:LichessXbox.Controls">
 
-    <Page.Resources>
-        <!-- Slide + fade the "continue playing" cards in from the right when expanding. -->
-        <Storyboard x:Key="OngoingPanelOpen">
-            <DoubleAnimation Storyboard.TargetName="OngoingPanel" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.18" />
-            <DoubleAnimation Storyboard.TargetName="OngoingPanelTransform" Storyboard.TargetProperty="X" From="44" To="0" Duration="0:0:0.24">
-                <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut" /></DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-        </Storyboard>
-        <Storyboard x:Key="OngoingPanelClose">
-            <DoubleAnimation Storyboard.TargetName="OngoingPanel" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.16" />
-            <DoubleAnimation Storyboard.TargetName="OngoingPanelTransform" Storyboard.TargetProperty="X" From="0" To="44" Duration="0:0:0.16">
-                <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseIn" /></DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-        </Storyboard>
-        <Storyboard x:Key="OngoingTabIn">
-            <DoubleAnimation Storyboard.TargetName="OngoingTab" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.16" />
-        </Storyboard>
-    </Page.Resources>
-
     <Grid>
         <Grid.Background>
             <StaticResource ResourceKey="HeroGradientBrush" />
@@ -121,9 +102,13 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="28" />
                                     <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="📋" FontFamily="Segoe UI Emoji" HorizontalAlignment="Center" />
                                 <TextBlock Grid.Column="1" Text="Games" Margin="8,0,0,0" />
+                                <!-- Lit when it's your move in a game in progress. -->
+                                <Ellipse Grid.Column="2" x:Name="GamesNavDot" Width="12" Height="12" Margin="8,0,2,0" VerticalAlignment="Center"
+                                         Fill="{StaticResource AccentGreenLightBrush}" Visibility="Collapsed" />
                             </Grid>
                         </Button>
                         <Button Style="{StaticResource NavButton}" Tag="profile" Click="Nav_Click">
@@ -188,6 +173,13 @@
                         FontFamily="Segoe MDL2 Assets" FontSize="18"
                         Content="&#xE700;" ToolTipService.ToolTip="Menu (Menu button)" />
 
+                <!-- Your-move hint: a glanceable green dot on the menu button, on every page,
+                     never over content. Open the menu to find the game (Games is dotted too). -->
+                <Ellipse x:Name="MenuMoveDot" Grid.Column="0" Width="13" Height="13"
+                         HorizontalAlignment="Center" VerticalAlignment="Top" Margin="26,8,0,0"
+                         Fill="{StaticResource AccentGreenLightBrush}" Visibility="Collapsed"
+                         IsHitTestVisible="False" />
+
                 <!-- Back: appears when there's somewhere to return to (also the B button). -->
                 <Button x:Name="BackButton" Grid.Column="0" Click="Back_Click"
                         Style="{StaticResource IconButton}"
@@ -199,76 +191,6 @@
 
                 <Frame x:Name="ContentFrame" Grid.Column="1" />
 
-                <!-- "Continue playing": collapsed to a small tab on the right edge by default so it
-                     isn't always over the content; selecting it expands the in-progress game cards. -->
-                <Button x:Name="OngoingTab" Grid.Column="1" Visibility="Collapsed" Style="{StaticResource TileButton}"
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,24,16"
-                        Background="{StaticResource AppSurfaceBrush}" Padding="14,10" HorizontalContentAlignment="Center"
-                        Click="ExpandOngoing_Click" ToolTipService.ToolTip="Games in progress">
-                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                        <TextBlock Text="◂" FontSize="14" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
-                        <Ellipse x:Name="OngoingTabDot" Width="10" Height="10" VerticalAlignment="Center"
-                                 Fill="{StaticResource AccentGreenLightBrush}" Visibility="Collapsed" />
-                        <TextBlock Text="♟" FontFamily="Segoe UI Symbol" FontSize="18" VerticalAlignment="Center"
-                                   Foreground="{StaticResource AccentGreenLightBrush}" />
-                        <TextBlock x:Name="OngoingTabCount" Text="0" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
-                                   VerticalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}" />
-                    </StackPanel>
-                </Button>
-
-                <Border x:Name="OngoingPanel" Grid.Column="1" Visibility="Collapsed"
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,24,16" MaxWidth="320"
-                        CornerRadius="18" Padding="14,12" Background="{StaticResource AppSurfaceBrush}"
-                        BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1" RenderTransformOrigin="1,1">
-                    <Border.RenderTransform>
-                        <TranslateTransform x:Name="OngoingPanelTransform" />
-                    </Border.RenderTransform>
-                    <StackPanel Spacing="10">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Continue playing" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
-                                       VerticalAlignment="Center" Foreground="{StaticResource AccentGreenLightBrush}" />
-                            <Button Grid.Column="1" x:Name="OngoingCollapseButton" Style="{StaticResource IconButton}"
-                                    Width="32" Height="32" CornerRadius="16" Background="{StaticResource AppSurfaceHighBrush}"
-                                    FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" Content="▸"
-                                    Click="CollapseOngoing_Click" ToolTipService.ToolTip="Collapse" />
-                        </Grid>
-                        <ItemsControl x:Name="OngoingList">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Button Style="{StaticResource TileButton}" Padding="10" Margin="0,0,0,8"
-                                            HorizontalContentAlignment="Left" Tag="{Binding GameId}" Click="OngoingGame_Click">
-                                        <Grid ColumnSpacing="12">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <Border Grid.Column="0" Width="76" Height="76" CornerRadius="8">
-                                                <controls:ChessBoardControl Fen="{Binding Fen}" WhiteAtBottom="{Binding WhiteAtBottom}"
-                                                                            Interactive="False" IsTabStop="False" />
-                                            </Border>
-                                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3" Margin="0,0,4,0">
-                                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                                    <Ellipse Width="10" Height="10" VerticalAlignment="Center" Fill="{StaticResource AccentGreenLightBrush}"
-                                                             Opacity="{Binding IsMyTurn, Converter={StaticResource BoolToOpacity}}" />
-                                                    <TextBlock Text="{Binding OpponentName}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
-                                                               Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
-                                                </StackPanel>
-                                                <TextBlock Text="{Binding TypeText}" FontSize="{StaticResource CaptionSize}" TextTrimming="CharacterEllipsis"
-                                                           Foreground="{StaticResource TextSecondaryBrush}" />
-                                                <TextBlock Text="{Binding TurnText}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
-                                                           Foreground="{StaticResource TextSecondaryBrush}" />
-                                            </StackPanel>
-                                        </Grid>
-                                    </Button>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </Border>
             </Grid>
         </SplitView>
     </Grid>
