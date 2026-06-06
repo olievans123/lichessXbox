@@ -37,152 +37,177 @@
         <WebView x:Name="EngineWeb" Grid.Column="0" Width="1" Height="1" Opacity="0"
                  IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Top" />
 
-        <!-- Side panel -->
-        <ScrollViewer Grid.Column="2" Margin="20,0,0,0" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-            <StackPanel Spacing="12" Padding="0,0,10,16">
-                <StackPanel Spacing="2">
+        <!-- Side panel: a height-filling grid. Fixed rows up top, then the explorer STRETCHES to
+             fill the rest so the panel reaches the bottom edge cleanly — no overflow off the bottom,
+             no dead strip. The FEN loader is tucked behind the header button to keep it compact. -->
+        <Grid Grid.Column="2" Margin="20,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Header + FEN loader (behind a button) -->
+            <Grid Grid.Row="0" Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Spacing="2">
                     <TextBlock Text="Analysis" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
                     <TextBlock x:Name="PlayersText" Visibility="Collapsed" FontSize="{StaticResource CaptionSize}"
                                Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
                     <TextBlock x:Name="OpeningNameText" Visibility="Collapsed" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
                                Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
                 </StackPanel>
+                <Button Grid.Column="1" Style="{StaticResource IconButton}" Width="44" Height="44" CornerRadius="22"
+                        VerticalAlignment="Top" Background="{StaticResource AppSurfaceHighBrush}"
+                        FontFamily="Segoe MDL2 Assets" FontSize="18" Content="&#xE8E5;"
+                        ToolTipService.ToolTip="Load position (FEN)">
+                    <Button.Flyout>
+                        <Flyout>
+                            <StackPanel Width="300" Spacing="10">
+                                <TextBlock Text="Load position (FEN)" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                                <TextBox x:Name="FenBox" FontSize="{StaticResource CaptionSize}" Height="52" VerticalContentAlignment="Center"
+                                         PlaceholderText="Paste a FEN…" />
+                                <Button Style="{StaticResource PrimaryButton}" Click="LoadFen_Click" Content="Load" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                <Button Style="{StaticResource TileButton}" Click="StartPos_Click" Content="Start position" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                            </StackPanel>
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
+            </Grid>
 
-                <!-- Engine eval -->
-                <Border Style="{StaticResource CardBorder}" Padding="16">
-                    <StackPanel Spacing="8">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock x:Name="EvalText" Grid.Column="0" Text="—" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold"
-                                       Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                            <ToggleSwitch x:Name="LocalEngineToggle" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                          OffContent="Cloud" OnContent="Local" Toggled="LocalEngine_Toggled" />
-                        </Grid>
-                        <!-- Fixed 2-line height: the PV grows as the engine deepens; a fixed box keeps
-                             the panel from reflowing (which moved the nav buttons under your cursor). -->
-                        <TextBlock x:Name="BestLineText" Text="Evaluating…" FontSize="{StaticResource CaptionSize}"
-                                   Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap"
-                                   Height="42" MaxLines="2" TextTrimming="CharacterEllipsis" VerticalAlignment="Top" />
-                        <TextBlock x:Name="DepthText" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                    </StackPanel>
-                </Border>
+            <!-- Engine eval -->
+            <Border Grid.Row="1" Style="{StaticResource CardBorder}" Padding="16" Margin="0,0,0,12">
+                <StackPanel Spacing="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock x:Name="EvalText" Grid.Column="0" Text="—" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold"
+                                   Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                        <ToggleSwitch x:Name="LocalEngineToggle" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                      OffContent="Cloud" OnContent="Local" Toggled="LocalEngine_Toggled" />
+                    </Grid>
+                    <!-- Fixed 2-line height: the PV grows as the engine deepens; a fixed box keeps
+                         the panel from reflowing (which moved the nav buttons under your cursor). -->
+                    <TextBlock x:Name="BestLineText" Text="Evaluating…" FontSize="{StaticResource CaptionSize}"
+                               Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap"
+                               Height="42" MaxLines="2" TextTrimming="CharacterEllipsis" VerticalAlignment="Top" />
+                    <TextBlock x:Name="DepthText" Text="" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                </StackPanel>
+            </Border>
 
-                <!-- Navigation -->
-                <Grid ColumnSpacing="6">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Style="{StaticResource TileButton}" Click="First_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE892;" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                    <Button Grid.Column="1" x:Name="BackButton" Style="{StaticResource TileButton}" Click="Back_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE76B;" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                    <Button Grid.Column="2" Style="{StaticResource TileButton}" Click="Forward_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE76C;" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                    <Button Grid.Column="3" Style="{StaticResource TileButton}" Click="Last_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE893;" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                    <Button Grid.Column="4" Style="{StaticResource TileButton}" Click="Flip_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE8AB;" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                </Grid>
+            <!-- Navigation -->
+            <Grid Grid.Row="2" ColumnSpacing="6" Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Style="{StaticResource TileButton}" Click="First_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE892;" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                <Button Grid.Column="1" x:Name="BackButton" Style="{StaticResource TileButton}" Click="Back_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE76B;" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                <Button Grid.Column="2" Style="{StaticResource TileButton}" Click="Forward_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE76C;" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                <Button Grid.Column="3" Style="{StaticResource TileButton}" Click="Last_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE893;" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                <Button Grid.Column="4" Style="{StaticResource TileButton}" Click="Flip_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE8AB;" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+            </Grid>
 
-                <!-- Moves: clickable, jump the board to any position (like the Play board) -->
-                <Border x:Name="MovesCard" Style="{StaticResource CardBorder}" Padding="16" Visibility="Collapsed">
-                    <StackPanel Spacing="8">
-                        <TextBlock Text="Moves" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                        <ScrollViewer x:Name="AnalysisMoveScroller" MaxHeight="200" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-                            <ItemsControl x:Name="AnalysisMoveRows">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid Padding="0,1" ColumnSpacing="6">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="30" />
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="{Binding No}" FontSize="{StaticResource CaptionSize}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
-                                            <Button Grid.Column="1" Style="{StaticResource MoveButton}" Tag="{Binding WhitePly}" Click="Move_Click"
-                                                    Content="{Binding White}" Foreground="{Binding WhiteCurrent, Converter={StaticResource CurrentMoveBrush}}" />
-                                            <Button Grid.Column="2" Style="{StaticResource MoveButton}" Tag="{Binding BlackPly}" Click="Move_Click"
-                                                    Content="{Binding Black}" Foreground="{Binding BlackCurrent, Converter={StaticResource CurrentMoveBrush}}"
-                                                    Visibility="{Binding BlackVisible}" />
-                                        </Grid>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-                    </StackPanel>
-                </Border>
+            <!-- Moves: clickable, jump the board to any position (like the Play board) -->
+            <Border x:Name="MovesCard" Grid.Row="3" Style="{StaticResource CardBorder}" Padding="16" Margin="0,0,0,12" Visibility="Collapsed">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Moves" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                    <ScrollViewer x:Name="AnalysisMoveScroller" MaxHeight="180" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+                        <ItemsControl x:Name="AnalysisMoveRows">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Padding="0,1" ColumnSpacing="6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="30" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding No}" FontSize="{StaticResource CaptionSize}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
+                                        <Button Grid.Column="1" Style="{StaticResource MoveButton}" Tag="{Binding WhitePly}" Click="Move_Click"
+                                                Content="{Binding White}" Foreground="{Binding WhiteCurrent, Converter={StaticResource CurrentMoveBrush}}" />
+                                        <Button Grid.Column="2" Style="{StaticResource MoveButton}" Tag="{Binding BlackPly}" Click="Move_Click"
+                                                Content="{Binding Black}" Foreground="{Binding BlackCurrent, Converter={StaticResource CurrentMoveBrush}}"
+                                                Visibility="{Binding BlackVisible}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </StackPanel>
+            </Border>
 
-                <!-- Opening explorer -->
-                <Border Style="{StaticResource CardBorder}" Padding="16">
-                    <StackPanel Spacing="10">
+            <!-- Opening explorer: stretches to fill the remaining height; the list scrolls inside. -->
+            <Border Grid.Row="4" Style="{StaticResource CardBorder}" Padding="16">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Spacing="6" Margin="0,0,0,8">
                         <TextBlock x:Name="OpeningText" Text="Opening explorer" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                    Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
                         <TextBlock x:Name="ExplorerEmpty" Text="No opening data for this position." FontSize="{StaticResource CaptionSize}"
                                    Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
-                        <ListView x:Name="ExplorerList" SelectionMode="None" IsItemClickEnabled="True"
-                                  ItemClick="Explorer_ItemClick" MaxHeight="240">
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid Padding="4,8">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="70" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="{Binding San}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
-                                                   Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
-                                        <StackPanel Grid.Column="1" Spacing="4">
-                                            <TextBlock Text="{Binding Stats}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                                            <StackPanel Orientation="Horizontal" Height="14">
-                                                <Border Width="{Binding BarWhite}" Background="#EFEADF" CornerRadius="3,0,0,3" />
-                                                <Border Width="{Binding BarDraw}" Background="#8A8470" />
-                                                <Border Width="{Binding BarBlack}" Background="#3A352B" CornerRadius="0,3,3,0" />
-                                            </StackPanel>
+                    </StackPanel>
+                    <ListView Grid.Row="1" x:Name="ExplorerList" SelectionMode="None" IsItemClickEnabled="True"
+                              ItemClick="Explorer_ItemClick">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="4,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="70" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="{Binding San}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                                    <StackPanel Grid.Column="1" Spacing="4">
+                                        <TextBlock Text="{Binding Stats}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
+                                        <StackPanel Orientation="Horizontal" Height="14">
+                                            <Border Width="{Binding BarWhite}" Background="#EFEADF" CornerRadius="3,0,0,3" />
+                                            <Border Width="{Binding BarDraw}" Background="#8A8470" />
+                                            <Border Width="{Binding BarBlack}" Background="#3A352B" CornerRadius="0,3,3,0" />
                                         </StackPanel>
-                                    </Grid>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-                    </StackPanel>
-                </Border>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </Border>
 
-                <!-- Tablebase -->
-                <Border x:Name="TablebaseCard" Style="{StaticResource CardBorder}" Padding="16" Visibility="Collapsed">
-                    <StackPanel Spacing="10">
-                        <TextBlock x:Name="TablebaseSummary" Text="Tablebase" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
-                                   Foreground="{StaticResource AccentGreenLightBrush}" />
-                        <ListView x:Name="TablebaseList" SelectionMode="None" IsItemClickEnabled="True"
-                                  ItemClick="Tablebase_ItemClick" MaxHeight="160">
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid Padding="4,6">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="{Binding San}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
-                                        <TextBlock Grid.Column="1" Text="{Binding Outcome}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextAlignment="Right" TextTrimming="CharacterEllipsis" />
-                                    </Grid>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-                    </StackPanel>
-                </Border>
-
-                <!-- FEN import -->
-                <Border Style="{StaticResource CardBorder}" Padding="16">
-                    <StackPanel Spacing="10">
-                        <TextBlock Text="Load position (FEN)" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                        <TextBox x:Name="FenBox" FontSize="{StaticResource CaptionSize}" Height="52" VerticalContentAlignment="Center"
-                                 PlaceholderText="Paste a FEN…" />
-                        <StackPanel Spacing="10">
-                            <Button Style="{StaticResource PrimaryButton}" Click="LoadFen_Click" Content="Load" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                            <Button Style="{StaticResource TileButton}" Click="StartPos_Click" Content="Start position" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                        </StackPanel>
-                    </StackPanel>
-                </Border>
-            </StackPanel>
-        </ScrollViewer>
+            <!-- Tablebase (appears in endgames, below the explorer) -->
+            <Border x:Name="TablebaseCard" Grid.Row="5" Style="{StaticResource CardBorder}" Padding="16" Margin="0,12,0,0" Visibility="Collapsed">
+                <StackPanel Spacing="10">
+                    <TextBlock x:Name="TablebaseSummary" Text="Tablebase" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
+                               Foreground="{StaticResource AccentGreenLightBrush}" />
+                    <ListView x:Name="TablebaseList" SelectionMode="None" IsItemClickEnabled="True"
+                              ItemClick="Tablebase_ItemClick" MaxHeight="160">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="4,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="{Binding San}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Outcome}" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextAlignment="Right" TextTrimming="CharacterEllipsis" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </Page>
