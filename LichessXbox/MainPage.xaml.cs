@@ -86,11 +86,6 @@ namespace LichessXbox
 
         // ----------------------------------------------------- back navigation
 
-        void Back_Click(object sender, RoutedEventArgs e)
-        {
-            if (ContentFrame.CanGoBack) ContentFrame.GoBack();
-        }
-
         // The gamepad B button (and the system back chrome) route here.
         void OnBackRequested(object sender, BackRequestedEventArgs e)
         {
@@ -104,7 +99,6 @@ namespace LichessXbox
         {
             _currentTag = TagForPage(e.SourcePageType);
             HighlightNav(_currentTag);
-            BackButton.Visibility = ContentFrame.CanGoBack ? Visibility.Visible : Visibility.Collapsed;
             _ = RefreshOngoingAsync();
         }
 
@@ -171,9 +165,6 @@ namespace LichessXbox
             // A top-level menu/section switch is lateral navigation (the menu IS the nav), so it
             // leaves no Back trail. Only contextual drill-ins (e.g. a game -> analysis) keep one.
             if (!drillIn) ContentFrame.BackStack.Clear();
-            // ContentFrame_Navigated (fired during Navigate) already synced state; refresh the Back
-            // button now that the stack may have been cleared.
-            BackButton.Visibility = ContentFrame.CanGoBack ? Visibility.Visible : Visibility.Collapsed;
         }
 
         // ----------------------------------------------------- in-progress games
