@@ -16,7 +16,7 @@
                 <TextBlock Text="Settings" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
                 <TextBlock Text="Board theme" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                <GridView x:Name="ThemeGrid" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Theme_ItemClick">
+                <GridView x:Name="ThemeGrid" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Theme_ItemClick" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                     <GridView.ItemTemplate>
                         <DataTemplate>
                             <Border Width="138" Height="104" CornerRadius="14"
@@ -47,7 +47,7 @@
                            FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
                 <GridView x:Name="PieceGrid" SelectionMode="Single" IsItemClickEnabled="True"
                           ItemClick="PieceSet_ItemClick" SelectionChanged="PieceSet_SelectionChanged"
-                          GotFocus="PieceGrid_GotFocus">
+                          GotFocus="PieceGrid_GotFocus" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                     <GridView.ItemTemplate>
                         <DataTemplate>
                             <Border Width="128" Height="100" CornerRadius="14"

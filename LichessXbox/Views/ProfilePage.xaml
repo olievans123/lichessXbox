@@ -119,7 +119,7 @@
             <TextBlock x:Name="NoRatings" Text="No rated games yet." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
             <TextBlock Text="Select a rating to see your games and rating graph." FontSize="{StaticResource CaptionSize}"
                        Foreground="{StaticResource TextSecondaryBrush}" />
-            <GridView x:Name="RatingsGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Rating_ItemClick">
+            <GridView x:Name="RatingsGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Rating_ItemClick" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                 <GridView.ItemTemplate>
                     <DataTemplate>
                         <Border Width="150" Height="100" CornerRadius="16"

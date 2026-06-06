@@ -20,7 +20,7 @@
                 <TextBlock Text="Tournaments" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
                 <TextBlock Text="Live and upcoming arenas on Lichess." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
             </StackPanel>
-            <ListView Grid.Row="1" x:Name="TournamentList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Tournament_ItemClick">
+            <ListView Grid.Row="1" x:Name="TournamentList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Tournament_ItemClick" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Border CornerRadius="12" Padding="18,14"
@@ -66,7 +66,7 @@
                 <!-- Informational only: clickable (so a gamepad can focus + scroll it) but never
                      "selected", so no persistent green selection ring lingers on a row. -->
                 <ListView Grid.Row="2" x:Name="StandingsList" SelectionMode="None" IsItemClickEnabled="True"
-                          Padding="0,0,0,12" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                          Padding="0,0,0,12" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid Padding="2,8">

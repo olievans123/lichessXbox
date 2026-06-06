@@ -161,7 +161,7 @@
                                    Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
                     </StackPanel>
                     <ListView Grid.Row="1" x:Name="ExplorerList" SelectionMode="None" IsItemClickEnabled="True"
-                              ItemClick="Explorer_ItemClick">
+                              ItemClick="Explorer_ItemClick" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Padding="4,8">
@@ -192,7 +192,7 @@
                     <TextBlock x:Name="TablebaseSummary" Text="Tablebase" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                Foreground="{StaticResource AccentGreenLightBrush}" />
                     <ListView x:Name="TablebaseList" SelectionMode="None" IsItemClickEnabled="True"
-                              ItemClick="Tablebase_ItemClick" MaxHeight="160">
+                              ItemClick="Tablebase_ItemClick" MaxHeight="160" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Padding="4,6">
