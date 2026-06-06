@@ -482,7 +482,10 @@ namespace LichessXbox.Controls
             if (src == null) return null;
             if (!_svgCache.TryGetValue(src.AbsoluteUri, out var img))
             {
-                img = new SvgImageSource(src);
+                // Pin a fixed square raster so a set's declared size (merida's "50mm", california's
+                // non-square viewBox, alpha's 2048…) can't make pieces render at inconsistent sizes —
+                // every piece normalizes to the same box and the viewBox maps into it.
+                img = new SvgImageSource(src) { RasterizePixelWidth = 256, RasterizePixelHeight = 256 };
                 _svgCache[src.AbsoluteUri] = img;
             }
             return img;

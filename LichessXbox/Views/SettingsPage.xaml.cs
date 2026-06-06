@@ -79,7 +79,9 @@ namespace LichessXbox.Views
             if (await PieceSets.EnsurePreviewAsync(item.Name))
             {
                 var uri = PieceSets.PreviewUriFor(item.Name);
-                if (uri != null) item.Preview = new SvgImageSource(uri);
+                // Fixed square raster so every set's thumbnail normalizes to the same size,
+                // regardless of the SVG's declared width/height/viewBox.
+                if (uri != null) item.Preview = new SvgImageSource(uri) { RasterizePixelWidth = 256, RasterizePixelHeight = 256 };
             }
         }
 

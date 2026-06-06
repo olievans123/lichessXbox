@@ -56,10 +56,10 @@
                                     <Grid Height="48">
                                         <TextBlock Text="♞" FontFamily="Segoe UI Symbol" FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Center"
                                                    Foreground="{StaticResource TextPrimaryBrush}" Visibility="{Binding GlyphVisibility}" />
-                                        <!-- Viewbox scales each set's SVG (which have differing intrinsic sizes) uniformly into the box. -->
-                                        <Viewbox MaxWidth="44" MaxHeight="44" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                            <Image Source="{Binding Preview}" Stretch="Uniform" />
-                                        </Viewbox>
+                                        <!-- Fixed-size image (not a Viewbox-by-intrinsic-size): the SVG fills a
+                                             consistent 44x44 box regardless of its declared width/height. -->
+                                        <Image Source="{Binding Preview}" Width="44" Height="44" Stretch="Uniform"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
                                     </Grid>
                                     <TextBlock Text="{Binding Name}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold" TextAlignment="Center"
                                                TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis" Foreground="{StaticResource TextPrimaryBrush}" />
