@@ -37,18 +37,11 @@
         <WebView x:Name="EngineWeb" Grid.Column="0" Width="1" Height="1" Opacity="0"
                  IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Top" />
 
-        <!-- Side panel: a height-filling grid. Fixed rows up top, then the explorer STRETCHES to
-             fill the rest so the panel reaches the bottom edge cleanly — no overflow off the bottom,
-             no dead strip. The FEN loader is tucked behind the header button to keep it compact. -->
-        <Grid Grid.Column="2" Margin="20,0,0,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+        <!-- Side panel: scrolls so everything is reachable (no cutoff). Moves is a fixed-height box;
+             the opening explorer sizes to its content and the panel scrolls down to it. The FEN
+             loader stays behind the header button. -->
+        <ScrollViewer Grid.Column="2" Margin="20,0,0,0" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+            <StackPanel Spacing="0" Padding="0,0,8,16">
 
             <!-- Header + FEN loader (behind a button) -->
             <Grid Grid.Row="0" Margin="0,0,0,12">
@@ -123,7 +116,7 @@
             <Border x:Name="MovesCard" Grid.Row="3" Style="{StaticResource CardBorder}" Padding="16" Margin="0,0,0,12" Visibility="Collapsed">
                 <StackPanel Spacing="8">
                     <TextBlock Text="Moves" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                    <ScrollViewer x:Name="AnalysisMoveScroller" MaxHeight="180" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+                    <ScrollViewer x:Name="AnalysisMoveScroller" Height="150" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
                         <ItemsControl x:Name="AnalysisMoveRows">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -147,21 +140,16 @@
                 </StackPanel>
             </Border>
 
-            <!-- Opening explorer: stretches to fill the remaining height; the list scrolls inside. -->
-            <Border Grid.Row="4" Style="{StaticResource CardBorder}" Padding="16">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    <StackPanel Grid.Row="0" Spacing="6" Margin="0,0,0,8">
-                        <TextBlock x:Name="OpeningText" Text="Opening explorer" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
-                                   Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
-                        <TextBlock x:Name="ExplorerEmpty" Text="No opening data for this position." FontSize="{StaticResource CaptionSize}"
-                                   Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
-                    </StackPanel>
-                    <ListView Grid.Row="1" x:Name="ExplorerList" SelectionMode="None" IsItemClickEnabled="True"
-                              ItemClick="Explorer_ItemClick" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+            <!-- Opening explorer: sizes to its content; scroll the panel to reach it all. -->
+            <Border Style="{StaticResource CardBorder}" Padding="16" Margin="0,0,0,12">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="OpeningText" Text="Opening explorer" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
+                               Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
+                    <TextBlock x:Name="ExplorerEmpty" Text="No opening data for this position." FontSize="{StaticResource CaptionSize}"
+                               Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
+                    <ListView x:Name="ExplorerList" SelectionMode="None" IsItemClickEnabled="True"
+                              ItemClick="Explorer_ItemClick" ScrollViewer.VerticalScrollMode="Disabled"
+                              ScrollViewer.VerticalScrollBarVisibility="Disabled">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Padding="4,8">
@@ -183,7 +171,7 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
-                </Grid>
+                </StackPanel>
             </Border>
 
             <!-- Tablebase (appears in endgames, below the explorer) -->
@@ -208,6 +196,7 @@
                     </ListView>
                 </StackPanel>
             </Border>
-        </Grid>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>

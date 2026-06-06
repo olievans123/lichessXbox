@@ -102,13 +102,9 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="28" />
                                     <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="📋" FontFamily="Segoe UI Emoji" HorizontalAlignment="Center" />
                                 <TextBlock Grid.Column="1" Text="Games" Margin="8,0,0,0" />
-                                <!-- Lit when it's your move in a game in progress. -->
-                                <Ellipse Grid.Column="2" x:Name="GamesNavDot" Width="12" Height="12" Margin="8,0,2,0" VerticalAlignment="Center"
-                                         Fill="{StaticResource AccentGreenLightBrush}" Visibility="Collapsed" />
                             </Grid>
                         </Button>
                         <Button Style="{StaticResource NavButton}" Tag="profile" Click="Nav_Click">
@@ -165,29 +161,71 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <Button x:Name="MenuButton" Grid.Column="0" Click="ToggleNav_Click"
-                        Style="{StaticResource IconButton}"
-                        VerticalAlignment="Top" HorizontalAlignment="Center"
-                        Width="44" Height="44" Margin="0,12,0,0" CornerRadius="22"
-                        Background="#59000000"
-                        FontFamily="Segoe MDL2 Assets" FontSize="18"
-                        Content="&#xE700;" ToolTipService.ToolTip="Menu (Menu button)" />
+                <!-- Gutter stack: hamburger, then Back (when applicable), then the games-in-progress
+                     tab — so the tab sits just below the hamburger, with Back above it when present.
+                     A vertical StackPanel so a collapsed Back closes the gap automatically. -->
+                <StackPanel Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,12,0,0" Spacing="10">
+                    <Button x:Name="MenuButton" Click="ToggleNav_Click" Style="{StaticResource IconButton}"
+                            Width="44" Height="44" CornerRadius="22" Background="#59000000"
+                            FontFamily="Segoe MDL2 Assets" FontSize="18"
+                            Content="&#xE700;" ToolTipService.ToolTip="Menu (Menu button)" />
 
-                <!-- Your-move hint: a glanceable green dot on the menu button, on every page,
-                     never over content. Open the menu to find the game (Games is dotted too). -->
-                <Ellipse x:Name="MenuMoveDot" Grid.Column="0" Width="13" Height="13"
-                         HorizontalAlignment="Center" VerticalAlignment="Top" Margin="26,8,0,0"
-                         Fill="{StaticResource AccentGreenLightBrush}" Visibility="Collapsed"
-                         IsHitTestVisible="False" />
+                    <Button x:Name="BackButton" Click="Back_Click" Style="{StaticResource IconButton}"
+                            Width="44" Height="44" CornerRadius="22" Background="#59000000"
+                            FontFamily="Segoe MDL2 Assets" FontSize="16"
+                            Content="&#xE72B;" Visibility="Collapsed" ToolTipService.ToolTip="Back (B)" />
 
-                <!-- Back: appears when there's somewhere to return to (also the B button). -->
-                <Button x:Name="BackButton" Grid.Column="0" Click="Back_Click"
-                        Style="{StaticResource IconButton}"
-                        VerticalAlignment="Top" HorizontalAlignment="Center"
-                        Width="44" Height="44" Margin="0,64,0,0" CornerRadius="22"
-                        Background="#59000000"
-                        FontFamily="Segoe MDL2 Assets" FontSize="16"
-                        Content="&#xE72B;" Visibility="Collapsed" ToolTipService.ToolTip="Back (B)" />
+                    <!-- Games in progress: glanceable count + your-move dot; opens the resume cards. -->
+                    <Button x:Name="OngoingTab" Style="{StaticResource IconButton}" Visibility="Collapsed"
+                            Width="44" Height="44" CornerRadius="22" Background="#59000000"
+                            ToolTipService.ToolTip="Games in progress">
+                        <Grid>
+                            <TextBlock x:Name="OngoingTabCount" Text="0" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}" />
+                            <Ellipse x:Name="OngoingTabDot" Width="11" Height="11" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                     Margin="0,-3,-3,0" Fill="{StaticResource AccentGreenLightBrush}" Visibility="Collapsed" />
+                        </Grid>
+                        <Button.Flyout>
+                            <Flyout Placement="Right">
+                                <StackPanel Width="320" Spacing="10">
+                                    <TextBlock Text="Continue playing" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
+                                               Foreground="{StaticResource AccentGreenLightBrush}" />
+                                    <ItemsControl x:Name="OngoingList">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button Style="{StaticResource TileButton}" Padding="10" Margin="0,0,0,8"
+                                                        HorizontalContentAlignment="Left" Tag="{Binding GameId}" Click="OngoingGame_Click">
+                                                    <Grid ColumnSpacing="12">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Border Grid.Column="0" Width="72" Height="72" CornerRadius="8">
+                                                            <controls:ChessBoardControl Fen="{Binding Fen}" WhiteAtBottom="{Binding WhiteAtBottom}"
+                                                                                        Interactive="False" IsTabStop="False" />
+                                                        </Border>
+                                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3" Margin="0,0,4,0">
+                                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                                <Ellipse Width="10" Height="10" VerticalAlignment="Center" Fill="{StaticResource AccentGreenLightBrush}"
+                                                                         Opacity="{Binding IsMyTurn, Converter={StaticResource BoolToOpacity}}" />
+                                                                <TextBlock Text="{Binding OpponentName}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
+                                                                           Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                                                            </StackPanel>
+                                                            <TextBlock Text="{Binding TypeText}" FontSize="{StaticResource CaptionSize}" TextTrimming="CharacterEllipsis"
+                                                                       Foreground="{StaticResource TextSecondaryBrush}" />
+                                                            <TextBlock Text="{Binding TurnText}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
+                                                                       Foreground="{StaticResource TextSecondaryBrush}" />
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                </StackPanel>
 
                 <Frame x:Name="ContentFrame" Grid.Column="1" />
 

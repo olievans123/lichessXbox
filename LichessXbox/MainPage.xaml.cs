@@ -28,6 +28,7 @@ namespace LichessXbox
         {
             this.InitializeComponent();
             this.KeyDown += Page_KeyDown;
+            OngoingList.ItemsSource = _ongoing;   // resume cards in the gutter tab's flyout
             // Keep nav state in sync on every navigation (forward AND Back); drive the Back button.
             ContentFrame.Navigated += ContentFrame_Navigated;
             SystemNavigationManager.GetForCurrentView().BackRequested += OnBackRequested;
@@ -184,7 +185,7 @@ namespace LichessXbox
             if (!AppState.Current.IsSignedIn)
             {
                 if (_ongoing.Count > 0) _ongoing.Clear();
-                UpdateMoveDots();
+                UpdateOngoingTab();
                 return;
             }
             if (_refreshingOngoing) return;   // a refresh is already in flight
@@ -211,17 +212,23 @@ namespace LichessXbox
                 _ongoing.Clear();
                 foreach (var g in games) _ongoing.Add(g);
             }
-            UpdateMoveDots();
+            UpdateOngoingTab();
         }
 
-        // A glanceable green dot on the menu button AND the Games entry whenever it's your move
-        // in a game in progress — visible on every page, never over content. The in-progress
-        // games themselves live on the Games page (open the menu → Games).
-        void UpdateMoveDots()
+        // The gutter games tab: shown when there are games in progress, with the count and a
+        // your-move dot. Tapping it opens the resume cards (its flyout) on any page.
+        void UpdateOngoingTab()
         {
-            var vis = _ongoing.Any(g => g.IsMyTurn) ? Visibility.Visible : Visibility.Collapsed;
-            MenuMoveDot.Visibility = vis;
-            GamesNavDot.Visibility = vis;
+            OngoingTab.Visibility = _ongoing.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            OngoingTabCount.Text = _ongoing.Count.ToString();
+            OngoingTabDot.Visibility = _ongoing.Any(g => g.IsMyTurn) ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        void OngoingGame_Click(object sender, RoutedEventArgs e)
+        {
+            OngoingTab.Flyout?.Hide();
+            if ((sender as FrameworkElement)?.Tag is string gameId && !string.IsNullOrEmpty(gameId))
+                OpenGame(gameId);
         }
 
         /// <summary>Resume a specific in-progress game on the Play page.</summary>
