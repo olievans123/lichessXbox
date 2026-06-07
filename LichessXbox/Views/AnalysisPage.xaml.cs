@@ -32,6 +32,7 @@ namespace LichessXbox.Views
         LocalEngine _engine;
         bool _useLocalEngine;
         bool _engineToggleReady;   // gates LocalEngine_Toggled until the page is loaded
+        bool _showEngine;          // engine (Local toggle, or cloud-miss fallback) is the eval source
         string _whiteName, _blackName;
 
         public AnalysisPage()
@@ -42,8 +43,9 @@ namespace LichessXbox.Views
             AnalysisMoveRows.ItemsSource = _moveRows;
             Board.MoveRequested += Board_MoveRequested;
             this.KeyDown += Page_KeyDown;
-            // Default to the local Stockfish engine; the user can flip to the cloud eval.
-            LocalEngineToggle.IsOn = true;
+            // Default to the cloud eval; it falls back to the local Stockfish engine automatically
+            // whenever the cloud has no evaluation for the position.
+            LocalEngineToggle.IsOn = false;
             this.Loaded += (s, e) =>
             {
                 _engineToggleReady = true;
@@ -116,14 +118,15 @@ namespace LichessXbox.Views
             _analysisCts = cts;
             string fen = pos.ToFen();
 
-            // Engine eval: local Stockfish if enabled, otherwise the cloud.
-            if (_useLocalEngine && _engine != null)
+            // Eval source: cloud first (instant for known positions), otherwise the local engine.
+            // When the cloud has nothing cached — or the user picked Local — fall back to Stockfish.
+            if (_useLocalEngine)
             {
-                BestLineText.Text = _engine.IsReady ? "Analysing locally…" : "Starting engine…";
-                _engine.Analyze(pos);   // results stream back via OnEngineInfo
+                StartLocalAnalysis(pos);
             }
             else
             {
+                _showEngine = false;
                 try
                 {
                     var eval = await AppState.Current.Api.GetCloudEvalAsync(fen, pos.WhiteToMove);
@@ -137,17 +140,13 @@ namespace LichessXbox.Views
                     }
                     else
                     {
-                        EvalText.Text = "—";
-                        BestLineText.Text = "No cloud evaluation for this position.";
-                        SetEvalBar(0);
+                        StartLocalAnalysis(pos);   // no cloud eval cached → analyse locally
                     }
                 }
                 catch
                 {
                     if (cts.IsCancellationRequested) return;
-                    EvalText.Text = "—";
-                    BestLineText.Text = "Engine unavailable offline.";
-                    SetEvalBar(0);
+                    StartLocalAnalysis(pos);   // cloud unreachable → local
                 }
             }
 
@@ -315,18 +314,29 @@ namespace LichessXbox.Views
             }
         }
 
+        // Run the local Stockfish engine on this position (booting it on first use). Used both for
+        // the Local toggle and as the automatic fallback when the cloud has no eval.
+        void StartLocalAnalysis(ChessPosition pos)
+        {
+            EnsureEngine();
+            _showEngine = true;
+            EvalText.Text = "…";
+            BestLineText.Text = _engine.IsReady ? "Analysing locally…" : "Starting engine…";
+            _engine.Analyze(pos);
+        }
+
         // The engine boots asynchronously inside the WebView; once it's up, analyse the
         // position the user is currently looking at (the first toggle-on lands here).
         void OnEngineReady(bool ready)
         {
-            if (!ready || !_useLocalEngine || _engine == null) return;
+            if (!ready || !_showEngine || _engine == null) return;
             BestLineText.Text = "Analysing locally…";
             _engine.Analyze(Current);
         }
 
         void OnEngineInfo(int depth, string evalText, string pvSan, string bestUci)
         {
-            if (!_useLocalEngine) return;
+            if (!_showEngine) return;
             EvalText.Text = evalText;
             if (!string.IsNullOrEmpty(pvSan)) BestLineText.Text = pvSan;
             SetEvalBar(AdvantageFromEval(evalText));
