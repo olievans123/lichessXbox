@@ -67,6 +67,12 @@
                      "selected", so no persistent green selection ring lingers on a row. -->
                 <ListView Grid.Row="2" x:Name="StandingsList" SelectionMode="None" IsItemClickEnabled="True"
                           Padding="0,0,0,12" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                    <!-- Read-only standings: focusable for gamepad scrolling, but no focus ring (nothing to click). -->
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="UseSystemFocusVisuals" Value="False" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid Padding="2,8">

@@ -51,7 +51,7 @@
             </Grid.RowDefinitions>
 
             <!-- Header + FEN loader (behind a button) -->
-            <Grid Grid.Row="0" Margin="0,0,0,10">
+            <Grid Grid.Row="0" Margin="0,0,0,8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -84,7 +84,7 @@
 
             <!-- Engine eval — compact: eval + depth + source toggle on one row, then a 1-line PV.
                  Kept tight so the opening explorer below gets real, scrollable height. -->
-            <Border Grid.Row="1" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,10">
+            <Border Grid.Row="1" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,8">
                 <StackPanel Spacing="6">
                     <Grid ColumnSpacing="8">
                         <Grid.ColumnDefinitions>
@@ -107,7 +107,7 @@
             </Border>
 
             <!-- Navigation -->
-            <Grid Grid.Row="2" ColumnSpacing="6" Margin="0,0,0,10">
+            <Grid Grid.Row="2" ColumnSpacing="6" Margin="0,0,0,8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
@@ -115,18 +115,18 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Style="{StaticResource TileButton}" Click="First_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE892;" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                <Button Grid.Column="1" x:Name="BackButton" Style="{StaticResource TileButton}" Click="Back_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE76B;" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                <Button Grid.Column="2" Style="{StaticResource TileButton}" Click="Forward_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE76C;" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                <Button Grid.Column="3" Style="{StaticResource TileButton}" Click="Last_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE893;" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                <Button Grid.Column="4" Style="{StaticResource TileButton}" Click="Flip_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE8AB;" Padding="0,14" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                <Button Grid.Column="0" Style="{StaticResource TileButton}" Click="First_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE892;" Padding="0,10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                <Button Grid.Column="1" x:Name="BackButton" Style="{StaticResource TileButton}" Click="Back_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE76B;" Padding="0,10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                <Button Grid.Column="2" Style="{StaticResource TileButton}" Click="Forward_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE76C;" Padding="0,10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                <Button Grid.Column="3" Style="{StaticResource TileButton}" Click="Last_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE893;" Padding="0,10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                <Button Grid.Column="4" Style="{StaticResource TileButton}" Click="Flip_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE8AB;" Padding="0,10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
             </Grid>
 
             <!-- Moves: clickable, jump the board to any position (like the Play board) -->
-            <Border Grid.Row="3" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,10">
+            <Border Grid.Row="3" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,8">
                 <StackPanel Spacing="6">
                     <TextBlock Text="Moves" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                    <Grid Height="80">
+                    <Grid Height="44">
                         <TextBlock x:Name="MovesEmpty" Text="No moves yet." FontSize="{StaticResource CaptionSize}"
                                    Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Top" />
                         <ScrollViewer x:Name="AnalysisMoveScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
@@ -155,7 +155,7 @@
             </Border>
 
             <!-- Opening explorer: fills the remaining height; the list scrolls internally. -->
-            <Border Grid.Row="4" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,10">
+            <Border Grid.Row="4" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,8">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -169,6 +169,14 @@
                     </StackPanel>
                     <ListView Grid.Row="1" x:Name="ExplorerList" SelectionMode="None" IsItemClickEnabled="True"
                               ItemClick="Explorer_ItemClick" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                        <!-- Soft, thin focus outline (not the heavy green reveal ring) for these clickable rows. -->
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="FocusVisualPrimaryBrush" Value="#59EFEADF" />
+                                <Setter Property="FocusVisualSecondaryBrush" Value="Transparent" />
+                                <Setter Property="FocusVisualPrimaryThickness" Value="1" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Padding="4,8">
@@ -200,6 +208,13 @@
                                Foreground="{StaticResource AccentGreenLightBrush}" />
                     <ListView x:Name="TablebaseList" SelectionMode="None" IsItemClickEnabled="True"
                               ItemClick="Tablebase_ItemClick" MaxHeight="160" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="FocusVisualPrimaryBrush" Value="#59EFEADF" />
+                                <Setter Property="FocusVisualSecondaryBrush" Value="Transparent" />
+                                <Setter Property="FocusVisualPrimaryThickness" Value="1" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Padding="4,6">

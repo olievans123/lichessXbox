@@ -15,8 +15,10 @@
             <controls:ChessBoardControl x:Name="Board" Interactive="True" />
         </Viewbox>
 
-        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-        <StackPanel Margin="24,0,0,0" Padding="0,0,10,16" Spacing="10" VerticalAlignment="Top">
+        <!-- A fixed control panel meant to fit on one screen: no visible bar (Hidden), but still
+             focus-scrollable as a safety net for the tallest state (themed + a result + retry). -->
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollMode="Disabled">
+        <StackPanel Margin="24,0,0,0" Padding="0,0,8,10" Spacing="8" VerticalAlignment="Top">
             <TextBlock Text="Puzzles" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
             <!-- Stacked (not a 3-wide row) so the labels never clip in the narrow sidebar. -->
@@ -42,8 +44,8 @@
                 </StackPanel>
             </Border>
 
-            <Border Style="{StaticResource CardBorder}" Padding="16">
-                <StackPanel Spacing="10">
+            <Border Style="{StaticResource CardBorder}" Padding="12">
+                <StackPanel Spacing="8">
                     <TextBlock x:Name="ToMoveText" Text="" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                Foreground="{StaticResource AccentGreenLightBrush}" />
                     <TextBlock x:Name="HintText" Text="Find the best move." FontSize="{StaticResource BodySize}"
@@ -55,7 +57,7 @@
                 </StackPanel>
             </Border>
 
-            <Border x:Name="ResultCard" Style="{StaticResource CardBorder}" Padding="16" Visibility="Collapsed">
+            <Border x:Name="ResultCard" Style="{StaticResource CardBorder}" Padding="12" Visibility="Collapsed">
                 <TextBlock x:Name="ResultText" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
             </Border>
 
@@ -64,7 +66,7 @@
             <Button x:Name="RetryButton" Style="{StaticResource TileButton}" Click="Retry_Click"
                     Content="Retry" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Visibility="Collapsed" />
 
-            <ProgressRing x:Name="Busy" IsActive="False" Width="36" Height="36"
+            <ProgressRing x:Name="Busy" IsActive="False" Width="28" Height="28"
                           Foreground="{StaticResource AccentGreenLightBrush}" HorizontalAlignment="Left" />
         </StackPanel>
         </ScrollViewer>
