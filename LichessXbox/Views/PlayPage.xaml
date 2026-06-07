@@ -146,7 +146,7 @@
                                 <TextBlock Text="Find a human opponent online" FontSize="{StaticResource BodySize}"
                                            FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
                                 <TextBlock FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap"
-                                           Text="Lichess only quick-pairs Rapid, Classical &amp; Correspondence through its API — Bullet &amp; Blitz can't be paired from apps." />
+                                           Text="Lichess only quick-pairs Rapid, Classical &amp; Correspondence through its API. For Bullet &amp; Blitz, use Challenge a friend." />
                             </StackPanel>
                             <GridView Grid.Row="1" x:Name="PresetGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Preset_ItemClick"
                                       ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollMode="Disabled">
@@ -202,10 +202,49 @@
                             <TextBox x:Name="FriendBox" PlaceholderText="Lichess username" Width="420" Height="56" HorizontalAlignment="Left"
                                      FontSize="{StaticResource BodySize}" VerticalContentAlignment="Center"
                                      FocusVisualPrimaryBrush="{StaticResource AccentGreenLightBrush}" />
+                            <!-- Time control: challenges allow any speed, so Bullet & Blitz work here. -->
+                            <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                                <TextBlock Text="Time control" FontSize="{StaticResource CaptionSize}"
+                                           Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                                <Button x:Name="FriendClockButton" Style="{StaticResource TileButton}" Padding="14,8">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock x:Name="FriendClockText" Text="Blitz 5+3" VerticalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}" />
+                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE70D;" FontSize="12" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
+                                    </StackPanel>
+                                    <Button.Flyout>
+                                        <Flyout x:Name="FriendClockFlyout" Placement="Top">
+                                            <Flyout.FlyoutPresenterStyle>
+                                                <Style TargetType="FlyoutPresenter">
+                                                    <Setter Property="Background" Value="{StaticResource AppSurfaceBrush}" />
+                                                    <Setter Property="BorderBrush" Value="{StaticResource HairlineBrush}" />
+                                                    <Setter Property="CornerRadius" Value="16" />
+                                                    <Setter Property="Padding" Value="16" />
+                                                    <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled" />
+                                                </Style>
+                                            </Flyout.FlyoutPresenterStyle>
+                                            <GridView x:Name="FriendClockGrid" SelectionMode="Single" IsItemClickEnabled="True"
+                                                      ItemClick="FriendClock_ItemClick" MaxWidth="384" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                                <GridView.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border Width="116" Height="76" CornerRadius="14"
+                                                                Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
+                                                            <StackPanel VerticalAlignment="Center" Spacing="2">
+                                                                <TextBlock Text="{Binding Glyph}" FontSize="18" HorizontalAlignment="Center" />
+                                                                <TextBlock Text="{Binding Label}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold" TextAlignment="Center"
+                                                                           Foreground="{StaticResource TextPrimaryBrush}" />
+                                                            </StackPanel>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </GridView.ItemTemplate>
+                                            </GridView>
+                                        </Flyout>
+                                    </Button.Flyout>
+                                </Button>
+                            </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
                                 <Button x:Name="ChallengeButton" Style="{StaticResource PrimaryButton}" Click="Challenge_Click"
                                         Content="Send challenge" MinWidth="200" />
-                                <TextBlock Text="Blitz 5+3 · casual" FontSize="{StaticResource CaptionSize}"
+                                <TextBlock Text="Casual" FontSize="{StaticResource CaptionSize}"
                                            Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
                             </StackPanel>
                             <TextBlock x:Name="ChallengeErrorText" Visibility="Collapsed" TextWrapping="Wrap"

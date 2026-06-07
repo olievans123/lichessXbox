@@ -53,6 +53,18 @@ namespace LichessXbox.Models
             new TimeControlPreset("Daily 3", 0, 0, "📅", true, 3),
             new TimeControlPreset("Daily 7", 0, 0, "📅", true, 7),
         };
+
+        // Challenging a specific player (the /api/challenge endpoint) allows every speed, so a
+        // friend game CAN be Bullet or Blitz. Casual, so it's easy to accept.
+        public static List<TimeControlPreset> ChallengeClocks => new List<TimeControlPreset>
+        {
+            new TimeControlPreset("Bullet 1+0", 60, 0, "🚀", false),
+            new TimeControlPreset("Bullet 2+1", 120, 1, "🚀", false),
+            new TimeControlPreset("Blitz 3+2", 180, 2, "⚡", false),
+            new TimeControlPreset("Blitz 5+3", 300, 3, "⚡", false),
+            new TimeControlPreset("Rapid 10+0", 600, 0, "🐎", false),
+            new TimeControlPreset("Classical 30+20", 1800, 20, "🏛", false),
+        };
     }
 
     /// <summary>An incoming challenge from another player (shown in the lobby inbox).</summary>

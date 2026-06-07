@@ -51,6 +51,7 @@ namespace LichessXbox.Views
         int _gameClockLimitSec = 300, _gameClockIncSec = 3, _gameDays;
         bool _gameRated;
         string _gameVariantKey = "standard";
+        TimeControlPreset _friendClock;   // chosen time control for a friend challenge (any speed)
         readonly DispatcherTimer _clockTimer = new DispatcherTimer();
 
         long _whiteMs, _blackMs;
@@ -71,6 +72,12 @@ namespace LichessXbox.Views
             this.InitializeComponent();
             foreach (var p in TimeControlPreset.Defaults) _presets.Add(p);
             PresetGrid.ItemsSource = _presets;
+
+            // Friend challenges allow any speed (Bullet/Blitz included); default to Blitz 5+3.
+            var friendClocks = TimeControlPreset.ChallengeClocks;
+            FriendClockGrid.ItemsSource = friendClocks;
+            _friendClock = friendClocks[3];
+            FriendClockGrid.SelectedIndex = 3;
 
             var levels = new List<AiLevel>();
             for (int i = 1; i <= 8; i++) levels.Add(new AiLevel(i));
@@ -261,8 +268,8 @@ namespace LichessXbox.Views
         {
             string user = FriendBox.Text?.Trim();
             if (string.IsNullOrEmpty(user)) return;
-            // Default to a Blitz 5+3 challenge.
-            var clock = new TimeControlPreset("Blitz 5+3", 300, 3, "⚡");
+            // Use the time control the player picked (Bullet/Blitz/Rapid/Classical — all allowed for challenges).
+            var clock = _friendClock ?? new TimeControlPreset("Blitz 5+3", 300, 3, "⚡", false);
             ChallengeErrorText.Visibility = Visibility.Collapsed;
             _autoOpen = true;
             SeekingText.Text = $"Waiting for {user} to accept…";
@@ -314,6 +321,16 @@ namespace LichessXbox.Views
                 VariantValueText.Text = v.Name;
                 VariantNote.Visibility = v.Key == "standard" ? Visibility.Collapsed : Visibility.Visible;
                 VariantFlyout.Hide();
+            }
+        }
+
+        void FriendClock_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            if (e.ClickedItem is TimeControlPreset c)
+            {
+                _friendClock = c;
+                FriendClockText.Text = c.Label;
+                FriendClockFlyout.Hide();
             }
         }
 
