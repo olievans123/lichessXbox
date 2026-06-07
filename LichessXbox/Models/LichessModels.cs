@@ -38,12 +38,15 @@ namespace LichessXbox.Models
             Label = label; ClockLimitSeconds = limit; ClockIncrementSeconds = inc; Glyph = glyph; Rated = rated; Days = days;
         }
 
+        // Online quick-pairing goes through the Lichess Board API seek, which only matches Rapid,
+        // Classical and Correspondence — Lichess blocks Bullet/Blitz for third-party apps. So these
+        // are the full set of time controls that can actually be paired online.
         public static List<TimeControlPreset> Defaults => new List<TimeControlPreset>
         {
-            new TimeControlPreset("Bullet 1+0", 60, 0, "🚀"),
-            new TimeControlPreset("Blitz 3+2", 180, 2, "⚡"),
-            new TimeControlPreset("Blitz 5+3", 300, 3, "⚡"),
+            new TimeControlPreset("Rapid 10+0", 600, 0, "🐎"),
             new TimeControlPreset("Rapid 10+5", 600, 5, "🐎"),
+            new TimeControlPreset("Rapid 15+10", 900, 10, "🐎"),
+            new TimeControlPreset("Classical 30+0", 1800, 0, "🏛"),
             new TimeControlPreset("Classical 30+20", 1800, 20, "🏛"),
             new TimeControlPreset("Casual 10+0", 600, 0, "🎲", false),
             new TimeControlPreset("Daily 1", 0, 0, "📅", true, 1),

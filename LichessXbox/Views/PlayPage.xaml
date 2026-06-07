@@ -142,8 +142,12 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Text="Find a human opponent online" Margin="0,0,0,10" FontSize="{StaticResource BodySize}"
-                                       FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                            <StackPanel Grid.Row="0" Margin="0,0,0,10" Spacing="3">
+                                <TextBlock Text="Find a human opponent online" FontSize="{StaticResource BodySize}"
+                                           FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
+                                <TextBlock FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap"
+                                           Text="Lichess only quick-pairs Rapid, Classical &amp; Correspondence through its API — Bullet &amp; Blitz can't be paired from apps." />
+                            </StackPanel>
                             <GridView Grid.Row="1" x:Name="PresetGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Preset_ItemClick"
                                       ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollMode="Disabled">
                                 <GridView.ItemTemplate>
