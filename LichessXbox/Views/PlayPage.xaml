@@ -149,7 +149,7 @@
                                            Text="Lichess only quick-pairs Rapid, Classical &amp; Correspondence through its API. For Bullet &amp; Blitz, use Challenge a friend." />
                             </StackPanel>
                             <GridView Grid.Row="1" x:Name="PresetGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Preset_ItemClick"
-                                      ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollMode="Disabled">
+                                      ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollMode="Disabled">
                                 <GridView.ItemTemplate>
                                     <DataTemplate>
                                         <Border Width="180" Height="92" CornerRadius="14"
