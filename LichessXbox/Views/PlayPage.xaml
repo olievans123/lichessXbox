@@ -199,7 +199,7 @@
                         <StackPanel x:Name="FriendPanel" Spacing="14" Visibility="Collapsed">
                             <TextBlock Text="Challenge a Lichess player" FontSize="{StaticResource BodySize}"
                                        FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                            <TextBox x:Name="FriendBox" PlaceholderText="Lichess username" Width="420" Height="48" HorizontalAlignment="Left"
+                            <TextBox x:Name="FriendBox" PlaceholderText="Lichess username" Width="420" Height="56" HorizontalAlignment="Left"
                                      FontSize="{StaticResource BodySize}" VerticalContentAlignment="Center"
                                      FocusVisualPrimaryBrush="{StaticResource AccentGreenLightBrush}" />
                             <!-- Time control: challenges allow any speed, so Bullet & Blitz work here. -->
@@ -369,7 +369,7 @@
             <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
             <StackPanel Margin="20,0,0,0" Spacing="8">
                 <!-- Opponent (top) -->
-                <Border Style="{StaticResource CardBorder}" Padding="12">
+                <Border Style="{StaticResource CardBorder}" Padding="12,8">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -443,7 +443,7 @@
                 </Border>
 
                 <!-- You (bottom) -->
-                <Border Style="{StaticResource CardBorder}" Padding="12">
+                <Border Style="{StaticResource CardBorder}" Padding="12,8">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />

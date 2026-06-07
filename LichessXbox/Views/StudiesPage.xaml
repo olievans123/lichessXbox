@@ -12,10 +12,10 @@
                        FontSize="{StaticResource BodySize}" Foreground="{StaticResource TextSecondaryBrush}" />
 
             <StackPanel Orientation="Horizontal" Spacing="14">
-                <TextBox x:Name="UserBox" PlaceholderText="Lichess username" Width="280" Height="52"
+                <TextBox x:Name="UserBox" PlaceholderText="Lichess username" Width="280" Height="60"
                          FontSize="{StaticResource BodySize}" VerticalContentAlignment="Center" />
                 <Button x:Name="LoadButton" Style="{StaticResource PrimaryButton}" Click="Load_Click"
-                        Content="Find studies" MinWidth="180" Height="52" VerticalAlignment="Center" />
+                        Content="Find studies" MinWidth="180" Height="60" VerticalAlignment="Center" />
             </StackPanel>
 
             <ProgressRing x:Name="Busy" IsActive="False" Width="36" Height="36" HorizontalAlignment="Left"
