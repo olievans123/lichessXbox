@@ -768,12 +768,28 @@ namespace LichessXbox.Views
                 row.WhiteCurrent = _viewPly == i + 1;
                 row.BlackCurrent = _viewPly == i + 2;
             }
-            // Keep the latest move visible while watching live.
-            if (_viewPly >= _plies.Count)
-            {
-                MoveScroller.UpdateLayout();
-                MoveScroller.ChangeView(null, MoveScroller.ScrollableHeight, null);
-            }
+            // Keep the current move visible — scroll up when stepping back, down when following live.
+            ScrollCurrentMoveIntoView();
+        }
+
+        // Bring the row holding the current ply into the fixed move box (only scrolls if it's off-screen).
+        void ScrollCurrentMoveIntoView()
+        {
+            int rows = _moveRows.Count;
+            if (rows == 0) return;
+            MoveScroller.UpdateLayout();
+            double extent = MoveScroller.ExtentHeight;
+            if (extent <= 0) return;
+            double rowH = extent / rows;
+            int rowIndex = _viewPly <= 0 ? 0 : (_viewPly - 1) / 2;   // row that holds the current ply
+            double rowTop = rowIndex * rowH;
+            double viewTop = MoveScroller.VerticalOffset;
+            double viewport = MoveScroller.ViewportHeight;
+            double target;
+            if (rowTop < viewTop) target = rowTop;                                          // above the view → scroll up
+            else if (rowTop + rowH > viewTop + viewport) target = rowTop + rowH - viewport;  // below the view → scroll down
+            else return;                                                                     // already visible
+            MoveScroller.ChangeView(null, Math.Max(0d, Math.Min(target, MoveScroller.ScrollableHeight)), null, true);
         }
 
         // ------------------------------------------------------- move navigation
