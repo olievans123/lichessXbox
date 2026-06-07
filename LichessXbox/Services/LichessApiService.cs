@@ -315,6 +315,32 @@ namespace LichessXbox.Services
             using (await SendBufferedAsync(req)) { }
         }
 
+        /// <summary>Incoming challenges (the "in" list of /api/challenge) for the app-wide gutter tab.</summary>
+        public async Task<System.Collections.Generic.List<IncomingChallenge>> GetIncomingChallengesAsync()
+        {
+            var list = new System.Collections.Generic.List<IncomingChallenge>();
+            using (var req = Build(HttpMethod.Get, "/api/challenge"))
+            using (var resp = await SendBufferedAsync(req))
+            {
+                if (!resp.IsSuccessStatusCode) return list;
+                var o = JObject.Parse(await resp.Content.ReadAsStringAsync());
+                foreach (var c in o["in"] as JArray ?? new JArray())
+                {
+                    string id = c.Value<string>("id");
+                    if (string.IsNullOrEmpty(id)) continue;
+                    string name = c["challenger"]?.Value<string>("name") ?? "Someone";
+                    string speed = c.Value<string>("speed") ?? c["variant"]?.Value<string>("name") ?? "Challenge";
+                    string tc = c["timeControl"]?.Value<string>("show");
+                    bool rated = c.Value<bool?>("rated") ?? false;
+                    string desc = char.ToUpperInvariant(speed[0]) + speed.Substring(1);
+                    if (!string.IsNullOrEmpty(tc)) desc += " · " + tc;
+                    desc += rated ? " · rated" : " · casual";
+                    list.Add(new IncomingChallenge { Id = id, ChallengerName = name, Description = desc });
+                }
+            }
+            return list;
+        }
+
         // ------------------------------------------------------------ puzzles
 
         public Task<PuzzleInfo> GetDailyPuzzleAsync() => GetPuzzleAsync("/api/puzzle/daily");

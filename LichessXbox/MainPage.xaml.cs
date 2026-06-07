@@ -22,6 +22,7 @@ namespace LichessXbox
         string _pendingAnalysisParam;
         string _currentTag = "home";
         readonly ObservableCollection<OngoingGame> _ongoing = new ObservableCollection<OngoingGame>();
+        readonly ObservableCollection<IncomingChallenge> _challenges = new ObservableCollection<IncomingChallenge>();
         readonly DispatcherTimer _ongoingTimer = new DispatcherTimer();
 
         public MainPage()
@@ -29,6 +30,7 @@ namespace LichessXbox
             this.InitializeComponent();
             this.KeyDown += Page_KeyDown;
             OngoingList.ItemsSource = _ongoing;   // resume cards in the gutter tab's flyout
+            ChallengeList.ItemsSource = _challenges;   // incoming-challenge cards in the challenge tab's flyout
             // Keep nav state in sync on every navigation (forward AND Back); drive the Back button.
             ContentFrame.Navigated += ContentFrame_Navigated;
             SystemNavigationManager.GetForCurrentView().BackRequested += OnBackRequested;
@@ -176,7 +178,9 @@ namespace LichessXbox
             if (!AppState.Current.IsSignedIn)
             {
                 if (_ongoing.Count > 0) _ongoing.Clear();
+                if (_challenges.Count > 0) _challenges.Clear();
                 UpdateOngoingTab();
+                UpdateChallengeTab();
                 return;
             }
             if (_refreshingOngoing) return;   // a refresh is already in flight
@@ -187,23 +191,42 @@ namespace LichessXbox
 
         async Task RefreshOngoingCoreAsync()
         {
-            List<OngoingGame> games;
+            List<OngoingGame> games = null;
             try { games = await AppState.Current.Api.GetOngoingGamesAsync(); }
-            catch { return; }
-
+            catch { }
             // Only rebuild the cards when something actually changed, so the board snapshots
             // don't re-render (flicker) on every refresh.
-            bool same = games.Count == _ongoing.Count;
-            if (same)
-                for (int i = 0; i < games.Count; i++)
-                    if (games[i].GameId != _ongoing[i].GameId || games[i].IsMyTurn != _ongoing[i].IsMyTurn || games[i].Fen != _ongoing[i].Fen)
-                    { same = false; break; }
-            if (!same)
+            if (games != null)
             {
-                _ongoing.Clear();
-                foreach (var g in games) _ongoing.Add(g);
+                bool same = games.Count == _ongoing.Count;
+                if (same)
+                    for (int i = 0; i < games.Count; i++)
+                        if (games[i].GameId != _ongoing[i].GameId || games[i].IsMyTurn != _ongoing[i].IsMyTurn || games[i].Fen != _ongoing[i].Fen)
+                        { same = false; break; }
+                if (!same)
+                {
+                    _ongoing.Clear();
+                    foreach (var g in games) _ongoing.Add(g);
+                }
             }
             UpdateOngoingTab();
+
+            // Incoming challenges → the gutter challenge tab (independent of the ongoing fetch).
+            try
+            {
+                var challenges = await AppState.Current.Api.GetIncomingChallengesAsync();
+                bool same = challenges.Count == _challenges.Count;
+                if (same)
+                    for (int i = 0; i < challenges.Count; i++)
+                        if (challenges[i].Id != _challenges[i].Id) { same = false; break; }
+                if (!same)
+                {
+                    _challenges.Clear();
+                    foreach (var c in challenges) _challenges.Add(c);
+                }
+            }
+            catch { }
+            UpdateChallengeTab();
         }
 
         // The gutter games tab: shown when there are games in progress, with the count and a
@@ -236,6 +259,34 @@ namespace LichessXbox
             ContentFrame.Navigate(typeof(PlayPage), gameId);
             _currentTag = "play";
             HighlightNav("play");
+        }
+
+        // The gutter challenge tab: shown when there are incoming challenges AND we're not on the
+        // Play page (which surfaces its own challenge banner in real time).
+        void UpdateChallengeTab()
+        {
+            ChallengeTab.Visibility = _challenges.Count > 0 && _currentTag != "play"
+                ? Visibility.Visible : Visibility.Collapsed;
+            ChallengeBadgeCount.Text = _challenges.Count.ToString();
+        }
+
+        async void AcceptChallenge_Click(object sender, RoutedEventArgs e)
+        {
+            ChallengeTab.Flyout?.Hide();
+            if ((sender as FrameworkElement)?.Tag is string id && !string.IsNullOrEmpty(id))
+            {
+                try { await AppState.Current.Api.AcceptChallengeAsync(id); } catch { }
+                await RefreshOngoingAsync();   // the accepted game surfaces in the games-in-progress tab
+            }
+        }
+
+        async void DeclineChallenge_Click(object sender, RoutedEventArgs e)
+        {
+            if ((sender as FrameworkElement)?.Tag is string id && !string.IsNullOrEmpty(id))
+            {
+                try { await AppState.Current.Api.DeclineChallengeAsync(id); } catch { }
+                await RefreshOngoingAsync();
+            }
         }
 
         /// <summary>Marks the active nav button green and resets the rest.</summary>
