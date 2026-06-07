@@ -24,14 +24,24 @@ namespace LichessXbox
             this.UnhandledException += async (s, e) =>
             {
                 e.Handled = true;
+                var full = e.Exception != null ? e.Exception.ToString() : e.Message;
+                try { await LogErrorAsync(full); } catch { }
                 try
                 {
-                    var msg = e.Exception != null ? e.Exception.ToString() : e.Message;
-                    if (msg != null && msg.Length > 1200) msg = msg.Substring(0, 1200);
+                    var msg = full != null && full.Length > 1200 ? full.Substring(0, 1200) : full;
                     await new Windows.UI.Popups.MessageDialog(msg, "Unexpected error").ShowAsync();
                 }
                 catch { /* dialog itself failed — nothing more we can do */ }
             };
+        }
+
+        // Append unhandled exceptions to LocalState/error.log so they can be pulled off the device
+        // afterwards (Windows Device Portal → filesystem) — Release builds drop Debug output.
+        static async System.Threading.Tasks.Task LogErrorAsync(string text)
+        {
+            var folder = Windows.Storage.ApplicationData.Current.LocalFolder;
+            var file = await folder.CreateFileAsync("error.log", Windows.Storage.CreationCollisionOption.OpenIfExists);
+            await Windows.Storage.FileIO.AppendTextAsync(file, "==== " + DateTimeOffset.Now.ToString("u") + " ====\n" + text + "\n\n");
         }
 
         protected override void OnLaunched(LaunchActivatedEventArgs e)

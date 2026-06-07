@@ -137,6 +137,18 @@ namespace LichessXbox.Views
                 BuildStartPosition();
                 SetupBoard();
             }
+            catch (Exception)
+            {
+                // A fetch/parse failure must never escape as an unhandled exception (it would crash the
+                // page). Fall back to the same "couldn't load" state with a working Retry (re-fetches).
+                _puzzle = null;
+                HintText.Text = "Couldn't load a puzzle.";
+                Board.Interactive = false;
+                ResultText.Text = "Couldn't load a puzzle. Check your connection and retry.";
+                ResultCard.Visibility = Visibility.Visible;
+                RetryButton.Visibility = Visibility.Visible;
+                RetryButton.Focus(FocusState.Programmatic);
+            }
             finally { Busy.IsActive = false; }
         }
 
