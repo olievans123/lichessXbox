@@ -503,14 +503,18 @@
                             FontFamily="Segoe MDL2 Assets" FontSize="18" Content="&#xE7A7;"
                             HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTipService.ToolTip="Takeback" />
                 </Grid>
-                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
-                    <Button x:Name="RematchButton" Style="{StaticResource PrimaryButton}" Padding="0,11" Click="Rematch_Click"
-                            FontFamily="Segoe MDL2 Assets" FontSize="18" Content="&#xE72C;" Width="143"
-                            HorizontalContentAlignment="Center" Visibility="Collapsed" ToolTipService.ToolTip="Rematch" />
-                    <Button x:Name="NewGameButton" Style="{StaticResource TileButton}" Padding="0,11" Click="NewGame_Click"
-                            FontFamily="Segoe MDL2 Assets" FontSize="18" Content="&#xE710;" Width="143"
-                            HorizontalContentAlignment="Center" Visibility="Collapsed" ToolTipService.ToolTip="New game" />
-                </StackPanel>
+                <Grid ColumnSpacing="6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" x:Name="RematchButton" Style="{StaticResource PrimaryButton}" Padding="0,11" Click="Rematch_Click"
+                            FontFamily="Segoe MDL2 Assets" FontSize="18" Content="&#xE72C;"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Visibility="Collapsed" ToolTipService.ToolTip="Rematch" />
+                    <Button Grid.Column="1" x:Name="NewGameButton" Style="{StaticResource TileButton}" Padding="0,11" Click="NewGame_Click"
+                            FontFamily="Segoe MDL2 Assets" FontSize="18" Content="&#xE710;"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Visibility="Collapsed" ToolTipService.ToolTip="New game" />
+                </Grid>
             </StackPanel>
             </ScrollViewer>
         </Grid>
