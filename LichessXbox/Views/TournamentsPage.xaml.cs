@@ -1,3 +1,4 @@
+using System.Linq;
 using LichessXbox.Models;
 using LichessXbox.Services;
 using Windows.UI.Xaml;
@@ -27,7 +28,9 @@ namespace LichessXbox.Views
             Busy.IsActive = true;
             try
             {
-                var tournaments = await AppState.Current.Api.GetTournamentsAsync();
+                var all = await AppState.Current.Api.GetTournamentsAsync();
+                // Only list tournaments we can actually play (Rapid/Classical via the Board API).
+                var tournaments = all?.Where(t => t.Playable).ToList();
                 TournamentList.ItemsSource = tournaments;
                 if (tournaments == null || tournaments.Count == 0)
                 {
@@ -93,11 +96,11 @@ namespace LichessXbox.Views
             string id = _selectedId;
             JoinButton.IsEnabled = false;
             JoinButton.Content = "Joining…";
-            bool ok;
-            try { ok = await AppState.Current.Api.JoinTournamentAsync(id); }
-            catch { ok = false; }
+            string err;
+            try { err = await AppState.Current.Api.JoinTournamentAsync(id); }
+            catch { err = "Couldn't join — try again."; }
             if (_selectedId != id) return;   // user moved to another tournament while joining
-            if (ok)
+            if (err == null)
             {
                 JoinButton.Content = "Joined ✓";   // arena game will surface via the continue-playing tab
             }
@@ -105,7 +108,7 @@ namespace LichessXbox.Views
             {
                 JoinButton.Content = "Join";
                 JoinButton.IsEnabled = true;
-                DetailStatus.Text = "Couldn't join. Sign out and back in to grant tournament access, then retry.";
+                DetailStatus.Text = err;   // the actual reason (lichess error, or re-auth hint on 401)
                 DetailStatus.Visibility = Visibility.Visible;
             }
         }

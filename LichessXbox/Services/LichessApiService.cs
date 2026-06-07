@@ -752,11 +752,19 @@ namespace LichessXbox.Services
             return (title, players);
         }
 
-        public async Task<bool> JoinTournamentAsync(string id)
+        /// <summary>Join an arena. Returns null on success, else a human-readable reason.</summary>
+        public async Task<string> JoinTournamentAsync(string id)
         {
             using (var req = Build(HttpMethod.Post, $"/api/tournament/{id}/join"))
             using (var resp = await SendBufferedAsync(req))
-                return resp.IsSuccessStatusCode;
+            {
+                if (resp.IsSuccessStatusCode) return null;
+                if ((int)resp.StatusCode == 401)
+                    return "Sign out and back in to grant tournament access, then retry.";
+                string body = "";
+                try { body = await resp.Content.ReadAsStringAsync(); } catch { }
+                return ExtractApiError(body, (int)resp.StatusCode);
+            }
         }
 
         // -------------------------------------------------------------- studies

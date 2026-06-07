@@ -101,6 +101,7 @@ namespace LichessXbox
         {
             _currentTag = TagForPage(e.SourcePageType);
             HighlightNav(_currentTag);
+            UpdateChallengeTab();   // the tab is hidden on Play — reflect the page change immediately
             _ = RefreshOngoingAsync();
         }
 
@@ -275,8 +276,9 @@ namespace LichessXbox
             ChallengeTab.Flyout?.Hide();
             if ((sender as FrameworkElement)?.Tag is string id && !string.IsNullOrEmpty(id))
             {
-                try { await AppState.Current.Api.AcceptChallengeAsync(id); } catch { }
-                await RefreshOngoingAsync();   // the accepted game surfaces in the games-in-progress tab
+                try { await AppState.Current.Api.AcceptChallengeAsync(id); }
+                catch { return; }
+                OpenGame(id);   // an accepted challenge's game shares the challenge id — open it straight away
             }
         }
 
