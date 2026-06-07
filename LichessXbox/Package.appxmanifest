@@ -14,7 +14,7 @@
   <mp:PhoneIdentity PhoneProductId="8b1e0a11-1c2d-4f33-9a44-0c0f1e2d3a40" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
 
   <Properties>
-    <DisplayName>Lichess for Xbox</DisplayName>
+    <DisplayName>Online Chess</DisplayName>
     <PublisherDisplayName>LichessXbox</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -33,8 +33,8 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="LichessXbox.App">
       <uap:VisualElements
-        DisplayName="Lichess for Xbox"
-        Description="Beautiful native Lichess client for Xbox — play, watch, and solve puzzles."
+        DisplayName="Online Chess"
+        Description="Online chess for Xbox — play the world, watch live games, and solve puzzles. Powered by lichess.org (unofficial)."
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png">
