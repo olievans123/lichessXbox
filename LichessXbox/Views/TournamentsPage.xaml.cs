@@ -102,7 +102,7 @@ namespace LichessXbox.Views
             {
                 JoinButton.Content = "Join";
                 JoinButton.IsEnabled = true;
-                DetailStatus.Text = "Couldn't join — try again.";
+                DetailStatus.Text = "Couldn't join. Sign out and back in to grant tournament access, then retry.";
                 DetailStatus.Visibility = Visibility.Visible;
             }
         }
