@@ -192,7 +192,8 @@ namespace LichessXbox.Models
     public class GameSummary
     {
         public string Id { get; set; }
-        public string Headline { get; set; }    // "vs DrNykterstein  (2843)" — opponent + their rating
+        public string Headline { get; set; }        // "vs DrNykterstein" — opponent name (ellipsizes)
+        public string OpponentRating { get; set; }   // "2843" or "" — pinned beside the name so it never clips
         public string ResultText { get; set; }  // "Win · 1-0  ·  1502" — result + your rating
         public string TimeControlText { get; set; }  // "Blitz · 5+3"
         public string DateText { get; set; }

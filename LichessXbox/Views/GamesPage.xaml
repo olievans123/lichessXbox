@@ -52,8 +52,16 @@
                                         <controls:ChessBoardControl Fen="{Binding FinalFen}" WhiteAtBottom="{Binding PlayerWhite}"
                                                                     Interactive="False" IsTabStop="False" />
                                     </Border>
-                                    <TextBlock Text="{Binding Headline}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
-                                               Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                                    <Grid ColumnSpacing="6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding Headline}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+                                        <TextBlock Grid.Column="1" Text="{Binding OpponentRating}" FontSize="{StaticResource CaptionSize}"
+                                                   Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                                    </Grid>
                                     <TextBlock Text="{Binding TimeControlText}" FontSize="{StaticResource CaptionSize}"
                                                Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
                                     <TextBlock Text="{Binding ResultText}" FontSize="{StaticResource CaptionSize}"

@@ -578,7 +578,8 @@ namespace LichessXbox.Services
             return new GameSummary
             {
                 Id = g.Value<string>("id"),
-                Headline = oppRating.HasValue ? $"vs {opp}  ({oppRating})" : $"vs {opp}",
+                Headline = $"vs {opp}",
+                OpponentRating = oppRating.HasValue ? oppRating.Value.ToString() : "",
                 ResultText = result,
                 TimeControlText = FormatTimeControl(g, speedCap),
                 DateText = "",
