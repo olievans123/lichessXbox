@@ -247,6 +247,7 @@ namespace LichessXbox.Models
         public string Name { get; set; }
         public string Info { get; set; }     // "Blitz · 3+2 · 142 players"
         public string Group { get; set; }    // "In progress" / "Upcoming" / "Finished"
+        public bool Playable { get; set; }   // Rapid/Classical (the Board API can't play Bullet/Blitz)
     }
 
     public class TournamentPlayer

@@ -700,6 +700,8 @@ namespace LichessXbox.Services
                     Name = t.Value<string>("fullName") ?? "Arena",
                     Info = $"{perf} · {limit / 60}+{inc} · {players} players",
                     Group = group,
+                    // Board API plays Rapid/Classical only → estimated game time (limit + 40·inc) ≥ 480s.
+                    Playable = (limit + 40 * inc) >= 480,
                 });
             }
         }

@@ -58,8 +58,11 @@ namespace LichessXbox.Views
             if (!(e.ClickedItem is TournamentItem t)) return;
             _selectedId = t.Id;
             DetailTitle.Text = t.Name;
-            JoinButton.Visibility = AppState.Current.IsSignedIn && t.Group != "Finished"
-                ? Visibility.Visible : Visibility.Collapsed;
+            // Arena games play through the Board API (Rapid/Classical only), so Bullet/Blitz
+            // tournaments can be viewed but not joined here.
+            bool canJoin = AppState.Current.IsSignedIn && t.Group != "Finished";
+            JoinButton.Visibility = canJoin && t.Playable ? Visibility.Visible : Visibility.Collapsed;
+            JoinNote.Visibility = canJoin && !t.Playable ? Visibility.Visible : Visibility.Collapsed;
             JoinButton.Content = "Join";
             JoinButton.IsEnabled = true;
             StandingsList.ItemsSource = null;
