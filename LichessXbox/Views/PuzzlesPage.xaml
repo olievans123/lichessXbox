@@ -19,17 +19,25 @@
              focus-scrollable as a safety net for the tallest state (themed + a result + retry). -->
         <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollMode="Disabled">
         <StackPanel Margin="24,0,0,0" Padding="0,0,8,10" Spacing="8" VerticalAlignment="Top">
-            <TextBlock Text="Puzzles" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+            <TextBlock x:Name="TitleText" Text="Training" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
-            <!-- Stacked (not a 3-wide row) so the labels never clip in the narrow sidebar. -->
-            <StackPanel Spacing="8">
-                <Button x:Name="ModeTraining" Style="{StaticResource NavButton}" Tag="training" Click="Mode_Click"
-                        Content="Training" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                <Button x:Name="ModeStreak" Style="{StaticResource NavButton}" Tag="streak" Click="Mode_Click"
-                        Content="Streak" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                <Button x:Name="ModeThemed" Style="{StaticResource NavButton}" Tag="themed" Click="Mode_Click"
-                        Content="Themed" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-            </StackPanel>
+            <!-- Mode as icons (the title above reflects the active one): Training / Streak / Themed. -->
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" x:Name="ModeTraining" Style="{StaticResource NavButton}" Tag="training" Click="Mode_Click"
+                        Content="🎯" FontFamily="Segoe UI Emoji" FontSize="22" Padding="0,10"
+                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTipService.ToolTip="Training" />
+                <Button Grid.Column="1" x:Name="ModeStreak" Style="{StaticResource NavButton}" Tag="streak" Click="Mode_Click"
+                        Content="🔥" FontFamily="Segoe UI Emoji" FontSize="22" Padding="0,10"
+                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTipService.ToolTip="Streak" />
+                <Button Grid.Column="2" x:Name="ModeThemed" Style="{StaticResource NavButton}" Tag="themed" Click="Mode_Click"
+                        Content="🏷️" FontFamily="Segoe UI Emoji" FontSize="22" Padding="0,10"
+                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTipService.ToolTip="Themed" />
+            </Grid>
 
             <ComboBox x:Name="ThemeBox" Visibility="Collapsed" HorizontalAlignment="Stretch" Style="{StaticResource ThemedComboBox}" FontSize="{StaticResource CaptionSize}"
                       Header="Theme" SelectionChanged="ThemeBox_SelectionChanged" />

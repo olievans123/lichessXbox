@@ -85,6 +85,7 @@ namespace LichessXbox.Views
         {
             _mode = (sender as FrameworkElement)?.Tag as string ?? "training";
             SetActiveMode(sender as Button);
+            TitleText.Text = _mode == "streak" ? "Streak" : _mode == "themed" ? "Themed" : "Training";
             ThemeBox.Visibility = _mode == "themed" ? Visibility.Visible : Visibility.Collapsed;
             StreakCard.Visibility = _mode == "streak" ? Visibility.Visible : Visibility.Collapsed;
             _streak = 0;
@@ -288,6 +289,9 @@ namespace LichessXbox.Views
 
         void Retry_Click(object sender, RoutedEventArgs e)
         {
+            // If no puzzle is loaded (e.g. the last Streak/Themed fetch failed), Retry should re-fetch
+            // rather than reset to a null start — which would NRE inside SetupBoard (_puzzle.Rating…).
+            if (_puzzle == null || _start == null) { _ = LoadCurrentAsync(); return; }
             _current = _start;
             _solutionIndex = 0;
             _solved = false;
