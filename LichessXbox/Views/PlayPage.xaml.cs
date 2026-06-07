@@ -751,6 +751,7 @@ namespace LichessXbox.Views
             // Reconcile in place — reuse existing rows and only update changed properties — so
             // the list doesn't flicker (full Clear+re-add re-realizes every row each move/nav).
             int rowCount = (_sans.Count + 1) / 2;
+            MovesEmpty.Visibility = _sans.Count > 0 ? Visibility.Collapsed : Visibility.Visible;
             while (_moveRows.Count < rowCount) _moveRows.Add(new MoveRowVM());
             while (_moveRows.Count > rowCount) _moveRows.RemoveAt(_moveRows.Count - 1);
             for (int r = 0; r < rowCount; r++)

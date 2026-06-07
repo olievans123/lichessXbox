@@ -438,13 +438,12 @@ namespace LichessXbox.Services
                 long w = m.Value<long?>("white") ?? 0, d = m.Value<long?>("draws") ?? 0, b = m.Value<long?>("black") ?? 0;
                 long total = w + d + b;
                 if (total == 0) total = 1;
-                int avg = m.Value<int?>("averageRating") ?? 0;
                 result.Moves.Add(new ExplorerMoveRow
                 {
                     San = m.Value<string>("san"),
                     Uci = m.Value<string>("uci"),
                     Total = w + d + b,
-                    Stats = $"{(w + d + b):N0} games" + (avg > 0 ? $" · avg {avg}" : ""),
+                    Stats = $"{(w + d + b):N0} games",
                     WhitePct = 100.0 * w / total,
                     DrawPct = 100.0 * d / total,
                     BlackPct = 100.0 * b / total,

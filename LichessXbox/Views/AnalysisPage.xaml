@@ -82,7 +82,7 @@
                 </Button>
             </Grid>
 
-            <!-- Engine eval — compact: eval + depth + source toggle on one row, then a 1-line PV.
+            <!-- Engine eval — compact: eval + source toggle on one row, then a 1-line PV.
                  Kept tight so the opening explorer below gets real, scrollable height. -->
             <Border Grid.Row="1" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,8">
                 <StackPanel Spacing="6">
@@ -94,8 +94,6 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock x:Name="EvalText" Grid.Column="0" Text="—" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold"
                                    Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
-                        <TextBlock x:Name="DepthText" Grid.Column="1" Text="" FontSize="{StaticResource CaptionSize}"
-                                   Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                         <ToggleSwitch x:Name="LocalEngineToggle" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"
                                       MinWidth="0" OffContent="Cloud" OnContent="Local" Toggled="LocalEngine_Toggled" />
                     </Grid>

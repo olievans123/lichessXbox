@@ -71,6 +71,8 @@
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem">
                             <Setter Property="UseSystemFocusVisuals" Value="False" />
+                            <!-- Stretch each row to the full width so the * name column expands and the score right-aligns. -->
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                         </Style>
                     </ListView.ItemContainerStyle>
                     <ListView.ItemTemplate>

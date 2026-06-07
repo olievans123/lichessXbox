@@ -31,6 +31,7 @@ namespace LichessXbox.Views
         CancellationTokenSource _analysisCts;
         LocalEngine _engine;
         bool _useLocalEngine;
+        bool _engineToggleReady;   // gates LocalEngine_Toggled until the page is loaded
         string _whiteName, _blackName;
 
         public AnalysisPage()
@@ -41,11 +42,11 @@ namespace LichessXbox.Views
             AnalysisMoveRows.ItemsSource = _moveRows;
             Board.MoveRequested += Board_MoveRequested;
             this.KeyDown += Page_KeyDown;
-            // Default to the cloud eval (instant for common positions, no engine to boot). The user
-            // can flip to the local engine for positions the cloud hasn't cached.
-            LocalEngineToggle.IsOn = false;
+            // Default to the local Stockfish engine; the user can flip to the cloud eval.
+            LocalEngineToggle.IsOn = true;
             this.Loaded += (s, e) =>
             {
+                _engineToggleReady = true;
                 _useLocalEngine = LocalEngineToggle.IsOn;
                 if (_useLocalEngine) EnsureEngine();
                 Sync();
@@ -100,7 +101,6 @@ namespace LichessXbox.Views
             RebuildAnalysisMoves();
 
             EvalText.Text = "…";
-            DepthText.Text = "";
             BestLineText.Text = "Evaluating…";
             _explorer.Clear();
             OpeningText.Text = "Opening explorer";
@@ -131,7 +131,6 @@ namespace LichessXbox.Views
                     if (eval != null)
                     {
                         EvalText.Text = eval.EvalText;
-                        DepthText.Text = "depth " + eval.Depth;
                         BestLineText.Text = string.IsNullOrEmpty(eval.PvUci) ? "" : pos.LineToSan(eval.PvUci.Split(' '));
                         SetEvalBar(eval.WhiteAdvantage);
                         ShowBestArrow(eval.BestMoveUci);
@@ -139,7 +138,6 @@ namespace LichessXbox.Views
                     else
                     {
                         EvalText.Text = "—";
-                        DepthText.Text = "";
                         BestLineText.Text = "No cloud evaluation for this position.";
                         SetEvalBar(0);
                     }
@@ -148,7 +146,6 @@ namespace LichessXbox.Views
                 {
                     if (cts.IsCancellationRequested) return;
                     EvalText.Text = "—";
-                    DepthText.Text = "";
                     BestLineText.Text = "Engine unavailable offline.";
                     SetEvalBar(0);
                 }
@@ -250,6 +247,7 @@ namespace LichessXbox.Views
 
         void LocalEngine_Toggled(object sender, RoutedEventArgs e)
         {
+            if (!_engineToggleReady) return;   // ignore the initial IsOn set during construction
             _useLocalEngine = LocalEngineToggle.IsOn;
             if (_useLocalEngine) EnsureEngine();
             else _engine?.Stop();
@@ -330,7 +328,6 @@ namespace LichessXbox.Views
         {
             if (!_useLocalEngine) return;
             EvalText.Text = evalText;
-            DepthText.Text = $"depth {depth} · local";
             if (!string.IsNullOrEmpty(pvSan)) BestLineText.Text = pvSan;
             SetEvalBar(AdvantageFromEval(evalText));
             ShowBestArrow(bestUci);
