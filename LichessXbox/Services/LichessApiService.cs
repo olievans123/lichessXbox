@@ -736,9 +736,10 @@ namespace LichessXbox.Services
         public async Task<System.Collections.Generic.List<StudyItem>> GetStudiesByUserAsync(string username)
         {
             var list = new System.Collections.Generic.List<StudyItem>();
-            using (var req = Build(HttpMethod.Get, $"/api/study/by/{username}"))
+            // Public endpoint — fetch ANONYMOUSLY. The app's OAuth token lacks the study:read scope,
+            // and lichess rejects (401) token-bearing study requests without it, even for public data.
+            using (var req = new HttpRequestMessage(HttpMethod.Get, Base + $"/api/study/by/{username}"))
             {
-                req.Headers.Accept.Clear();
                 req.Headers.Accept.ParseAdd("application/x-ndjson");
                 using (var resp = await _http.SendAsync(req, HttpCompletionOption.ResponseHeadersRead))
                 {
@@ -768,9 +769,9 @@ namespace LichessXbox.Services
         /// <summary>Export a whole study as PGN (chapters separated by blank lines).</summary>
         public async Task<string> GetStudyPgnAsync(string studyId)
         {
-            using (var req = Build(HttpMethod.Get, $"/api/study/{studyId}.pgn"))
+            // Anonymous — same missing study:read scope issue as the listing.
+            using (var req = new HttpRequestMessage(HttpMethod.Get, Base + $"/api/study/{studyId}.pgn"))
             {
-                req.Headers.Accept.Clear();
                 req.Headers.Accept.ParseAdd("application/x-chess-pgn");
                 using (var resp = await SendBufferedAsync(req, default, 25))
                 {

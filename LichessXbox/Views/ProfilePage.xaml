@@ -117,9 +117,14 @@
 
             <TextBlock Text="Ratings" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
             <TextBlock x:Name="NoRatings" Text="No rated games yet." FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
-            <TextBlock Text="Select a rating to see your games and rating graph." FontSize="{StaticResource CaptionSize}"
-                       Foreground="{StaticResource TextSecondaryBrush}" />
-            <GridView x:Name="RatingsGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Rating_ItemClick" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+            <GridView x:Name="RatingsGrid" SelectionMode="None" IsItemClickEnabled="False" ItemClick="Rating_ItemClick" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                <!-- Display-only: ratings aren't clickable (no graph/games drill-in) and aren't focus stops. -->
+                <GridView.ItemContainerStyle>
+                    <Style TargetType="GridViewItem">
+                        <Setter Property="IsTabStop" Value="False" />
+                        <Setter Property="UseSystemFocusVisuals" Value="False" />
+                    </Style>
+                </GridView.ItemContainerStyle>
                 <GridView.ItemTemplate>
                     <DataTemplate>
                         <Border Width="150" Height="100" CornerRadius="16"
