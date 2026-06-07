@@ -110,8 +110,9 @@ namespace LichessXbox.Views
                 {
                     case "streak":
                         // Streak is just a local consecutive-solve counter over random puzzles
-                        // (there is no public puzzle-streak endpoint).
-                        _puzzle = await AppState.Current.Api.GetNextPuzzleAsync();
+                        // (there is no public puzzle-streak endpoint). Daily fallback, like training.
+                        _puzzle = await AppState.Current.Api.GetNextPuzzleAsync()
+                                  ?? await AppState.Current.Api.GetDailyPuzzleAsync();
                         break;
                     case "themed":
                         _puzzle = await AppState.Current.Api.GetThemedPuzzleAsync(_theme);
