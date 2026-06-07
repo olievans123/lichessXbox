@@ -367,9 +367,9 @@
             </Grid>
 
             <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-            <StackPanel Margin="20,0,0,0" Spacing="8">
+            <StackPanel Margin="20,0,0,0" Spacing="6">
                 <!-- Opponent (top) -->
-                <Border Style="{StaticResource CardBorder}" Padding="12,8">
+                <Border Style="{StaticResource CardBorder}" Padding="12,4">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -393,8 +393,8 @@
                     </Grid>
                 </Border>
 
-                <Border Style="{StaticResource CardBorder}" Padding="12">
-                    <StackPanel Spacing="10">
+                <Border Style="{StaticResource CardBorder}" Padding="12,8">
+                    <StackPanel Spacing="8">
                         <TextBlock x:Name="StatusBanner" Text="Your move" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                    Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
                         <!-- Move history in algebraic notation (SAN); bounded, scrollable, current move highlighted. -->
@@ -443,7 +443,7 @@
                 </Border>
 
                 <!-- You (bottom) -->
-                <Border Style="{StaticResource CardBorder}" Padding="12,8">
+                <Border Style="{StaticResource CardBorder}" Padding="12,4">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
