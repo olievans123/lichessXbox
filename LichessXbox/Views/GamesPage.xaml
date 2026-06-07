@@ -48,15 +48,17 @@
                         <DataTemplate>
                             <Border CornerRadius="14" Padding="10" Width="184"
                                     Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
-                                <StackPanel Spacing="8">
+                                <StackPanel Spacing="6">
                                     <Border CornerRadius="8" Width="164" Height="164">
                                         <controls:ChessBoardControl Fen="{Binding FinalFen}" WhiteAtBottom="{Binding PlayerWhite}"
                                                                     Interactive="False" IsTabStop="False" />
                                     </Border>
                                     <TextBlock Text="{Binding Headline}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
                                                Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding TimeControlText}" FontSize="{StaticResource CaptionSize}"
+                                               Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
                                     <TextBlock Text="{Binding ResultText}" FontSize="{StaticResource CaptionSize}"
-                                               Foreground="{Binding Outcome, Converter={StaticResource OutcomeBrush}}" />
+                                               Foreground="{Binding Outcome, Converter={StaticResource OutcomeBrush}}" TextTrimming="CharacterEllipsis" />
                                 </StackPanel>
                             </Border>
                         </DataTemplate>

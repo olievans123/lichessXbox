@@ -192,8 +192,9 @@ namespace LichessXbox.Models
     public class GameSummary
     {
         public string Id { get; set; }
-        public string Headline { get; set; }    // "vs DrNykterstein (Blitz)"
-        public string ResultText { get; set; }  // "Win · 1-0"
+        public string Headline { get; set; }    // "vs DrNykterstein  (2843)" — opponent + their rating
+        public string ResultText { get; set; }  // "Win · 1-0  ·  1502" — result + your rating
+        public string TimeControlText { get; set; }  // "Blitz · 5+3"
         public string DateText { get; set; }
         public string Moves { get; set; }        // space-separated SAN moves
         public string InitialFen { get; set; }

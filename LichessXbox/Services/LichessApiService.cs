@@ -525,12 +525,16 @@ namespace LichessXbox.Services
 
         static GameSummary ParseGameSummary(JObject g, string me)
         {
-            var white = g["players"]?["white"]?["user"];
-            var black = g["players"]?["black"]?["user"];
+            var whiteP = g["players"]?["white"];
+            var blackP = g["players"]?["black"];
+            var white = whiteP?["user"];
+            var black = blackP?["user"];
             string whiteName = white?.Value<string>("name") ?? "Anonymous";
             string blackName = black?.Value<string>("name") ?? "Anonymous";
             bool iAmWhite = string.Equals(whiteName, me, StringComparison.OrdinalIgnoreCase);
             string opp = iAmWhite ? blackName : whiteName;
+            int? myRating = iAmWhite ? whiteP?.Value<int?>("rating") : blackP?.Value<int?>("rating");
+            int? oppRating = iAmWhite ? blackP?.Value<int?>("rating") : whiteP?.Value<int?>("rating");
             string winner = g.Value<string>("winner");
             string speed = g.Value<string>("speed") ?? "game";
             string result;
@@ -542,13 +546,16 @@ namespace LichessXbox.Services
                 outcome = iWon ? 0 : 1;
                 result = (iWon ? "Win · " : "Loss · ") + (winner == "white" ? "1-0" : "0-1");
             }
+            if (myRating.HasValue) result += "  ·  " + myRating.Value;
             string initialFen = g.Value<string>("initialFen");
             string moves = g.Value<string>("moves") ?? "";
+            string speedCap = char.ToUpperInvariant(speed[0]) + speed.Substring(1);
             return new GameSummary
             {
                 Id = g.Value<string>("id"),
-                Headline = $"vs {opp}  ·  {char.ToUpperInvariant(speed[0]) + speed.Substring(1)}",
+                Headline = oppRating.HasValue ? $"vs {opp}  ({oppRating})" : $"vs {opp}",
                 ResultText = result,
+                TimeControlText = FormatTimeControl(g, speedCap),
                 DateText = "",
                 Moves = moves,
                 InitialFen = initialFen,
@@ -558,6 +565,23 @@ namespace LichessXbox.Services
                 WhiteName = whiteName,
                 BlackName = blackName,
             };
+        }
+
+        // Human-readable time control: "Blitz · 5+3", "Rapid · 10+0", "Correspondence · 3d", or just the speed.
+        static string FormatTimeControl(JObject g, string speedCap)
+        {
+            var clock = g["clock"];
+            if (clock != null)
+            {
+                int init = clock.Value<int?>("initial") ?? 0;
+                int incr = clock.Value<int?>("increment") ?? 0;
+                string mins = init == 15 ? "¼" : init == 30 ? "½" : init == 45 ? "¾"
+                    : init % 60 == 0 ? (init / 60).ToString()
+                    : (init / 60.0).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
+                return $"{speedCap} · {mins}+{incr}";
+            }
+            int days = g.Value<int?>("daysPerTurn") ?? 0;
+            return days > 0 ? $"{speedCap} · {days}d" : speedCap;
         }
 
         // Replay SAN moves from the start to get the final position, for the board thumbnail.
