@@ -237,7 +237,12 @@ namespace LichessXbox.Views
             var pos = new ChessPosition();
             Array.Copy(_squares, pos.Squares, 64);
             pos.WhiteToMove = _whiteToMove;
-            pos.CastleWK = pos.CastleWQ = pos.CastleBK = pos.CastleBQ = false;
+            // Infer castling rights from pieces on their home squares (a1=0 … h8=63) — always
+            // stripping them made even the starting position lose castling once analyzed.
+            pos.CastleWK = _squares[4] == 'K' && _squares[7] == 'R';
+            pos.CastleWQ = _squares[4] == 'K' && _squares[0] == 'R';
+            pos.CastleBK = _squares[60] == 'k' && _squares[63] == 'r';
+            pos.CastleBQ = _squares[60] == 'k' && _squares[56] == 'r';
             pos.EnPassant = -1;
             if (FenBox != null) FenBox.Text = pos.ToFen();
         }
@@ -263,7 +268,7 @@ namespace LichessXbox.Views
             for (int i = 0; i < 64; i++) { if (_squares[i] == 'K') wk++; else if (_squares[i] == 'k') bk++; }
             if (wk != 1 || bk != 1)
             {
-                EditorStatus.Text = "Add exactly one white king and one black king before analysing.";
+                EditorStatus.Text = "Add exactly one white king and one black king before analyzing.";
                 EditorStatus.Visibility = Visibility.Visible;
                 return;
             }

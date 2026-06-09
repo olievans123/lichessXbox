@@ -24,6 +24,7 @@ namespace LichessXbox
         readonly ObservableCollection<OngoingGame> _ongoing = new ObservableCollection<OngoingGame>();
         readonly ObservableCollection<IncomingChallenge> _challenges = new ObservableCollection<IncomingChallenge>();
         readonly DispatcherTimer _ongoingTimer = new DispatcherTimer();
+        bool _ongoingFlyoutOpen, _challengeFlyoutOpen;   // don't rebuild a flyout's cards while it's open
 
         public MainPage()
         {
@@ -31,6 +32,18 @@ namespace LichessXbox
             this.KeyDown += Page_KeyDown;
             OngoingList.ItemsSource = _ongoing;   // resume cards in the gutter tab's flyout
             ChallengeList.ItemsSource = _challenges;   // incoming-challenge cards in the challenge tab's flyout
+            // A 15s poll that rebuilds the cards while their flyout is open recycles the focused
+            // card and strands the gamepad — hold rebuilds until the flyout closes, then refresh.
+            if (OngoingTab.Flyout != null)
+            {
+                OngoingTab.Flyout.Opened += (s, e) => _ongoingFlyoutOpen = true;
+                OngoingTab.Flyout.Closed += (s, e) => { _ongoingFlyoutOpen = false; _ = RefreshOngoingAsync(); };
+            }
+            if (ChallengeTab.Flyout != null)
+            {
+                ChallengeTab.Flyout.Opened += (s, e) => _challengeFlyoutOpen = true;
+                ChallengeTab.Flyout.Closed += (s, e) => { _challengeFlyoutOpen = false; _ = RefreshOngoingAsync(); };
+            }
             // Keep nav state in sync on every navigation (forward AND Back); drive the Back button.
             ContentFrame.Navigated += ContentFrame_Navigated;
             SystemNavigationManager.GetForCurrentView().BackRequested += OnBackRequested;
@@ -197,7 +210,7 @@ namespace LichessXbox
             catch { }
             // Only rebuild the cards when something actually changed, so the board snapshots
             // don't re-render (flicker) on every refresh.
-            if (games != null)
+            if (games != null && !_ongoingFlyoutOpen)
             {
                 bool same = games.Count == _ongoing.Count;
                 if (same)
@@ -220,7 +233,7 @@ namespace LichessXbox
                 if (same)
                     for (int i = 0; i < challenges.Count; i++)
                         if (challenges[i].Id != _challenges[i].Id) { same = false; break; }
-                if (!same)
+                if (!same && !_challengeFlyoutOpen)
                 {
                     _challenges.Clear();
                     foreach (var c in challenges) _challenges.Add(c);
@@ -276,9 +289,12 @@ namespace LichessXbox
             ChallengeTab.Flyout?.Hide();
             if ((sender as FrameworkElement)?.Tag is string id && !string.IsNullOrEmpty(id))
             {
-                try { await AppState.Current.Api.AcceptChallengeAsync(id); }
-                catch { return; }
-                OpenGame(id);   // an accepted challenge's game shares the challenge id — open it straight away
+                bool ok;
+                try { ok = await AppState.Current.Api.AcceptChallengeAsync(id); }
+                catch { ok = false; }
+                // Only open on success — an expired/withdrawn challenge would land on a dead board.
+                if (ok) OpenGame(id);   // an accepted challenge's game shares the challenge id
+                else await RefreshOngoingAsync();   // re-poll so the stale card disappears
             }
         }
 
@@ -286,8 +302,13 @@ namespace LichessXbox
         {
             if ((sender as FrameworkElement)?.Tag is string id && !string.IsNullOrEmpty(id))
             {
+                // Close first: declining the last card would collapse the flyout's content under
+                // the focused button and strand gamepad focus in an empty popup.
+                ChallengeTab.Flyout?.Hide();
                 try { await AppState.Current.Api.DeclineChallengeAsync(id); } catch { }
                 await RefreshOngoingAsync();
+                (ChallengeTab.Visibility == Visibility.Visible ? ChallengeTab : MenuButton)
+                    .Focus(FocusState.Programmatic);
             }
         }
 

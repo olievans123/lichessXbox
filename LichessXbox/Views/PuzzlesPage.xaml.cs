@@ -27,6 +27,7 @@ namespace LichessXbox.Views
         string _mode = "training";   // training | streak | themed
         string _theme = "fork";
         int _streak;
+        int _loadStamp;   // invalidates in-flight loads when a newer one starts (mode/theme spam)
 
         static readonly (string Key, string Name)[] Themes =
         {
@@ -101,7 +102,13 @@ namespace LichessXbox.Views
 
         async Task LoadCurrentAsync()
         {
+            // A newer load (mode/theme switched mid-fetch) supersedes this one; pending board
+            // animation timers belong to the old puzzle and must not fire into the new one.
+            int stamp = ++_loadStamp;
+            _replyTimer.Stop();
+            _advanceTimer.Stop();
             Busy.IsActive = true;
+            Busy.Visibility = Visibility.Visible;
             ResultCard.Visibility = Visibility.Collapsed;
             RetryButton.Visibility = Visibility.Collapsed;
             try
@@ -124,6 +131,8 @@ namespace LichessXbox.Views
                         break;
                 }
 
+                if (stamp != _loadStamp) return;   // superseded by a newer load — let it drive the UI
+
                 if (_puzzle == null)
                 {
                     HintText.Text = "Couldn't load a puzzle. Try again.";
@@ -139,6 +148,7 @@ namespace LichessXbox.Views
             }
             catch (Exception)
             {
+                if (stamp != _loadStamp) return;
                 // A fetch/parse failure must never escape as an unhandled exception (it would crash the
                 // page). Fall back to the same "couldn't load" state with a working Retry (re-fetches).
                 _puzzle = null;
@@ -149,7 +159,12 @@ namespace LichessXbox.Views
                 RetryButton.Visibility = Visibility.Visible;
                 RetryButton.Focus(FocusState.Programmatic);
             }
-            finally { Busy.IsActive = false; }
+            finally
+            {
+                // Only the load that still owns the page clears the spinner — an older one's
+                // finally must not blank out the newer load's busy state.
+                if (stamp == _loadStamp) { Busy.IsActive = false; Busy.Visibility = Visibility.Collapsed; }
+            }
         }
 
         // ------------------------------------------------------- puzzle setup
@@ -281,7 +296,7 @@ namespace LichessXbox.Views
         {
             _solved = true;
             Board.Interactive = false;
-            ResultText.Text = $"Streak ended at {_streak}. Tap Next to try again.";
+            ResultText.Text = $"Streak ended at {_streak} — press “Next puzzle” to go again.";
             ResultCard.Visibility = Visibility.Visible;
             HintText.Text = "Wrong move — streak over.";
             _streak = 0;

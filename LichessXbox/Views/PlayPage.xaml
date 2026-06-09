@@ -146,13 +146,13 @@
                                 <TextBlock Text="Find a human opponent online" FontSize="{StaticResource BodySize}"
                                            FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
                                 <TextBlock FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap"
-                                           Text="Lichess only quick-pairs Rapid, Classical &amp; Correspondence through its API. For Bullet &amp; Blitz, use Challenge a friend." />
+                                           Text="Lichess only quick-pairs Rapid, Classical &amp; Daily for apps. For Bullet &amp; Blitz, use Challenge." />
                             </StackPanel>
                             <GridView Grid.Row="1" x:Name="PresetGrid" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Preset_ItemClick"
                                       ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollMode="Disabled">
                                 <GridView.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Width="180" Height="92" CornerRadius="14"
+                                        <Border Width="180" Height="92" CornerRadius="16"
                                                 Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                             <StackPanel Margin="14,8" VerticalAlignment="Center" Spacing="1">
                                                 <TextBlock Text="{Binding Glyph}" FontSize="22" />
@@ -226,7 +226,7 @@
                                                       ItemClick="FriendClock_ItemClick" MaxWidth="384" ScrollViewer.VerticalScrollBarVisibility="Auto">
                                                 <GridView.ItemTemplate>
                                                     <DataTemplate>
-                                                        <Border Width="116" Height="76" CornerRadius="14"
+                                                        <Border Width="116" Height="76" CornerRadius="16"
                                                                 Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                                                             <StackPanel VerticalAlignment="Center" Spacing="2">
                                                                 <TextBlock Text="{Binding Glyph}" FontSize="18" HorizontalAlignment="Center" />
@@ -336,7 +336,9 @@
                         <ScaleTransform x:Name="ResultCardScale" ScaleX="1" ScaleY="1" />
                     </Border.RenderTransform>
                     <StackPanel>
-                        <Border x:Name="ResultAccent" Height="6" CornerRadius="20,20,0,0" Background="{StaticResource AccentGreenBrush}" />
+                        <!-- Inset accent bar: floats inside the card so it never fights the card's
+                             18px corner curve (a child Border can't be clipped to the parent's radius). -->
+                        <Border x:Name="ResultAccent" Height="6" CornerRadius="3" Margin="28,18,28,0" Background="{StaticResource AccentGreenBrush}" />
                         <StackPanel Padding="28,24,28,22" Spacing="6">
                             <TextBlock x:Name="ResultIcon" FontFamily="Segoe MDL2 Assets" FontSize="40" HorizontalAlignment="Center"
                                        Foreground="{StaticResource AccentGreenLightBrush}" Visibility="Collapsed" />
@@ -386,9 +388,9 @@
                             </StackPanel>
                         </StackPanel>
                         <Border x:Name="TopClockChip" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="14,7">
+                                Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="14,6" MinWidth="96">
                             <TextBlock x:Name="TopClock" Text="--:--" FontSize="{StaticResource SubtitleSize}" FontFamily="Consolas"
-                                       Foreground="{StaticResource TextPrimaryBrush}" />
+                                       Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" />
                         </Border>
                     </Grid>
                 </Border>
@@ -434,13 +436,13 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Button Grid.Column="0" x:Name="MoveFirstButton" Style="{StaticResource TileButton}" Padding="0,8" Click="MoveFirst_Click"
-                                    FontFamily="Segoe MDL2 Assets" Content="&#xE892;" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                    FontFamily="Segoe MDL2 Assets" Content="&#xE892;" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTipService.ToolTip="First move" />
                             <Button Grid.Column="1" x:Name="MovePrevButton" Style="{StaticResource TileButton}" Padding="0,8" Click="MovePrev_Click"
-                                    FontFamily="Segoe MDL2 Assets" Content="&#xE76B;" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                    FontFamily="Segoe MDL2 Assets" Content="&#xE76B;" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTipService.ToolTip="Previous move" />
                             <Button Grid.Column="2" x:Name="MoveNextButton" Style="{StaticResource TileButton}" Padding="0,8" Click="MoveNext_Click"
-                                    FontFamily="Segoe MDL2 Assets" Content="&#xE76C;" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                    FontFamily="Segoe MDL2 Assets" Content="&#xE76C;" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTipService.ToolTip="Next move" />
                             <Button Grid.Column="3" x:Name="MoveLastButton" Style="{StaticResource TileButton}" Padding="0,8" Click="MoveLast_Click"
-                                    FontFamily="Segoe MDL2 Assets" Content="&#xE893;" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                    FontFamily="Segoe MDL2 Assets" Content="&#xE893;" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTipService.ToolTip="Latest move" />
                         </Grid>
                         <TextBlock x:Name="MovePositionText" Text="" FontSize="{StaticResource CaptionSize}"
                                    Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" />
@@ -465,9 +467,9 @@
                             </StackPanel>
                         </StackPanel>
                         <Border x:Name="BottomClockChip" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="14,7">
+                                Background="{StaticResource ClockChipBrush}" CornerRadius="10" Padding="14,6" MinWidth="96">
                             <TextBlock x:Name="BottomClock" Text="--:--" FontSize="{StaticResource SubtitleSize}" FontFamily="Consolas"
-                                       Foreground="{StaticResource TextPrimaryBrush}" />
+                                       Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" />
                         </Border>
                     </Grid>
                 </Border>

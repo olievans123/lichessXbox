@@ -19,7 +19,6 @@ namespace LichessXbox.Views
     {
         LanCallbackServer _server;
         string _verifier, _state;
-        bool _gamesLoaded;                // recent games are perf-independent — fetch them once
         int _pairAttempt;   // guards against stale callbacks when restarting/cancelling
         readonly DispatcherTimer _qrExpiry = new DispatcherTimer { Interval = TimeSpan.FromSeconds(90) };
 
@@ -32,6 +31,10 @@ namespace LichessXbox.Views
                 QrBusy.IsActive = false;
                 QrStatus.Text = "This code expired — press “New code” for a fresh one.";
             };
+            // The QR is rendered by a web service; if that fetch fails, say so instead of
+            // leaving a blank white square.
+            QrImage.ImageFailed += (s, e) =>
+                QrStatus.Text = "Couldn't load the QR code — check the connection, or use “Enter a token”.";
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e) => await RefreshAsync();
@@ -60,7 +63,10 @@ namespace LichessXbox.Views
             LoadingRing.IsActive = true;
             LoadingPanel.Visibility = Visibility.Visible;
 
-            var account = await AppState.Current.EnsureAccountAsync();
+            // Offline with a stored token must degrade to the sign-in card, not throw out of the
+            // async void OnNavigatedTo and pop the global error dialog.
+            LichessAccount account = null;
+            try { account = await AppState.Current.EnsureAccountAsync(); } catch { }
 
             LoadingPanel.Visibility = Visibility.Collapsed;
             LoadingRing.IsActive = false;
@@ -97,13 +103,6 @@ namespace LichessXbox.Views
             if (a.ClassicalRating.HasValue) ratings.Add(new RatingTile("Classical", a.ClassicalRating.Value));
             RatingsGrid.ItemsSource = ratings;
             NoRatings.Visibility = (ratings.Count == 0) ? Visibility.Visible : Visibility.Collapsed;
-
-            // Start with the in-page detail hidden; it opens when a rating is chosen.
-            RatingDetailPanel.Visibility = Visibility.Collapsed;
-            _gamesLoaded = false;
-            ProfileGames.ItemsSource = null;
-            ProfileGraph.Children.Clear();
-            ProfileRatingRange.Text = "";
 
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => SignOutButton.Focus(FocusState.Programmatic));
         }
@@ -144,7 +143,7 @@ namespace LichessXbox.Views
             if (!started)
             {
                 QrBusy.IsActive = false;
-                QrStatus.Text = "Couldn't start pairing on this network — use “Enter a token manually”.";
+                QrStatus.Text = "Couldn't start pairing on this network — use “Enter a token”.";
                 return;
             }
             _server = server;
@@ -188,7 +187,7 @@ namespace LichessXbox.Views
                 else QrStatus.Text = "Token exchange failed — try again or use manual.";
             }
             catch (TaskCanceledException) { /* pairing stopped */ }
-            catch (Exception ex) { QrStatus.Text = "Pairing error: " + ex.Message; }
+            catch (Exception) { QrStatus.Text = "Pairing didn't complete — press “New code” to try again, or use “Enter a token”."; }
             finally { if (attempt == _pairAttempt) QrBusy.IsActive = false; }
         }
 
@@ -209,6 +208,7 @@ namespace LichessXbox.Views
             if (string.IsNullOrEmpty(token)) { ShowAuthError("Enter a token first."); return; }
 
             Busy.IsActive = true;
+            Busy.Visibility = Visibility.Visible;
             SignInButton.IsEnabled = false;
             bool failed = false;
             try
@@ -221,6 +221,7 @@ namespace LichessXbox.Views
             finally
             {
                 Busy.IsActive = false;
+                Busy.Visibility = Visibility.Collapsed;
                 SignInButton.IsEnabled = true;
                 if (failed) SignInButton.Focus(FocusState.Programmatic);
             }
@@ -253,91 +254,5 @@ namespace LichessXbox.Views
             await RefreshAsync();
         }
 
-        // Clicking a rating reveals that perf's elo graph + your recent games right here.
-        async void Rating_ItemClick(object sender, ItemClickEventArgs e)
-        {
-            if (!(e.ClickedItem is RatingTile t)) return;
-            await ShowRatingDetailAsync(t.Mode);
-        }
-
-        async Task ShowRatingDetailAsync(string perf)
-        {
-            RatingDetailTitle.Text = perf + " rating";
-            RatingDetailPanel.Visibility = Visibility.Visible;
-            RatingDetailPanel.StartBringIntoView();   // scroll the freshly revealed detail into view
-
-            var account = await AppState.Current.EnsureAccountAsync();
-            if (account == null) return;
-
-            // Rating graph for the chosen perf.
-            try { DrawGraph(await AppState.Current.Api.GetRatingHistoryAsync(account.Username, perf)); }
-            catch { ProfileGraph.Children.Clear(); ProfileRatingRange.Text = "Couldn't load rating history."; }
-
-            // Recent games are the same regardless of perf, so only fetch them once.
-            if (!_gamesLoaded)
-            {
-                ProfileGamesBusy.IsActive = true;
-                ProfileNoGames.Visibility = Visibility.Collapsed;
-                try
-                {
-                    var games = await AppState.Current.Api.GetUserGamesAsync(account.Username, 12);
-                    ProfileGames.ItemsSource = games;
-                    bool any = games != null && games.Count > 0;
-                    ProfileNoGames.Text = "No games yet.";
-                    ProfileNoGames.Visibility = any ? Visibility.Collapsed : Visibility.Visible;
-                    _gamesLoaded = any;   // leave unset on empty so a later click retries
-                }
-                catch
-                {
-                    ProfileNoGames.Text = "Couldn't load your games.";
-                    ProfileNoGames.Visibility = Visibility.Visible;
-                }
-                finally { ProfileGamesBusy.IsActive = false; }
-            }
-
-            // Move focus onto the revealed content so the reveal reads clearly at 10 feet —
-            // focusing the games list both signals "something happened" and scrolls it on-screen.
-            if (ProfileGames.Items.Count > 0) ProfileGames.Focus(FocusState.Programmatic);
-            else RatingDetailPanel.StartBringIntoView();
-        }
-
-        void ProfileGame_ItemClick(object sender, ItemClickEventArgs e)
-        {
-            if (!(e.ClickedItem is GameSummary g)) return;
-            var shell = (Window.Current.Content as Frame)?.Content as LichessXbox.MainPage;
-            shell?.OpenAnalysis((g.InitialFen ?? "startpos") + "|" + (g.Moves ?? "") + "|" + (g.WhiteName ?? "White") + "|" + (g.BlackName ?? "Black"));
-        }
-
-        // Simple rating sparkline (same style as the Games page graph).
-        void DrawGraph(List<(int x, int y)> points)
-        {
-            ProfileGraph.Children.Clear();
-            if (points == null || points.Count < 2) { ProfileRatingRange.Text = "No rating history yet."; return; }
-
-            double w = 560, h = 150, pad = 10;
-            if (ProfileGraph.ActualWidth > 10) w = ProfileGraph.ActualWidth;
-            if (ProfileGraph.ActualHeight > 10) h = ProfileGraph.ActualHeight;
-
-            int minR = int.MaxValue, maxR = int.MinValue;
-            foreach (var p in points) { if (p.y < minR) minR = p.y; if (p.y > maxR) maxR = p.y; }
-            if (maxR == minR) { maxR += 1; minR -= 1; }
-
-            int n = points.Count;
-            var line = new Polyline
-            {
-                Stroke = new SolidColorBrush(Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F)),
-                StrokeThickness = 3,
-            };
-            var pts = new PointCollection();
-            for (int i = 0; i < n; i++)
-            {
-                double x = pad + (w - 2 * pad) * i / (n - 1);
-                double y = pad + (h - 2 * pad) * (1 - (double)(points[i].y - minR) / (maxR - minR));
-                pts.Add(new Point(x, y));
-            }
-            line.Points = pts;
-            ProfileGraph.Children.Add(line);
-            ProfileRatingRange.Text = $"{minR} – {maxR}  ·  {n} games tracked";
-        }
     }
 }

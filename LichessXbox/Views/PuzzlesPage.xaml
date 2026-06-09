@@ -18,7 +18,7 @@
         <!-- A fixed control panel meant to fit on one screen: no visible bar (Hidden), but still
              focus-scrollable as a safety net for the tallest state (themed + a result + retry). -->
         <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollMode="Disabled">
-        <StackPanel Margin="24,0,0,0" Padding="0,0,8,10" Spacing="8" VerticalAlignment="Top">
+        <StackPanel Margin="20,0,0,0" Padding="0,0,8,10" Spacing="8" VerticalAlignment="Top">
             <TextBlock x:Name="TitleText" Text="Training" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
             <!-- Mode as icons (the title above reflects the active one): Training / Streak / Themed. -->
@@ -74,7 +74,7 @@
             <Button x:Name="RetryButton" Style="{StaticResource TileButton}" Click="Retry_Click"
                     Content="Retry" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Visibility="Collapsed" />
 
-            <ProgressRing x:Name="Busy" IsActive="False" Width="28" Height="28"
+            <ProgressRing x:Name="Busy" IsActive="False" Visibility="Collapsed" Width="28" Height="28"
                           Foreground="{StaticResource AccentGreenLightBrush}" HorizontalAlignment="Left" />
         </StackPanel>
         </ScrollViewer>

@@ -5,7 +5,7 @@
     xmlns:controls="using:LichessXbox.Controls"
     Background="Transparent">
 
-    <Grid Padding="32,24,32,24">
+    <Grid Padding="{StaticResource PagePadding}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
@@ -31,7 +31,7 @@
                             <TextBlock Text="&#x265F;&#xFE0F;" FontSize="28" />
                             <StackPanel>
                                 <TextBlock Text="Play online" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-                                <TextBlock Text="Bullet · Blitz · Rapid · Classical" FontSize="{StaticResource CaptionSize}"
+                                <TextBlock Text="Rapid · Classical · Daily — or any speed vs a friend" FontSize="{StaticResource CaptionSize}"
                                            Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
                             </StackPanel>
                         </StackPanel>

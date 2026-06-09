@@ -129,7 +129,7 @@ namespace LichessXbox.Views
                 _showEngine = false;
                 try
                 {
-                    var eval = await AppState.Current.Api.GetCloudEvalAsync(fen, pos.WhiteToMove);
+                    var eval = await AppState.Current.Api.GetCloudEvalAsync(fen);
                     if (cts.IsCancellationRequested) return;
                     if (eval != null)
                     {
@@ -214,7 +214,13 @@ namespace LichessXbox.Views
 
         void Explorer_ItemClick(object sender, ItemClickEventArgs e)
         {
-            if (e.ClickedItem is ExplorerMoveRow row) PlayUci(row.Uci);
+            if (e.ClickedItem is ExplorerMoveRow row)
+            {
+                // The explorer list reloads for the new position, which would drop gamepad focus
+                // from the clicked (now recycled) row — hand focus to the board first.
+                Board.FocusBoard();
+                PlayUci(row.Uci);
+            }
         }
 
         void Tablebase_ItemClick(object sender, ItemClickEventArgs e)
@@ -266,22 +272,28 @@ namespace LichessXbox.Views
                 catch { _sans.Add("…"); }
             }
 
-            int rowCount = (n + 1) / 2;
+            // When the root position has Black to move (custom FEN / mid-game import), the first
+            // SAN belongs to Black — offset the pairing so it renders "1.  …  e5" instead of
+            // shoving Black's move into the White column.
+            int offset = _history.Count > 0 && !_history[0].WhiteToMove ? 1 : 0;
+            int rowCount = (n + offset + 1) / 2;
             while (_moveRows.Count < rowCount) _moveRows.Add(new MoveRowVM());
             while (_moveRows.Count > rowCount) _moveRows.RemoveAt(_moveRows.Count - 1);
             for (int r = 0; r < rowCount; r++)
             {
-                int i = r * 2;
                 var row = _moveRows[r];
                 row.No = (r + 1) + ".";
-                row.White = _sans[i];
-                bool hasBlack = i + 1 < n;
-                row.Black = hasBlack ? _sans[i + 1] : "";
+                int wIdx = r * 2 - offset;          // _sans index for this row's white half-move
+                int bIdx = wIdx + 1;
+                bool hasWhite = wIdx >= 0 && wIdx < n;
+                row.White = hasWhite ? _sans[wIdx] : "…";
+                row.WhitePly = hasWhite ? wIdx + 1 : 0;   // "…" jumps to the root
+                row.WhiteCurrent = hasWhite && _ply == wIdx + 1;
+                bool hasBlack = bIdx >= 0 && bIdx < n;
+                row.Black = hasBlack ? _sans[bIdx] : "";
                 row.BlackVisible = hasBlack ? Visibility.Visible : Visibility.Collapsed;
-                row.WhitePly = i + 1;   // jump to the position after white's move on this row
-                row.BlackPly = i + 2;
-                row.WhiteCurrent = _ply == i + 1;
-                row.BlackCurrent = _ply == i + 2;
+                row.BlackPly = hasBlack ? bIdx + 1 : 0;
+                row.BlackCurrent = hasBlack && _ply == bIdx + 1;
             }
             MovesEmpty.Visibility = n > 0 ? Visibility.Collapsed : Visibility.Visible;
             ScrollCurrentMoveIntoView();
@@ -299,7 +311,8 @@ namespace LichessXbox.Views
             double extent = AnalysisMoveScroller.ExtentHeight;
             if (extent <= 0) return;
             double rowH = extent / rows;
-            int rowIndex = _ply <= 0 ? 0 : (_ply - 1) / 2;   // the row holding the current ply
+            int off = _history.Count > 0 && !_history[0].WhiteToMove ? 1 : 0;   // black-to-move root offset
+            int rowIndex = _ply <= 0 ? 0 : (_ply - 1 + off) / 2;   // the row holding the current ply
             double target = Math.Min(rowIndex * rowH, AnalysisMoveScroller.ScrollableHeight);
             AnalysisMoveScroller.ChangeView(null, target, null, true);
         }
@@ -321,7 +334,7 @@ namespace LichessXbox.Views
             EnsureEngine();
             _showEngine = true;
             EvalText.Text = "…";
-            BestLineText.Text = _engine.IsReady ? "Analysing locally…" : "Starting engine…";
+            BestLineText.Text = _engine.IsReady ? "Analyzing locally…" : "Starting engine…";
             _engine.Analyze(pos);
         }
 
@@ -330,7 +343,7 @@ namespace LichessXbox.Views
         void OnEngineReady(bool ready)
         {
             if (!ready || !_showEngine || _engine == null) return;
-            BestLineText.Text = "Analysing locally…";
+            BestLineText.Text = "Analyzing locally…";
             _engine.Analyze(Current);
         }
 
@@ -369,15 +382,29 @@ namespace LichessXbox.Views
 
         // ---------------------------------------------------------------- import
 
+        // Land gamepad focus in the FEN box the moment the flyout opens.
+        void FenFlyout_Opened(object sender, object e) => FenBox.Focus(FocusState.Programmatic);
+
         void LoadFen_Click(object sender, RoutedEventArgs e)
         {
             string fen = FenBox.Text?.Trim();
             if (string.IsNullOrEmpty(fen)) return;
-            try { ResetTo(ChessPosition.FromFen(fen)); }
+            try
+            {
+                var pos = ChessPosition.FromFen(fen);
+                FenFlyout.Hide();   // close before loading so focus lands back on the board
+                ResetTo(pos);
+                Board.FocusBoard();
+            }
             catch { BestLineText.Text = "That FEN could not be read."; }
         }
 
-        void StartPos_Click(object sender, RoutedEventArgs e) => ResetTo(ChessPosition.Starting());
+        void StartPos_Click(object sender, RoutedEventArgs e)
+        {
+            FenFlyout.Hide();
+            ResetTo(ChessPosition.Starting());
+            Board.FocusBoard();
+        }
 
         void ResetTo(ChessPosition pos)
         {

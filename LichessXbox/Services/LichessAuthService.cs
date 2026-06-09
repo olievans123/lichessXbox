@@ -25,7 +25,7 @@ namespace LichessXbox.Services
         public const string ClientId = "lichess-xbox-app";
         const string Authorize = "https://lichess.org/oauth";
         const string TokenEndpoint = "https://lichess.org/api/token";
-        const string Scopes = "board:play challenge:write challenge:read puzzle:read preference:read tournament:write";
+        const string Scopes = "board:play challenge:write challenge:read puzzle:read preference:read study:read tournament:write";
 
         const string VaultResource = "LichessXbox";
         const string VaultUser = "bearer";

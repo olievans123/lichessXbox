@@ -61,7 +61,7 @@
                     <TextBlock x:Name="PlayersText" Visibility="Collapsed" FontSize="{StaticResource CaptionSize}"
                                Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
                     <!-- Always present (fixed 1-line height) so the opening name appearing can't shift the panel. -->
-                    <TextBlock x:Name="OpeningNameText" Height="20" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
+                    <TextBlock x:Name="OpeningNameText" Height="22" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold"
                                Foreground="{StaticResource AccentGreenLightBrush}" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
                 </StackPanel>
                 <Button Grid.Column="1" Style="{StaticResource IconButton}" Width="44" Height="44" CornerRadius="22"
@@ -69,7 +69,9 @@
                         FontFamily="Segoe MDL2 Assets" FontSize="18" Content="&#xE8E5;"
                         ToolTipService.ToolTip="Load position (FEN)">
                     <Button.Flyout>
-                        <Flyout>
+                        <!-- Auto-focus the FEN box on open: with a gamepad, XY navigation doesn't
+                             reliably enter a fresh flyout on its own. -->
+                        <Flyout x:Name="FenFlyout" Opened="FenFlyout_Opened">
                             <StackPanel Width="300" Spacing="10">
                                 <TextBlock Text="Load position (FEN)" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                                 <TextBox x:Name="FenBox" FontSize="{StaticResource CaptionSize}" Height="52" VerticalContentAlignment="Center"
@@ -100,7 +102,7 @@
                     <!-- 1-line PV (ellipsis). Fixed height keeps the panel from reflowing as the engine deepens. -->
                     <TextBlock x:Name="BestLineText" Text="Evaluating…" FontSize="{StaticResource CaptionSize}"
                                Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="NoWrap"
-                               Height="20" MaxLines="1" TextTrimming="CharacterEllipsis" VerticalAlignment="Top" />
+                               Height="22" MaxLines="1" TextTrimming="CharacterEllipsis" VerticalAlignment="Top" />
                 </StackPanel>
             </Border>
 
@@ -113,18 +115,19 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Style="{StaticResource TileButton}" Click="First_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE892;" Padding="0,10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                <Button Grid.Column="1" x:Name="BackButton" Style="{StaticResource TileButton}" Click="Back_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE76B;" Padding="0,10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                <Button Grid.Column="2" Style="{StaticResource TileButton}" Click="Forward_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE76C;" Padding="0,10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                <Button Grid.Column="3" Style="{StaticResource TileButton}" Click="Last_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE893;" Padding="0,10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                <Button Grid.Column="4" Style="{StaticResource TileButton}" Click="Flip_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE8AB;" Padding="0,10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                <Button Grid.Column="0" Style="{StaticResource TileButton}" Click="First_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE892;" Padding="0,10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTipService.ToolTip="First move" />
+                <Button Grid.Column="1" x:Name="BackButton" Style="{StaticResource TileButton}" Click="Back_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE76B;" Padding="0,10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTipService.ToolTip="Previous move" />
+                <Button Grid.Column="2" Style="{StaticResource TileButton}" Click="Forward_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE76C;" Padding="0,10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTipService.ToolTip="Next move" />
+                <Button Grid.Column="3" Style="{StaticResource TileButton}" Click="Last_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE893;" Padding="0,10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTipService.ToolTip="Latest move" />
+                <Button Grid.Column="4" Style="{StaticResource TileButton}" Click="Flip_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE8AB;" Padding="0,10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTipService.ToolTip="Flip board" />
             </Grid>
 
             <!-- Moves: clickable, jump the board to any position (like the Play board) -->
             <Border Grid.Row="3" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,8">
                 <StackPanel Spacing="6">
                     <TextBlock Text="Moves" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                    <Grid Height="44">
+                    <!-- Whole multiple of the ~27px move-row height: 2 clean rows, no half-clipped third. -->
+                    <Grid Height="54">
                         <TextBlock x:Name="MovesEmpty" Text="No moves yet." FontSize="{StaticResource CaptionSize}"
                                    Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Top" />
                         <ScrollViewer x:Name="AnalysisMoveScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
@@ -200,7 +203,7 @@
             </Border>
 
             <!-- Tablebase (appears in endgames, below the explorer) -->
-            <Border x:Name="TablebaseCard" Grid.Row="5" Style="{StaticResource CardBorder}" Padding="16" Margin="0,12,0,0" Visibility="Collapsed">
+            <Border x:Name="TablebaseCard" Grid.Row="5" Style="{StaticResource CardBorder}" Padding="12" Margin="0" Visibility="Collapsed">
                 <StackPanel Spacing="10">
                     <TextBlock x:Name="TablebaseSummary" Text="Tablebase" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                Foreground="{StaticResource AccentGreenLightBrush}" />

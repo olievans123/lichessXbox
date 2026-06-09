@@ -35,6 +35,8 @@ namespace LichessXbox.Views
             string user = UserBox.Text?.Trim();
             if (string.IsNullOrEmpty(user)) return;
             Busy.IsActive = true;
+            Busy.Visibility = Visibility.Visible;
+            StatusStrip.Visibility = Visibility.Visible;
             StatusText.Text = "";
             StudyList.ItemsSource = null;
             try
@@ -48,17 +50,32 @@ namespace LichessXbox.Views
             {
                 StatusText.Text = "Couldn't load studies. Check the username.";
             }
-            finally { Busy.IsActive = false; }
+            finally
+            {
+                Busy.IsActive = false;
+                Busy.Visibility = Visibility.Collapsed;
+                StatusStrip.Visibility = string.IsNullOrEmpty(StatusText.Text) ? Visibility.Collapsed : Visibility.Visible;
+            }
         }
 
         async void Study_ItemClick(object sender, ItemClickEventArgs e)
         {
             if (!(e.ClickedItem is StudyItem study)) return;
             Busy.IsActive = true;
+            Busy.Visibility = Visibility.Visible;
+            StatusStrip.Visibility = Visibility.Visible;
             StatusText.Text = "";
             try
             {
                 string pgn = await AppState.Current.Api.GetStudyPgnAsync(study.Id);
+                if (pgn == null)
+                {
+                    // Lichess requires the study:read scope to export a study (anonymous = 403).
+                    StatusText.Text = AppState.Current.IsSignedIn
+                        ? "Couldn't open that study — sign out and back in (Profile) to grant study access."
+                        : "Sign in on the Profile page to open studies.";
+                    return;
+                }
                 if (string.IsNullOrWhiteSpace(pgn)) { StatusText.Text = "Study has no moves to show."; return; }
 
                 var chapters = ParseChapters(pgn);
@@ -75,7 +92,12 @@ namespace LichessXbox.Views
                 ChapterList.Focus(FocusState.Programmatic);
             }
             catch { StatusText.Text = "Couldn't open that study."; }
-            finally { Busy.IsActive = false; }
+            finally
+            {
+                Busy.IsActive = false;
+                Busy.Visibility = Visibility.Collapsed;
+                StatusStrip.Visibility = string.IsNullOrEmpty(StatusText.Text) ? Visibility.Collapsed : Visibility.Visible;
+            }
         }
 
         void Chapter_ItemClick(object sender, ItemClickEventArgs e)

@@ -17,6 +17,7 @@ namespace LichessXbox.Services
     {
         readonly WebView _web;
         bool _ready;
+        bool _fence;   // true between "stop" and the engine's "readyok" — drop stale info lines
         ChessPosition _context = ChessPosition.Starting();
 
         /// <summary>Fires with (depth, evalText, pvSan, bestMoveUci) as analysis deepens.</summary>
@@ -44,7 +45,13 @@ namespace LichessXbox.Services
         {
             _context = pos;
             if (!_ready) return;
+            // UCI fence: after "stop", the old search can still flush a few "info" lines. Those
+            // would be re-oriented against the NEW _context (flipped eval sign, wrong best-move
+            // arrow). "isready" is processed in order, so dropping info lines until its "readyok"
+            // guarantees every emitted info belongs to the new position.
+            _fence = true;
             Send("stop");
+            Send("isready");
             Send("position fen " + pos.ToFen());
             Send("go depth " + depth);
         }
@@ -79,11 +86,12 @@ namespace LichessXbox.Services
             }
             else if (line.StartsWith("readyok") || line.StartsWith("uciok"))
             {
+                _fence = false;   // the restart handshake completed — infos are fresh again
                 if (!_ready) { _ready = true; ReadyChanged?.Invoke(true); }
             }
             else if (line.StartsWith("info ") && line.Contains(" pv "))
             {
-                ParseInfo(line);
+                if (!_fence) ParseInfo(line);
             }
         }
 

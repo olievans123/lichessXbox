@@ -163,6 +163,13 @@ namespace LichessXbox.Views
             OnlineModeAccent.Visibility = online ? Visibility.Visible : Visibility.Collapsed;
             ComputerModeAccent.Visibility = computer ? Visibility.Visible : Visibility.Collapsed;
             FriendModeAccent.Visibility = friend ? Visibility.Visible : Visibility.Collapsed;
+
+            // The rail's D-pad-Right target must always be the VISIBLE detail panel — pointing
+            // at a collapsed panel's control makes Right a dead end on the inactive rail buttons.
+            Control detail = computer ? (Control)LevelGrid : friend ? (Control)FriendBox : PresetGrid;
+            OnlineModeButton.XYFocusRight = detail;
+            ComputerModeButton.XYFocusRight = detail;
+            FriendModeButton.XYFocusRight = detail;
         }
 
         void Mode_Click(object sender, RoutedEventArgs e)
@@ -274,12 +281,18 @@ namespace LichessXbox.Views
             _autoOpen = true;
             SeekingText.Text = $"Waiting for {user} to accept…";
             ShowOnly(SeekingPanel);
-            _seekCts = new CancellationTokenSource();
-            bool ok = await AppState.Current.Api.ChallengeUserAsync(user, clock, Variant);
+            var cts = new CancellationTokenSource();
+            _seekCts = cts;
+            bool ok;
+            try { ok = await AppState.Current.Api.ChallengeUserAsync(user, clock, Variant); }
+            catch { ok = false; }
+            // Bail if THIS challenge was cancelled or superseded while we awaited.
+            if (cts.IsCancellationRequested || _seekCts != cts) return;
             if (!ok && !_gameActive)
             {
                 SeekingText.Text = $"Could not challenge {user}.";
                 await Task.Delay(1500);
+                if (cts.IsCancellationRequested || _seekCts != cts) return;
                 if (!_gameActive)
                 {
                     // Leave a persistent error on the lobby so the failure isn't missed.
@@ -307,7 +320,16 @@ namespace LichessXbox.Views
             string id = (sender as FrameworkElement)?.Tag as string;
             if (string.IsNullOrEmpty(id)) return;
             RemoveChallenge(id);
-            await AppState.Current.Api.DeclineChallengeAsync(id);
+            // Declining the last challenge collapses the banner under the focused button —
+            // hand focus back to the active lobby panel so the gamepad isn't stranded.
+            if (_challenges.Count == 0)
+            {
+                Control target = ComputerPanel.Visibility == Visibility.Visible ? (Control)LevelGrid
+                               : FriendPanel.Visibility == Visibility.Visible ? (Control)FriendBox
+                               : PresetGrid;
+                target.Focus(FocusState.Programmatic);
+            }
+            try { await AppState.Current.Api.DeclineChallengeAsync(id); } catch { }
         }
 
         // ------------------------------------------------------------- seeking
@@ -405,9 +427,12 @@ namespace LichessXbox.Views
             TopAdvantage.Text = ""; BottomAdvantage.Text = "";
 
             // Reconnect the board stream only while THIS game is still live (not after the result
-            // card shows, and not once a different game has started).
+            // card shows, and not once a different game has started). The callback itself is also
+            // gated on the game id: the read loop checks cancellation BEFORE each await, so one
+            // already-read line could otherwise slip through after a new game took over.
             string gid = gameId;
-            _ = RunStreamAsync(() => AppState.Current.Api.StreamBoardGameAsync(gameId, OnGameState, ct), ct,
+            _ = RunStreamAsync(() => AppState.Current.Api.StreamBoardGameAsync(gameId,
+                                   msg => { if (_gameId == gid) OnGameState(msg); }, ct), ct,
                                () => _gameId == gid && !_resultShown);
         }
 
@@ -625,8 +650,9 @@ namespace LichessXbox.Views
                     break;
                 case "timeout":
                 case "outoftime":
-                    kind = (winner == "white") == _playerIsWhite ? 0 : 1;
-                    method = "by timeout";
+                    // No winner on a flag = draw (the other side had insufficient mating material).
+                    if (string.IsNullOrEmpty(winner)) { kind = 2; method = "by timeout"; }
+                    else { kind = (winner == "white") == _playerIsWhite ? 0 : 1; method = "by timeout"; }
                     break;
                 case "stalemate":
                     kind = 2; method = "by stalemate";
@@ -820,6 +846,13 @@ namespace LichessXbox.Views
         void UpdateNavUi(bool live)
         {
             bool atStart = _viewPly <= 0;
+            // Disabling the button that currently holds gamepad focus silently drops focus to
+            // nowhere — hand it to the opposite stepper first.
+            var focused = Windows.UI.Xaml.Input.FocusManager.GetFocusedElement();
+            if (atStart && (ReferenceEquals(focused, MoveFirstButton) || ReferenceEquals(focused, MovePrevButton)))
+                MoveNextButton.Focus(FocusState.Programmatic);
+            else if (live && (ReferenceEquals(focused, MoveNextButton) || ReferenceEquals(focused, MoveLastButton)))
+                MovePrevButton.Focus(FocusState.Programmatic);
             MoveFirstButton.IsEnabled = !atStart;
             MovePrevButton.IsEnabled = !atStart;
             MoveNextButton.IsEnabled = !live;
@@ -853,6 +886,7 @@ namespace LichessXbox.Views
         void ClockTick(object sender, object e)
         {
             if (!_gameActive) return;
+            if (_plies.Count < 2) return;   // lichess clocks don't run until both sides have moved
             if (_whiteToMove) _whiteMs = Math.Max(0, _whiteMs - 200);
             else _blackMs = Math.Max(0, _blackMs - 200);
             UpdateClocks();
@@ -891,43 +925,50 @@ namespace LichessXbox.Views
         async void Board_MoveRequested(object sender, ChessMove move)
         {
             if (string.IsNullOrEmpty(_gameId)) return;
-            bool ok = await AppState.Current.Api.MakeBoardMoveAsync(_gameId, move.ToUci());
-            if (!ok) StatusBanner.Text = "Illegal move — try again.";
+            // A transient network failure must read like a rejected move, not escape the async
+            // void and pop the global error dialog over a live game.
+            bool ok;
+            try { ok = await AppState.Current.Api.MakeBoardMoveAsync(_gameId, move.ToUci()); }
+            catch { ok = false; }
+            if (!ok) StatusBanner.Text = "Move didn't go through — try again.";
             // The game stream will deliver the authoritative new position.
         }
 
         async void Resign_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(_gameId)) return;
-            await AppState.Current.Api.ResignAsync(_gameId);
+            try { await AppState.Current.Api.ResignAsync(_gameId); }
+            catch { StatusBanner.Text = "Network hiccup — try again."; }
         }
 
         async void OfferDraw_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(_gameId)) return;
-            await AppState.Current.Api.OfferDrawAsync(_gameId, true);
-            StatusBanner.Text = "Draw offered.";
+            try { await AppState.Current.Api.OfferDrawAsync(_gameId, true); StatusBanner.Text = "Draw offered."; }
+            catch { StatusBanner.Text = "Network hiccup — try again."; }
         }
 
         async void Takeback_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(_gameId)) return;
-            await AppState.Current.Api.TakebackAsync(_gameId, true);
-            StatusBanner.Text = "Takeback requested.";
+            try { await AppState.Current.Api.TakebackAsync(_gameId, true); StatusBanner.Text = "Takeback requested."; }
+            catch { StatusBanner.Text = "Network hiccup — try again."; }
         }
 
         async void AcceptDraw_Click(object sender, RoutedEventArgs e)
         {
             DrawOfferBanner.Visibility = Visibility.Collapsed;
             if (string.IsNullOrEmpty(_gameId)) return;
-            await AppState.Current.Api.OfferDrawAsync(_gameId, true);
+            try { await AppState.Current.Api.OfferDrawAsync(_gameId, true); }
+            catch { StatusBanner.Text = "Network hiccup — try again."; }
         }
 
         async void DeclineDraw_Click(object sender, RoutedEventArgs e)
         {
             DrawOfferBanner.Visibility = Visibility.Collapsed;
             if (string.IsNullOrEmpty(_gameId)) return;
-            await AppState.Current.Api.OfferDrawAsync(_gameId, false);
+            try { await AppState.Current.Api.OfferDrawAsync(_gameId, false); }
+            catch { StatusBanner.Text = "Network hiccup — try again."; }
         }
 
         async void Rematch_Click(object sender, RoutedEventArgs e)

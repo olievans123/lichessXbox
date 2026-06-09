@@ -10,6 +10,8 @@ namespace LichessXbox.Views
     public sealed partial class TournamentsPage : Page
     {
         string _selectedId;
+        bool _joined;   // current selection: are we entered? (Join ↔ Leave toggle)
+        readonly System.Collections.Generic.HashSet<string> _joinedIds = new System.Collections.Generic.HashSet<string>();
 
         public TournamentsPage()
         {
@@ -60,13 +62,13 @@ namespace LichessXbox.Views
         {
             if (!(e.ClickedItem is TournamentItem t)) return;
             _selectedId = t.Id;
+            _joined = _joinedIds.Contains(t.Id);   // remember arenas we entered this session
             DetailTitle.Text = t.Name;
-            // Arena games play through the Board API (Rapid/Classical only), so Bullet/Blitz
-            // tournaments can be viewed but not joined here.
-            bool canJoin = AppState.Current.IsSignedIn && t.Group != "Finished";
-            JoinButton.Visibility = canJoin && t.Playable ? Visibility.Visible : Visibility.Collapsed;
-            JoinNote.Visibility = canJoin && !t.Playable ? Visibility.Visible : Visibility.Collapsed;
-            JoinButton.Content = "Join";
+            // The list is pre-filtered to Board-API-playable arenas (Rapid/Classical), so any
+            // selectable tournament can be joined once signed in.
+            JoinButton.Visibility = AppState.Current.IsSignedIn && t.Group != "Finished"
+                ? Visibility.Visible : Visibility.Collapsed;
+            JoinButton.Content = _joined ? "Leave arena" : "Join";
             JoinButton.IsEnabled = true;
             StandingsList.ItemsSource = null;
 
@@ -90,24 +92,36 @@ namespace LichessXbox.Views
             }
         }
 
+        // Join ↔ Leave toggle. While joined, the arena pairs you automatically — games surface
+        // via the games-in-progress tab (the pawn, top-left), so we say exactly that.
         async void Join_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(_selectedId) || !JoinButton.IsEnabled) return;   // guard double-press
             string id = _selectedId;
+            bool leaving = _joined;
             JoinButton.IsEnabled = false;
-            JoinButton.Content = "Joining…";
+            JoinButton.Content = leaving ? "Leaving…" : "Joining…";
             string err;
-            try { err = await AppState.Current.Api.JoinTournamentAsync(id); }
-            catch { err = "Couldn't join — try again."; }
-            if (_selectedId != id) return;   // user moved to another tournament while joining
+            try
+            {
+                err = leaving
+                    ? await AppState.Current.Api.WithdrawTournamentAsync(id)
+                    : await AppState.Current.Api.JoinTournamentAsync(id);
+            }
+            catch { err = leaving ? "Couldn't leave — try again." : "Couldn't join — try again."; }
+            if (_selectedId != id) return;   // user moved to another tournament meanwhile
+            JoinButton.IsEnabled = true;
             if (err == null)
             {
-                JoinButton.Content = "Joined ✓";   // arena game will surface via the continue-playing tab
+                _joined = !leaving;
+                if (_joined) _joinedIds.Add(id); else _joinedIds.Remove(id);
+                JoinButton.Content = _joined ? "Leave arena" : "Join";
+                DetailStatus.Text = _joined ? "You're in! Pairings appear in the games tab (the pawn, top-left)." : "";
+                DetailStatus.Visibility = _joined ? Visibility.Visible : Visibility.Collapsed;
             }
             else
             {
-                JoinButton.Content = "Join";
-                JoinButton.IsEnabled = true;
+                JoinButton.Content = leaving ? "Leave arena" : "Join";
                 DetailStatus.Text = err;   // the actual reason (lichess error, or re-auth hint on 401)
                 DetailStatus.Visibility = Visibility.Visible;
             }

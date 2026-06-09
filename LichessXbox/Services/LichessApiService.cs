@@ -135,6 +135,10 @@ namespace LichessXbox.Services
                     string line;
                     while (!ct.IsCancellationRequested && (line = await reader.ReadLineAsync()) != null)
                     {
+                        // The loop condition checks the token BEFORE the await, so a line that
+                        // completed during cancellation would otherwise still be delivered —
+                        // re-arming page machinery that was just torn down.
+                        if (ct.IsCancellationRequested) return;
                         if (string.IsNullOrWhiteSpace(line)) continue;
                         JObject obj = null;
                         try { obj = JObject.Parse(line); }
@@ -298,15 +302,17 @@ namespace LichessXbox.Services
                 form["clock.increment"] = (clock?.ClockIncrementSeconds ?? 3).ToString();
             }
             using (var content = new FormUrlEncodedContent(form))
-            using (var req = Build(HttpMethod.Post, $"/api/challenge/{username}", content))
+            using (var req = Build(HttpMethod.Post, $"/api/challenge/{Uri.EscapeDataString(username)}", content))
             using (var resp = await SendBufferedAsync(req))
                 return resp.IsSuccessStatusCode;
         }
 
-        public async Task AcceptChallengeAsync(string id)
+        /// <summary>Accept an incoming challenge. False when it can't be accepted (expired/withdrawn).</summary>
+        public async Task<bool> AcceptChallengeAsync(string id)
         {
             using (var req = Build(HttpMethod.Post, $"/api/challenge/{id}/accept"))
-            using (await SendBufferedAsync(req)) { }
+            using (var resp = await SendBufferedAsync(req))
+                return resp.IsSuccessStatusCode;
         }
 
         public async Task DeclineChallengeAsync(string id)
@@ -397,10 +403,11 @@ namespace LichessXbox.Services
         }
 
         /// <summary>
-        /// Cloud engine evaluation for a FEN. <paramref name="whiteToMove"/> orients the
-        /// score to White's perspective. Returns null if the position isn't cached.
+        /// Cloud engine evaluation for a FEN. Lichess cloud-eval scores are already from
+        /// White's perspective (unlike raw UCI), so they're used as-is — re-orienting by the
+        /// side to move flipped the sign on every black-to-move position. Null if not cached.
         /// </summary>
-        public async Task<CloudEval> GetCloudEvalAsync(string fen, bool whiteToMove)
+        public async Task<CloudEval> GetCloudEvalAsync(string fen)
         {
             string json = await GetAbsoluteAsync(Base + "/api/cloud-eval?fen=" + Uri.EscapeDataString(fen) + "&multiPv=1");
             if (json == null) return null;
@@ -422,13 +429,13 @@ namespace LichessXbox.Services
 
             if (mate.HasValue)
             {
-                int m = whiteToMove ? mate.Value : -mate.Value;
+                int m = mate.Value;
                 eval.EvalText = (m >= 0 ? "#" : "#-") + Math.Abs(m);
                 eval.WhiteAdvantage = m >= 0 ? 1 : -1;
             }
             else if (cp.HasValue)
             {
-                double whiteCp = whiteToMove ? cp.Value : -cp.Value;
+                double whiteCp = cp.Value;
                 eval.EvalText = (whiteCp >= 0 ? "+" : "") + (whiteCp / 100.0).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
                 eval.WhiteAdvantage = 2.0 / (1.0 + Math.Exp(-0.004 * whiteCp)) - 1.0;
             }
@@ -491,11 +498,26 @@ namespace LichessXbox.Services
                 {
                     San = m.Value<string>("san"),
                     Uci = m.Value<string>("uci"),
-                    // Category here is from the mover's opponent perspective, hence inverted.
-                    Outcome = DescribeTb(m.Value<string>("category"), m.Value<int?>("dtz")),
+                    // A move's category is reported from the side to move AFTER it (the mover's
+                    // opponent), so invert it — "Win" in the list must mean THIS move wins.
+                    Outcome = DescribeTb(InvertTb(m.Value<string>("category")), m.Value<int?>("dtz")),
                 });
             }
             return res;
+        }
+
+        static string InvertTb(string category)
+        {
+            switch (category)
+            {
+                case "win": return "loss";
+                case "loss": return "win";
+                case "cursed-win": return "blessed-loss";
+                case "blessed-loss": return "cursed-win";
+                case "maybe-win": return "maybe-loss";
+                case "maybe-loss": return "maybe-win";
+                default: return category;   // draw / unknown stay as-is
+            }
         }
 
         static string DescribeTb(string category, int? dtz)
@@ -517,7 +539,7 @@ namespace LichessXbox.Services
         public async Task<System.Collections.Generic.List<GameSummary>> GetUserGamesAsync(string username, int max = 20)
         {
             var list = new System.Collections.Generic.List<GameSummary>();
-            using (var req = Build(HttpMethod.Get, $"/api/games/user/{username}?max={max}&moves=true&sort=dateDesc"))
+            using (var req = Build(HttpMethod.Get, $"/api/games/user/{Uri.EscapeDataString(username)}?max={max}&moves=true&sort=dateDesc&lastFen=true"))
             {
                 req.Headers.Accept.Clear();
                 req.Headers.Accept.ParseAdd("application/x-ndjson");
@@ -585,7 +607,8 @@ namespace LichessXbox.Services
                 DateText = "",
                 Moves = moves,
                 InitialFen = initialFen,
-                FinalFen = ComputeFinalFen(initialFen, moves),
+                // Prefer the server's final position (exact for variants); replay SAN as fallback.
+                FinalFen = g.Value<string>("lastFen") ?? ComputeFinalFen(initialFen, moves),
                 PlayerWhite = iAmWhite,
                 Outcome = outcome,
                 WhiteName = whiteName,
@@ -768,6 +791,19 @@ namespace LichessXbox.Services
             }
         }
 
+        /// <summary>Leave (pause out of) an arena. Returns null on success, else a reason.</summary>
+        public async Task<string> WithdrawTournamentAsync(string id)
+        {
+            using (var req = Build(HttpMethod.Post, $"/api/tournament/{id}/withdraw"))
+            using (var resp = await SendBufferedAsync(req))
+            {
+                if (resp.IsSuccessStatusCode) return null;
+                string body = "";
+                try { body = await resp.Content.ReadAsStringAsync(); } catch { }
+                return ExtractApiError(body, (int)resp.StatusCode);
+            }
+        }
+
         // -------------------------------------------------------------- studies
 
         public async Task<System.Collections.Generic.List<StudyItem>> GetStudiesByUserAsync(string username)
@@ -775,7 +811,7 @@ namespace LichessXbox.Services
             var list = new System.Collections.Generic.List<StudyItem>();
             // Public endpoint — fetch ANONYMOUSLY. The app's OAuth token lacks the study:read scope,
             // and lichess rejects (401) token-bearing study requests without it, even for public data.
-            using (var req = new HttpRequestMessage(HttpMethod.Get, Base + $"/api/study/by/{username}"))
+            using (var req = new HttpRequestMessage(HttpMethod.Get, Base + $"/api/study/by/{Uri.EscapeDataString(username)}"))
             {
                 req.Headers.Accept.ParseAdd("application/x-ndjson");
                 using (var resp = await _http.SendAsync(req, HttpCompletionOption.ResponseHeadersRead))
@@ -806,9 +842,11 @@ namespace LichessXbox.Services
         /// <summary>Export a whole study as PGN (chapters separated by blank lines).</summary>
         public async Task<string> GetStudyPgnAsync(string studyId)
         {
-            // Anonymous — same missing study:read scope issue as the listing.
-            using (var req = new HttpRequestMessage(HttpMethod.Get, Base + $"/api/study/{studyId}.pgn"))
+            // Unlike the listing, the PGN export REQUIRES the study:read scope (anonymous = 403),
+            // so this call sends the bearer token.
+            using (var req = Build(HttpMethod.Get, $"/api/study/{studyId}.pgn"))
             {
+                req.Headers.Accept.Clear();
                 req.Headers.Accept.ParseAdd("application/x-chess-pgn");
                 using (var resp = await SendBufferedAsync(req, default, 25))
                 {

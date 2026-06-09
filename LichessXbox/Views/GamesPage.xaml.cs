@@ -37,8 +37,16 @@ namespace LichessXbox.Views
 
         async System.Threading.Tasks.Task ReloadAsync()
         {
-            var account = await AppState.Current.EnsureAccountAsync();
-            if (account == null) return;
+            // Offline must land in the "couldn't load" state, not escape the async void caller.
+            LichessAccount account = null;
+            try { account = await AppState.Current.EnsureAccountAsync(); } catch { }
+            if (account == null)
+            {
+                NoGames.Text = "Couldn't load your games.";
+                NoGames.Visibility = Visibility.Visible;
+                RetryGamesButton.Visibility = Visibility.Visible;
+                return;
+            }
 
             Busy.Visibility = Visibility.Visible;
             Busy.IsActive = true;

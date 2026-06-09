@@ -27,7 +27,7 @@
                             </StackPanel>
                         </StackPanel>
 
-                        <Button x:Name="HomeNav" Style="{StaticResource NavButton}" Tag="home" Click="Nav_Click">
+                        <Button Style="{StaticResource NavButton}" Tag="home" Click="Nav_Click">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="28" />
@@ -75,6 +75,26 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="🧩" FontFamily="Segoe UI Emoji" HorizontalAlignment="Center" />
                                 <TextBlock Grid.Column="1" Text="Puzzles" Margin="8,0,0,0" />
+                            </Grid>
+                        </Button>
+                        <Button Style="{StaticResource NavButton}" Tag="tournaments" Click="Nav_Click">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="🏆" FontFamily="Segoe UI Emoji" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Tournaments" Margin="8,0,0,0" />
+                            </Grid>
+                        </Button>
+                        <Button Style="{StaticResource NavButton}" Tag="studies" Click="Nav_Click">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="📚" FontFamily="Segoe UI Emoji" HorizontalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="Studies" Margin="8,0,0,0" />
                             </Grid>
                         </Button>
                         <Button Style="{StaticResource NavButton}" Tag="games" Click="Nav_Click">

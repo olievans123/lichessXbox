@@ -55,10 +55,13 @@
         <!-- Channels / streamers / broadcasts -->
         <ScrollViewer Grid.Column="1" Margin="20,0,0,0" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
             <StackPanel Spacing="16" Padding="0,0,10,16">
-                <ProgressRing x:Name="Busy" IsActive="False" Width="32" Height="32" HorizontalAlignment="Center" />
+                <!-- The loading ring lives INSIDE the header row so it never reflows the sidebar
+                     (a ring above the title pushed everything down during load, then snapped back). -->
                 <StackPanel Orientation="Horizontal" Spacing="10">
                     <Border Width="14" Height="14" CornerRadius="7" Background="{StaticResource LiveBrush}" VerticalAlignment="Center" />
                     <TextBlock x:Name="HeaderText" Text="Lichess TV" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                    <ProgressRing x:Name="Busy" IsActive="False" Visibility="Collapsed" Width="22" Height="22"
+                                  Foreground="{StaticResource AccentGreenLightBrush}" VerticalAlignment="Center" Margin="4,6,0,0" />
                 </StackPanel>
 
                 <TextBlock Text="Channels" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />

@@ -60,13 +60,8 @@
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" x:Name="DetailTitle" Text="Select a tournament" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold"
                            Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
-                <StackPanel Grid.Row="1" Margin="0,14">
-                    <Button x:Name="JoinButton" Style="{StaticResource PrimaryButton}" Click="Join_Click"
-                            Content="Join" MinWidth="160" Visibility="Collapsed" HorizontalAlignment="Left" />
-                    <TextBlock x:Name="JoinNote" Visibility="Collapsed" Margin="0,4,0,0" TextWrapping="Wrap"
-                               FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
-                               Text="Bullet &amp; Blitz tournaments can't be played in the app — only Rapid &amp; Classical." />
-                </StackPanel>
+                <Button Grid.Row="1" x:Name="JoinButton" Style="{StaticResource PrimaryButton}" Click="Join_Click"
+                        Content="Join" MinWidth="160" Margin="0,14" Visibility="Collapsed" HorizontalAlignment="Left" />
                 <TextBlock Grid.Row="2" x:Name="DetailStatus" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" VerticalAlignment="Top" Margin="0,8,0,0" />
                 <!-- Informational only: clickable (so a gamepad can focus + scroll it) but never
                      "selected", so no persistent green selection ring lingers on a row. -->

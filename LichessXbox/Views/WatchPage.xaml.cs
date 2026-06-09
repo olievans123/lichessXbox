@@ -5,6 +5,7 @@ using LichessXbox.Chess;
 using LichessXbox.Models;
 using LichessXbox.Services;
 using Newtonsoft.Json.Linq;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
@@ -21,24 +22,43 @@ namespace LichessXbox.Views
         bool _orientationWhite = true;
         string _whiteName = "—", _blackName = "—", _whiteRating = "", _blackRating = "";
         string _currentChannel = "best";
+        // Live-tick the clocks between TV frames (frames only arrive on moves, so without this
+        // the clocks freeze mid-think). Resynced from every wc/bc the stream delivers.
+        readonly DispatcherTimer _clockTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
+        long _wMs = -1, _bMs = -1;   // -1 = no clock data yet
+        bool _whiteTurn = true;
 
         public WatchPage()
         {
             this.InitializeComponent();
+            _clockTimer.Tick += ClockTick;
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             StartChannel(_currentChannel, "Lichess TV");
+            _clockTimer.Start();
             // The board is non-interactive (watch only), so it can't take focus — the list does.
             await LoadListsAsync();
         }
 
-        protected override void OnNavigatedFrom(NavigationEventArgs e) => _streamCts?.Cancel();
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            _clockTimer.Stop();
+            _streamCts?.Cancel();
+        }
+
+        void ClockTick(object sender, object e)
+        {
+            if (_wMs < 0 || _bMs < 0) return;   // nothing to tick until the stream supplies clocks
+            if (_whiteTurn) { _wMs = Math.Max(0, _wMs - 200); SetClock(true, _wMs); }
+            else { _bMs = Math.Max(0, _bMs - 200); SetClock(false, _bMs); }
+        }
 
         async Task LoadListsAsync()
         {
             Busy.IsActive = true;
+            Busy.Visibility = Windows.UI.Xaml.Visibility.Visible;
             try
             {
                 try
@@ -52,7 +72,7 @@ namespace LichessXbox.Views
                 try { SimulList.ItemsSource = await AppState.Current.Api.GetSimulsAsync(); SetEmptyState(SimulList, SimulsEmpty); } catch { ShowEmptyState(SimulsEmpty); }
                 try { BroadcastList.ItemsSource = await AppState.Current.Api.GetBroadcastsAsync(); SetEmptyState(BroadcastList, BroadcastsEmpty); } catch { ShowEmptyState(BroadcastsEmpty); }
             }
-            finally { Busy.IsActive = false; }
+            finally { Busy.IsActive = false; Busy.Visibility = Windows.UI.Xaml.Visibility.Collapsed; }
 
             // Land gamepad focus on the first non-empty list so the page is never a dead-end.
             Control target =
@@ -92,6 +112,7 @@ namespace LichessXbox.Views
             // Clear the previous channel's game so it doesn't linger until the first frame arrives.
             TopName.Text = ""; BottomName.Text = ""; TopRating.Text = ""; BottomRating.Text = "";
             TopClock.Text = "--:--"; BottomClock.Text = "--:--";
+            _wMs = _bMs = -1;   // pause local ticking until the new channel supplies clocks
             Board.LastMove = null;
             Board.Position = ChessPosition.Starting();   // neutral board until the first frame lands
             _ = RunAsync(key, attempt, ct);
@@ -145,16 +166,20 @@ namespace LichessXbox.Views
                     }
                 }
                 Board.WhiteAtBottom = _orientationWhite;
-                ApplyBoard(d.Value<string>("fen"), null);
+                string ffen = d.Value<string>("fen");
+                ApplyBoard(ffen, null);
+                SyncTurn(ffen);
                 ApplyPlayers();
                 ApplyClocks(d["players"] as JArray);
             }
             else if (t == "fen")
             {
-                ApplyBoard(d.Value<string>("fen"), d.Value<string>("lm"));
+                string fen = d.Value<string>("fen");
+                ApplyBoard(fen, d.Value<string>("lm"));
+                SyncTurn(fen);
                 long? wc = d.Value<long?>("wc"); long? bc = d.Value<long?>("bc");
-                if (wc.HasValue) SetClock(true, wc.Value * 1000);
-                if (bc.HasValue) SetClock(false, bc.Value * 1000);
+                if (wc.HasValue) { _wMs = wc.Value * 1000; SetClock(true, _wMs); }
+                if (bc.HasValue) { _bMs = bc.Value * 1000; SetClock(false, _bMs); }
             }
         }
 
@@ -186,6 +211,14 @@ namespace LichessXbox.Views
             }
         }
 
+        // Whose clock runs comes from the frame's FEN side-to-move; frames without one (bare
+        // piece placement) alternate, since each fen frame is a move being played.
+        void SyncTurn(string fen)
+        {
+            var parts = (fen ?? "").Trim().Split(' ');
+            _whiteTurn = parts.Length > 1 ? parts[1] == "w" : !_whiteTurn;
+        }
+
         void ApplyClocks(JArray players)
         {
             if (players == null) return;
@@ -193,7 +226,9 @@ namespace LichessXbox.Views
             {
                 string color = p.Value<string>("color");
                 long? seconds = p.Value<long?>("seconds");
-                if (seconds.HasValue) SetClock(color == "white", seconds.Value * 1000);
+                if (!seconds.HasValue) continue;
+                if (color == "white") _wMs = seconds.Value * 1000; else _bMs = seconds.Value * 1000;
+                SetClock(color == "white", seconds.Value * 1000);
             }
         }
 
