@@ -268,6 +268,11 @@ namespace LichessXbox.Models
         public string Id { get; set; }
         public string Name { get; set; }
         public string Owner { get; set; }
+        // Owners can disable PGN export per-study (the endpoint 403s even anonymously,
+        // though the study stays public on the site). Probed at listing time.
+        public bool Exportable { get; set; } = true;
+        public string ActionText => Exportable ? "Open" : "View-only";
+        public double CardOpacity => Exportable ? 1.0 : 0.55;
     }
 
     /// <summary>Lichess TV / broadcast featured game snapshot.</summary>

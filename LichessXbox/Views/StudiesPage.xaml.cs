@@ -61,6 +61,13 @@ namespace LichessXbox.Views
         async void Study_ItemClick(object sender, ItemClickEventArgs e)
         {
             if (!(e.ClickedItem is StudyItem study)) return;
+            if (!study.Exportable)
+            {
+                // The owner disabled PGN export — no token or scope can open it.
+                StatusStrip.Visibility = Visibility.Visible;
+                StatusText.Text = "The owner of this study has switched off PGN export, so it can't be opened here. It's view-only on lichess.org.";
+                return;
+            }
             Busy.IsActive = true;
             Busy.Visibility = Visibility.Visible;
             StatusStrip.Visibility = Visibility.Visible;
@@ -72,10 +79,10 @@ namespace LichessXbox.Views
                 {
                     // Export is tried anonymously (public studies need no scope), with a
                     // token retry for private ones — a null is a genuine fetch failure.
-                    // Show lichess's status code: 429 = rate-limited (wait a minute),
-                    // 404 = study gone, 401/403 = private study we can't read.
                     int code = AppState.Current.Api.LastStudyExportStatus;
-                    StatusText.Text = code == 429
+                    StatusText.Text = code == 403
+                        ? "The owner of this study has switched off PGN export, so it can't be opened here. It's view-only on lichess.org."
+                        : code == 429
                         ? "Lichess is rate-limiting us (HTTP 429) — wait a minute, then try again."
                         : $"Couldn't open that study (HTTP {code}) — try again in a moment.";
                     return;

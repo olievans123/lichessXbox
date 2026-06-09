@@ -839,7 +839,31 @@ namespace LichessXbox.Services
                     }
                 }
             }
+            // A public study can still have PGN export disabled by its owner: the export
+            // endpoint 403s (even anonymously) while the study stays listed and viewable on
+            // the site. HEAD doesn't discriminate (204 either way), so probe with a
+            // headers-only GET and mark view-only studies before the user clicks into them.
+            using (var gate = new SemaphoreSlim(6))
+            {
+                var probes = new List<Task>();
+                foreach (var s in list) probes.Add(ProbeStudyExportableAsync(s, gate));
+                try { await Task.WhenAll(probes); } catch { }
+            }
             return list;
+        }
+
+        async Task ProbeStudyExportableAsync(StudyItem s, SemaphoreSlim gate)
+        {
+            await gate.WaitAsync();
+            try
+            {
+                using (var req = new HttpRequestMessage(HttpMethod.Get, Base + $"/api/study/{s.Id}.pgn"))
+                using (var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(8)))
+                using (var resp = await _http.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, timeout.Token))
+                    s.Exportable = (int)resp.StatusCode != 403;
+            }
+            catch { /* leave Exportable=true — the click path reports the real error */ }
+            finally { gate.Release(); }
         }
 
         /// <summary>Export a whole study as PGN (chapters separated by blank lines).</summary>

@@ -30,7 +30,9 @@
             <ListView x:Name="StudyList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Study_ItemClick" ScrollViewer.VerticalScrollMode="Disabled">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <Border CornerRadius="12" Padding="18,14"
+                        <!-- View-only studies (owner disabled PGN export) render dimmed with a
+                             "View-only" tag instead of "Open". -->
+                        <Border CornerRadius="12" Padding="18,14" Opacity="{Binding CardOpacity}"
                                 Background="{StaticResource AppSurfaceHighBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -40,7 +42,7 @@
                                 <StackPanel>
                                     <TextBlock Text="{Binding Name}" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
                                 </StackPanel>
-                                <TextBlock Grid.Column="1" Text="Open" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}"
+                                <TextBlock Grid.Column="1" Text="{Binding ActionText}" FontSize="{StaticResource CaptionSize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}"
                                            HorizontalAlignment="Right" VerticalAlignment="Center" Margin="12,0,0,0" />
                             </Grid>
                         </Border>
