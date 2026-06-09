@@ -31,9 +31,28 @@ namespace LichessXbox.Views
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             await ReloadAsync();
-            // Still entered in an arena (e.g. back from a finished round)? Resume the watch so
-            // the next pairing opens by itself.
-            if (_joinedIds.Count > 0 && AppState.Current.IsSignedIn) await StartPairingWatchAsync(true);
+            // Still entered in an arena (e.g. back from a finished round)? Re-assert
+            // pairMeAsap (each pairing needs it afresh — we're never "on the page") and
+            // resume the watch so the next pairing opens by itself.
+            if (_joinedIds.Count > 0 && AppState.Current.IsSignedIn)
+            {
+                await NudgeJoinedArenasAsync();
+                if (_joinedIds.Count > 0) await StartPairingWatchAsync(true);
+            }
+        }
+
+        async System.Threading.Tasks.Task NudgeJoinedArenasAsync()
+        {
+            foreach (var id in _joinedIds.ToList())
+            {
+                try
+                {
+                    // Join is idempotent: it unpauses and re-requests a pairing.
+                    string err = await AppState.Current.Api.JoinTournamentAsync(id);
+                    if (err != null) _joinedIds.Remove(id);   // arena finished/closed — drop it
+                }
+                catch { /* transient network — keep the arena and try again next visit */ }
+            }
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e) => StopPairingWatch();
@@ -87,8 +106,17 @@ namespace LichessXbox.Views
             JoinButton.IsEnabled = true;
             StandingsList.ItemsSource = null;
 
-            if (!_watching)
+            // The waiting banner belongs to the arena we ENTERED — selecting a different
+            // tournament must not claim we're in that one too. The watch itself keeps
+            // running in the background either way.
+            if (_watching && _joined)
             {
+                ShowWaitingBanner();
+            }
+            else
+            {
+                PairRing.IsActive = false;
+                PairRing.Visibility = Visibility.Collapsed;
                 DetailStatus.Text = "Loading standings…";
                 DetailStatus.Visibility = Visibility.Visible;
             }
@@ -103,7 +131,7 @@ namespace LichessXbox.Views
                 if (_selectedId != id) return;   // a newer selection won the race — don't clobber it
                 if (!string.IsNullOrEmpty(title)) DetailTitle.Text = title;
                 StandingsList.ItemsSource = players;
-                if (_watching) return;   // keep the "waiting for your pairing" line on screen
+                if (_watching && _joined) return;   // keep the "waiting for your pairing" line on screen
                 bool anyStandings = players != null && players.Count > 0;
                 DetailStatus.Text = anyStandings ? "" : "No standings yet.";
                 DetailStatus.Visibility = anyStandings ? Visibility.Collapsed : Visibility.Visible;
@@ -151,6 +179,8 @@ namespace LichessXbox.Views
                     StopPairingWatch();
                     DetailStatus.Text = "";
                     DetailStatus.Visibility = Visibility.Collapsed;
+                    // Still entered elsewhere? Keep watching for that arena's pairing.
+                    if (_joinedIds.Count > 0) await StartPairingWatchAsync(true);
                 }
             }
             else
@@ -186,6 +216,13 @@ namespace LichessXbox.Views
             }
             _watching = true;
             _pairTimer.Start();
+            // Only claim "you're in" when the selection IS an entered arena (or nothing
+            // is selected yet) — not over some other tournament's standings.
+            if (_selectedId == null || _joinedIds.Contains(_selectedId)) ShowWaitingBanner();
+        }
+
+        void ShowWaitingBanner()
+        {
             PairRing.IsActive = true;
             PairRing.Visibility = Visibility.Visible;
             DetailStatus.Text = "You're in — waiting for your pairing. The game will open by itself.";

@@ -779,7 +779,12 @@ namespace LichessXbox.Services
         /// <summary>Join an arena. Returns null on success, else a human-readable reason.</summary>
         public async Task<string> JoinTournamentAsync(string id)
         {
-            using (var req = Build(HttpMethod.Post, $"/api/tournament/{id}/join"))
+            // pairMeAsap: pair us even though we're not "connected to the tournament page".
+            // An API client has no tournament page open, so without this lichess treats the
+            // player as absent and NEVER pairs them. Re-sending join (idempotent; it also
+            // unpauses) re-asserts it for the next round.
+            using (var content = new FormUrlEncodedContent(new Dictionary<string, string> { ["pairMeAsap"] = "true" }))
+            using (var req = Build(HttpMethod.Post, $"/api/tournament/{id}/join", content))
             using (var resp = await SendBufferedAsync(req))
             {
                 if (resp.IsSuccessStatusCode) return null;
