@@ -783,8 +783,11 @@ namespace LichessXbox.Services
             using (var resp = await SendBufferedAsync(req))
             {
                 if (resp.IsSuccessStatusCode) return null;
-                if ((int)resp.StatusCode == 401)
-                    return "Sign out and back in to grant tournament access, then retry.";
+                // 401/403 = the token can't join arenas. Re-pairing by QR grants the scope,
+                // but a pasted personal token keeps the scopes it was CREATED with — signing
+                // out and back in with the same token will never fix it.
+                if ((int)resp.StatusCode == 401 || (int)resp.StatusCode == 403)
+                    return "This sign-in can't join arenas. Re-pair by QR on the Profile page, or paste a new token created with the tournament:write scope.";
                 string body = "";
                 try { body = await resp.Content.ReadAsStringAsync(); } catch { }
                 return ExtractApiError(body, (int)resp.StatusCode);
@@ -842,9 +845,21 @@ namespace LichessXbox.Services
         /// <summary>Export a whole study as PGN (chapters separated by blank lines).</summary>
         public async Task<string> GetStudyPgnAsync(string studyId)
         {
-            // Unlike the listing, the PGN export REQUIRES the study:read scope (anonymous = 403),
-            // so this call sends the bearer token.
-            using (var req = Build(HttpMethod.Get, $"/api/study/{studyId}.pgn"))
+            // Public studies export fine ANONYMOUSLY — and lichess rejects a token-bearing
+            // request when the token lacks the study:read scope (e.g. a personal token created
+            // before that scope was ticked), even for public data. So go anonymous first, and
+            // only retry with the token for studies the anonymous request can't see (private).
+            string pgn = await FetchStudyPgnAsync(studyId, false);
+            if (pgn == null && _auth.IsAuthenticated) pgn = await FetchStudyPgnAsync(studyId, true);
+            return pgn;
+        }
+
+        async Task<string> FetchStudyPgnAsync(string studyId, bool withToken)
+        {
+            var req = withToken
+                ? Build(HttpMethod.Get, $"/api/study/{studyId}.pgn")
+                : new HttpRequestMessage(HttpMethod.Get, Base + $"/api/study/{studyId}.pgn");
+            using (req)
             {
                 req.Headers.Accept.Clear();
                 req.Headers.Accept.ParseAdd("application/x-chess-pgn");

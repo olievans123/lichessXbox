@@ -70,10 +70,9 @@ namespace LichessXbox.Views
                 string pgn = await AppState.Current.Api.GetStudyPgnAsync(study.Id);
                 if (pgn == null)
                 {
-                    // Lichess requires the study:read scope to export a study (anonymous = 403).
-                    StatusText.Text = AppState.Current.IsSignedIn
-                        ? "Couldn't open that study — sign out and back in (Profile) to grant study access."
-                        : "Sign in on the Profile page to open studies.";
+                    // Export is tried anonymously (public studies need no scope), with a
+                    // token retry for private ones — so a null here is a genuine fetch failure.
+                    StatusText.Text = "Couldn't open that study — check your connection and try again.";
                     return;
                 }
                 if (string.IsNullOrWhiteSpace(pgn)) { StatusText.Text = "Study has no moves to show."; return; }
