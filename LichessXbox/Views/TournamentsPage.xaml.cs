@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using LichessXbox.Models;
 using LichessXbox.Services;
@@ -11,7 +12,16 @@ namespace LichessXbox.Views
     {
         string _selectedId;
         bool _joined;   // current selection: are we entered? (Join ↔ Leave toggle)
-        readonly System.Collections.Generic.HashSet<string> _joinedIds = new System.Collections.Generic.HashSet<string>();
+        // Arenas we entered must survive page re-creation (each navigation builds a new
+        // instance) — otherwise returning from an arena game forgets we're entered and the
+        // pairing watch never resumes for the next round. Static = app-session lifetime.
+        static readonly System.Collections.Generic.HashSet<string> _joinedIds = new System.Collections.Generic.HashSet<string>();
+
+        // ---- pairing watch: poll ongoing games while entered; a NEW game = our pairing.
+        DispatcherTimer _pairTimer;
+        readonly System.Collections.Generic.HashSet<string> _knownGames = new System.Collections.Generic.HashSet<string>();
+        bool _watching;
+        bool _tickBusy;
 
         public TournamentsPage()
         {
@@ -21,7 +31,12 @@ namespace LichessXbox.Views
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             await ReloadAsync();
+            // Still entered in an arena (e.g. back from a finished round)? Resume the watch so
+            // the next pairing opens by itself.
+            if (_joinedIds.Count > 0 && AppState.Current.IsSignedIn) await StartPairingWatchAsync(true);
         }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e) => StopPairingWatch();
 
         async void Retry_Click(object sender, RoutedEventArgs e) => await ReloadAsync();
 
@@ -72,28 +87,37 @@ namespace LichessXbox.Views
             JoinButton.IsEnabled = true;
             StandingsList.ItemsSource = null;
 
-            DetailStatus.Text = "Loading standings…";
-            DetailStatus.Visibility = Visibility.Visible;
+            if (!_watching)
+            {
+                DetailStatus.Text = "Loading standings…";
+                DetailStatus.Visibility = Visibility.Visible;
+            }
+            await LoadStandingsAsync(t.Id);
+        }
+
+        async System.Threading.Tasks.Task LoadStandingsAsync(string id)
+        {
             try
             {
-                var (title, players) = await AppState.Current.Api.GetTournamentStandingsAsync(t.Id);
-                if (_selectedId != t.Id) return;   // a newer selection won the race — don't clobber it
+                var (title, players) = await AppState.Current.Api.GetTournamentStandingsAsync(id);
+                if (_selectedId != id) return;   // a newer selection won the race — don't clobber it
                 if (!string.IsNullOrEmpty(title)) DetailTitle.Text = title;
                 StandingsList.ItemsSource = players;
+                if (_watching) return;   // keep the "waiting for your pairing" line on screen
                 bool anyStandings = players != null && players.Count > 0;
                 DetailStatus.Text = anyStandings ? "" : "No standings yet.";
                 DetailStatus.Visibility = anyStandings ? Visibility.Collapsed : Visibility.Visible;
             }
             catch
             {
-                if (_selectedId != t.Id) return;
+                if (_selectedId != id || _watching) return;
                 DetailStatus.Text = "Standings unavailable.";
                 DetailStatus.Visibility = Visibility.Visible;
             }
         }
 
-        // Join ↔ Leave toggle. While joined, the arena pairs you automatically — games surface
-        // via the games-in-progress tab (the pawn, top-left), so we say exactly that.
+        // Join ↔ Leave toggle. While entered, the arena pairs you automatically — the watch
+        // below spots the new game and opens the board without any further input.
         async void Join_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(_selectedId) || !JoinButton.IsEnabled) return;   // guard double-press
@@ -101,6 +125,8 @@ namespace LichessXbox.Views
             bool leaving = _joined;
             JoinButton.IsEnabled = false;
             JoinButton.Content = leaving ? "Leaving…" : "Joining…";
+            // Snapshot BEFORE joining so a pairing that lands instantly still counts as "new".
+            if (!leaving) await SnapshotKnownGamesAsync();
             string err;
             try
             {
@@ -116,15 +142,84 @@ namespace LichessXbox.Views
                 _joined = !leaving;
                 if (_joined) _joinedIds.Add(id); else _joinedIds.Remove(id);
                 JoinButton.Content = _joined ? "Leave arena" : "Join";
-                DetailStatus.Text = _joined ? "You're in! Pairings appear in the games tab (the pawn, top-left)." : "";
-                DetailStatus.Visibility = _joined ? Visibility.Visible : Visibility.Collapsed;
+                if (_joined)
+                {
+                    await StartPairingWatchAsync(false);   // baseline already snapshotted above
+                }
+                else
+                {
+                    StopPairingWatch();
+                    DetailStatus.Text = "";
+                    DetailStatus.Visibility = Visibility.Collapsed;
+                }
             }
             else
             {
                 JoinButton.Content = leaving ? "Leave arena" : "Join";
-                DetailStatus.Text = err;   // the actual reason (lichess error, or re-auth hint on 401)
+                StopPairingWatch();
+                DetailStatus.Text = err;   // the actual reason (lichess error, or scope hint on 401/403)
                 DetailStatus.Visibility = Visibility.Visible;
             }
+        }
+
+        // ------------------------------------------------------------ pairing watch
+
+        async System.Threading.Tasks.Task SnapshotKnownGamesAsync()
+        {
+            // Games that already exist are NOT the pairing we're waiting for.
+            _knownGames.Clear();
+            try
+            {
+                var games = await AppState.Current.Api.GetOngoingGamesAsync();
+                if (games != null) foreach (var gm in games) _knownGames.Add(gm.GameId);
+            }
+            catch { /* empty baseline just means the first poll can match an existing game */ }
+        }
+
+        async System.Threading.Tasks.Task StartPairingWatchAsync(bool resnapshot)
+        {
+            if (resnapshot) await SnapshotKnownGamesAsync();
+            if (_pairTimer == null)
+            {
+                _pairTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
+                _pairTimer.Tick += PairTimer_Tick;
+            }
+            _watching = true;
+            _pairTimer.Start();
+            PairRing.IsActive = true;
+            PairRing.Visibility = Visibility.Visible;
+            DetailStatus.Text = "You're in — waiting for your pairing. The game will open by itself.";
+            DetailStatus.Visibility = Visibility.Visible;
+        }
+
+        void StopPairingWatch()
+        {
+            _watching = false;
+            _pairTimer?.Stop();
+            PairRing.IsActive = false;
+            PairRing.Visibility = Visibility.Collapsed;
+        }
+
+        async void PairTimer_Tick(object sender, object e)
+        {
+            if (_tickBusy) return;   // a slow poll mustn't stack another on top
+            _tickBusy = true;
+            try
+            {
+                if (_joinedIds.Count == 0) { StopPairingWatch(); return; }
+                System.Collections.Generic.List<OngoingGame> games = null;
+                try { games = await AppState.Current.Api.GetOngoingGamesAsync(); } catch { }
+                if (games == null) return;
+                foreach (var gm in games)
+                {
+                    if (_knownGames.Contains(gm.GameId)) continue;
+                    // A game we've never seen while entered in an arena = our pairing. Go.
+                    StopPairingWatch();   // OnNavigatedTo resumes it when we come back
+                    ((Window.Current.Content as Frame)?.Content as MainPage)?.OpenGame(gm.GameId);
+                    return;
+                }
+            }
+            finally { _tickBusy = false; }
         }
     }
 }

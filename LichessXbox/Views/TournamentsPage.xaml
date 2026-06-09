@@ -56,16 +56,28 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" x:Name="DetailTitle" Text="Select a tournament" FontSize="{StaticResource SubtitleSize}" FontWeight="Bold"
                            Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
                 <Button Grid.Row="1" x:Name="JoinButton" Style="{StaticResource PrimaryButton}" Click="Join_Click"
                         Content="Join" MinWidth="160" Margin="0,14" Visibility="Collapsed" HorizontalAlignment="Left" />
-                <TextBlock Grid.Row="2" x:Name="DetailStatus" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" VerticalAlignment="Top" Margin="0,8,0,0" />
+                <!-- Status gets its OWN row (it used to share the standings row and drew on top of
+                     rank #1). The ring spins while we wait for the arena to pair us. -->
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <ProgressRing Grid.Column="0" x:Name="PairRing" IsActive="False" Visibility="Collapsed" Width="20" Height="20"
+                                  Margin="0,8,10,0" VerticalAlignment="Top" Foreground="{StaticResource AccentGreenLightBrush}" />
+                    <TextBlock Grid.Column="1" x:Name="DetailStatus" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
+                               Visibility="Collapsed" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,8,0,0" />
+                </Grid>
                 <!-- Informational only: clickable (so a gamepad can focus + scroll it) but never
                      "selected", so no persistent green selection ring lingers on a row. -->
-                <ListView Grid.Row="2" x:Name="StandingsList" SelectionMode="None" IsItemClickEnabled="True"
+                <ListView Grid.Row="3" x:Name="StandingsList" SelectionMode="None" IsItemClickEnabled="True"
                           Padding="0,0,0,12" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                     <!-- Read-only standings: focusable for gamepad scrolling, but no focus ring (nothing to click). -->
                     <ListView.ItemContainerStyle>

@@ -71,8 +71,13 @@ namespace LichessXbox.Views
                 if (pgn == null)
                 {
                     // Export is tried anonymously (public studies need no scope), with a
-                    // token retry for private ones — so a null here is a genuine fetch failure.
-                    StatusText.Text = "Couldn't open that study — check your connection and try again.";
+                    // token retry for private ones — a null is a genuine fetch failure.
+                    // Show lichess's status code: 429 = rate-limited (wait a minute),
+                    // 404 = study gone, 401/403 = private study we can't read.
+                    int code = AppState.Current.Api.LastStudyExportStatus;
+                    StatusText.Text = code == 429
+                        ? "Lichess is rate-limiting us (HTTP 429) — wait a minute, then try again."
+                        : $"Couldn't open that study (HTTP {code}) — try again in a moment.";
                     return;
                 }
                 if (string.IsNullOrWhiteSpace(pgn)) { StatusText.Text = "Study has no moves to show."; return; }

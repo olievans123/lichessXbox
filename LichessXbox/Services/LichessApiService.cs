@@ -854,6 +854,10 @@ namespace LichessXbox.Services
             return pgn;
         }
 
+        /// <summary>HTTP status of the most recent study export attempt — surfaced in the
+        /// Studies page error so a failure on the console tells us WHAT lichess said.</summary>
+        public int LastStudyExportStatus { get; private set; }
+
         async Task<string> FetchStudyPgnAsync(string studyId, bool withToken)
         {
             var req = withToken
@@ -865,6 +869,7 @@ namespace LichessXbox.Services
                 req.Headers.Accept.ParseAdd("application/x-chess-pgn");
                 using (var resp = await SendBufferedAsync(req, default, 25))
                 {
+                    LastStudyExportStatus = (int)resp.StatusCode;
                     if (!resp.IsSuccessStatusCode) return null;
                     return await resp.Content.ReadAsStringAsync();
                 }
