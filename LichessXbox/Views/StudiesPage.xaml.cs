@@ -22,12 +22,22 @@ namespace LichessXbox.Views
         public StudiesPage()
         {
             this.InitializeComponent();
+            // Keep this instance alive across navigation: pressing B on the analysis board
+            // must land back on the SAME state (username, results, chapter list) — not a
+            // blank page that forces the whole search again.
+            NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
         }
 
         protected override void OnNavigatedTo(Windows.UI.Xaml.Navigation.NavigationEventArgs e)
         {
-            _opening = false;   // reset when returning (the page instance may be restored via Back)
-            UserBox.Focus(FocusState.Programmatic);
+            _opening = false;   // reset when returning (this cached instance is reused via Back)
+            // Land focus where the user left off: chapter list → study list → username box.
+            if (ChaptersPanel.Visibility == Visibility.Visible)
+                ChapterList.Focus(FocusState.Programmatic);
+            else if (StudyList.Items != null && StudyList.Items.Count > 0)
+                StudyList.Focus(FocusState.Programmatic);
+            else
+                UserBox.Focus(FocusState.Programmatic);
         }
 
         async void Load_Click(object sender, RoutedEventArgs e)
@@ -65,7 +75,7 @@ namespace LichessXbox.Views
             {
                 // The owner disabled PGN export — no token or scope can open it.
                 StatusStrip.Visibility = Visibility.Visible;
-                StatusText.Text = "The owner of this study has switched off PGN export, so it can't be opened here. It's view-only on lichess.org.";
+                StatusText.Text = "This study is locked: its owner has blocked downloads, so it can't be opened in the app.";
                 return;
             }
             Busy.IsActive = true;
@@ -81,7 +91,7 @@ namespace LichessXbox.Views
                     // token retry for private ones — a null is a genuine fetch failure.
                     int code = AppState.Current.Api.LastStudyExportStatus;
                     StatusText.Text = code == 403
-                        ? "The owner of this study has switched off PGN export, so it can't be opened here. It's view-only on lichess.org."
+                        ? "This study is locked: its owner has blocked downloads, so it can't be opened in the app."
                         : code == 429
                         ? "Lichess is rate-limiting us (HTTP 429) — wait a minute, then try again."
                         : $"Couldn't open that study (HTTP {code}) — try again in a moment.";

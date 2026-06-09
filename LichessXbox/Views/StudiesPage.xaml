@@ -19,13 +19,19 @@
             </StackPanel>
 
             <!-- One slim status strip (ring + text inline) — collapses when idle, so there's no
-                 phantom gap between the search row and the results. -->
-            <StackPanel x:Name="StatusStrip" Orientation="Horizontal" Spacing="10" Visibility="Collapsed">
-                <ProgressRing x:Name="Busy" IsActive="False" Visibility="Collapsed" Width="24" Height="24"
-                              Foreground="{StaticResource AccentGreenLightBrush}" VerticalAlignment="Center" />
-                <TextBlock x:Name="StatusText" Text="" FontSize="{StaticResource CaptionSize}" TextWrapping="Wrap"
+                 phantom gap between the search row and the results. A Grid (not a horizontal
+                 StackPanel) so the text column has a real width and long errors WRAP instead
+                 of running off-screen. -->
+            <Grid x:Name="StatusStrip" Visibility="Collapsed">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <ProgressRing x:Name="Busy" Grid.Column="0" IsActive="False" Visibility="Collapsed" Width="24" Height="24"
+                              Margin="0,0,10,0" Foreground="{StaticResource AccentGreenLightBrush}" VerticalAlignment="Center" />
+                <TextBlock x:Name="StatusText" Grid.Column="1" Text="" FontSize="{StaticResource CaptionSize}" TextWrapping="Wrap"
                            Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
-            </StackPanel>
+            </Grid>
 
             <ListView x:Name="StudyList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Study_ItemClick" ScrollViewer.VerticalScrollMode="Disabled">
                 <ListView.ItemTemplate>
