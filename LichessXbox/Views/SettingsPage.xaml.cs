@@ -53,6 +53,7 @@ namespace LichessXbox.Views
             PieceGrid.ItemsSource = _pieceItems;
             PopulatePieces(false);
             SelectCurrentPiece();
+            PreviewSet(BoardTheme.PieceSet);   // side board shows the CURRENT set; only A changes it
             _loaded = true;
             ThemeGrid.FocusOnLoad();
         }
@@ -125,18 +126,8 @@ namespace LichessXbox.Views
             if (e.ClickedItem is BoardTheme.Preset p) BoardTheme.Apply(p.Name);
         }
 
-        // Live-preview a piece set on the side board without applying it. On a GridView the D-pad
-        // moves FOCUS (not selection), so we preview from GotFocus — selection only changes on A.
-        void PieceGrid_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if ((e.OriginalSource as FrameworkElement)?.DataContext is PieceSetItem item) PreviewSet(item.Name);
-        }
-
-        void PieceSet_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (PieceGrid.SelectedItem is PieceSetItem item) PreviewSet(item.Name);
-        }
-
+        // Show a set on the side board. Called only when a set is APPLIED (on A) or on load —
+        // moving the highlight no longer previews, so nothing changes until you commit with A.
         void PreviewSet(string set)
         {
             if (string.IsNullOrEmpty(set) || PreviewBoard.PieceSetOverride == set) return;
@@ -174,6 +165,7 @@ namespace LichessXbox.Views
             if (set == PieceSets.Native)
             {
                 BoardTheme.SetPieceSet(set);
+                PreviewSet(set);   // reflect the applied set on the side board
                 PieceStatus.Visibility = Visibility.Collapsed;
                 ShowPreviewVeil(false);
                 return;
@@ -187,6 +179,7 @@ namespace LichessXbox.Views
             if (ok)
             {
                 BoardTheme.SetPieceSet(set);           // fires Changed → every board redraws with the SVG set
+                PreviewSet(set);                       // reflect the applied set on the side board
                 PieceStatus.Visibility = Visibility.Collapsed;
             }
             else
