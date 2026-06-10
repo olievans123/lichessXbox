@@ -345,7 +345,9 @@
                         <Border x:Name="Sheen" CornerRadius="{TemplateBinding CornerRadius}" IsHitTestVisible="False" Opacity="0">
                             <Border.Background><SolidColorBrush Color="#FFFFFF" Opacity="0.12" /></Border.Background>
                         </Border>
-                        <Border x:Name="Ring" CornerRadius="{TemplateBinding CornerRadius}" BorderThickness="2.5" IsHitTestVisible="False" Opacity="0">
+                        <!-- Inset a touch so the ring doesn't run under a corner count badge
+                             (games/challenges tabs), which made the badge number hard to read. -->
+                        <Border x:Name="Ring" CornerRadius="{TemplateBinding CornerRadius}" Margin="2" BorderThickness="2.5" IsHitTestVisible="False" Opacity="0">
                             <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
                         </Border>
                         <VisualStateManager.VisualStateGroups>

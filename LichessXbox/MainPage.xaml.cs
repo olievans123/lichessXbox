@@ -143,13 +143,17 @@ namespace LichessXbox
         // ----------------------------------------------------- back navigation
 
         // The gamepad B button (and the system back chrome) route here. B peels layers
-        // outside-in: nav pane → the page's own overlays/panels → frame back-stack.
+        // outside-in: nav pane → the page's own overlays/panels → frame back-stack → Home.
+        // A root page (no back-stack) routes to Home rather than silently EXITING the app —
+        // which is what happened on Puzzles etc. (e.g. focusing the board then pressing B).
+        // Only Home itself leaves B unhandled, so the dashboard-exit still works from there.
         void OnBackRequested(object sender, BackRequestedEventArgs e)
         {
             if (e.Handled) return;
             if (NavSplit.IsPaneOpen) { ClosePane(); e.Handled = true; return; }
             if (ContentFrame.Content is IBackHandler page && page.HandleBack()) { e.Handled = true; return; }
-            if (ContentFrame.CanGoBack) { ContentFrame.GoBack(); e.Handled = true; }
+            if (ContentFrame.CanGoBack) { ContentFrame.GoBack(); e.Handled = true; return; }
+            if (_currentTag != "home") { GoTo("home"); e.Handled = true; }
         }
 
         // Single source of truth for nav state — runs on forward navigation AND on Back.

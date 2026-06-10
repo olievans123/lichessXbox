@@ -13,8 +13,12 @@ using Windows.UI.Xaml.Navigation;
 
 namespace LichessXbox.Views
 {
-    public sealed partial class PuzzlesPage : Page
+    public sealed partial class PuzzlesPage : Page, IBackHandler
     {
+        /// <summary>B drops a held piece / disengages the board before leaving the page —
+        /// without this, B on the focused puzzle board fell through and exited the app.</summary>
+        public bool HandleBack() => Board.CancelSelection() || Board.DisengageBoard();
+
         PuzzleInfo _puzzle;
         ChessPosition _start;
         ChessPosition _current;
