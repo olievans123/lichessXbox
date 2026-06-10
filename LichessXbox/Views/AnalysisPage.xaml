@@ -122,15 +122,13 @@
                 <Button Grid.Column="4" Style="{StaticResource TileButton}" Click="Flip_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE8AB;" Padding="0,10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTipService.ToolTip="Flip board" />
             </Grid>
 
-            <!-- Moves: clickable, jump the board to any position (like the Play board).
-                 The whole card is the engageable focus unit (green ring on the OUTER box,
-                 press A to step in); the inner scroller just scrolls the focused move
-                 into view. -->
+            <!-- Moves: same model as the Play board — focus the box (ring), the RIGHT stick
+                 scrolls the history, the LEFT stick moves focus off it. The focus target is a
+                 non-scrolling host (a focused ScrollViewer would eat the left stick). -->
             <Border Grid.Row="3" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,8">
               <Grid>
-                <!-- MovesFocusRing frames the whole card while the moves list is focused as a
-                     UNIT; pressing A engages the (natively engageable) ScrollViewer, the ring
-                     hides, and the focused move shows its own highlight. B steps back out. -->
+                <ContentControl x:Name="MovesHost" IsTabStop="True" UseSystemFocusVisuals="False"
+                                HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                 <StackPanel Spacing="6">
                     <TextBlock Text="Moves" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                     <!-- Whole multiple of the ~27px move-row height: 2 clean rows, no half-clipped third. -->
@@ -138,7 +136,7 @@
                         <TextBlock x:Name="MovesEmpty" Text="No moves yet." FontSize="{StaticResource CaptionSize}"
                                    Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Top" />
                         <ScrollViewer x:Name="AnalysisMoveScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
-                                      UseSystemFocusVisuals="False">
+                                      IsTabStop="False" UseSystemFocusVisuals="False">
                             <ItemsControl x:Name="AnalysisMoveRows">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -161,6 +159,7 @@
                     </ScrollViewer>
                     </Grid>
                 </StackPanel>
+                </ContentControl>
                 <Border x:Name="MovesFocusRing" Margin="-13" CornerRadius="18" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
                     <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
                 </Border>

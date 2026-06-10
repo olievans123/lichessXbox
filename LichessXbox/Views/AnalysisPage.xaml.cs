@@ -22,8 +22,8 @@ namespace LichessXbox.Views
     /// </summary>
     public sealed partial class AnalysisPage : Page, IBackHandler
     {
-        /// <summary>B peels layers before leaving: held piece, board, then the moves list.</summary>
-        public bool HandleBack() => Board.CancelSelection() || Board.DisengageBoard() || (_movesEngager?.Disengage() ?? false);
+        /// <summary>B peels board layers before leaving: drop a held piece, then disengage.</summary>
+        public bool HandleBack() => Board.CancelSelection() || Board.DisengageBoard();
 
         readonly List<ChessPosition> _history = new List<ChessPosition> { ChessPosition.Starting() };
         readonly List<ChessMove> _moves = new List<ChessMove>();
@@ -63,15 +63,14 @@ namespace LichessXbox.Views
             };
             // Frame each side-panel card on its OUTER box while the (natively engageable)
             // list/scroller holds focus as a unit; A engages it and the ring hides.
-            // Moves: manual engagement (ScrollViewer engagement is scroll-mode, never focuses a
-            // move). A enters the box and lands on the LAST/current move; B exits.
-            _movesEngager = new ButtonListEngager(AnalysisMoveScroller, MovesFocusRing);
+            // Moves: same model as the Play board — focus the box (ring), right stick scrolls,
+            // left stick moves focus off (the host is non-scrolling so it can't trap the stick).
+            MovesHost.FrameOnFocus(MovesFocusRing);
+            MovesHost.ScrollOnRightStick(AnalysisMoveScroller);
             ExplorerList.FrameOnFocus(ExplorerFocusRing);
             NotesScroller.FrameOnFocus(ExplorerFocusRing);   // notes share the explorer card's ring
             TablebaseList.FrameOnFocus(TablebaseFocusRing);
         }
-
-        ButtonListEngager _movesEngager;
 
         void EnsureEngine()
         {

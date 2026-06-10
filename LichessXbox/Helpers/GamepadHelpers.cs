@@ -64,6 +64,22 @@ namespace LichessXbox.Helpers
             };
         }
 
+        /// <summary>While <paramref name="host"/> holds focus, the RIGHT stick scrolls
+        /// <paramref name="scroller"/> a row at a time. (A focused ScrollViewer would grab the
+        /// LEFT stick to scroll, blocking focus from leaving — so the host is a non-scrolling
+        /// element and the inner scroller is scrolled here instead.)</summary>
+        public static void ScrollOnRightStick(this Control host, ScrollViewer scroller, double step = 28)
+        {
+            if (host == null || scroller == null) return;
+            host.KeyDown += (s, e) =>
+            {
+                if (e.Key == VirtualKey.GamepadRightThumbstickUp)
+                { scroller.ChangeView(null, scroller.VerticalOffset - step, null, false); e.Handled = true; }
+                else if (e.Key == VirtualKey.GamepadRightThumbstickDown)
+                { scroller.ChangeView(null, scroller.VerticalOffset + step, null, false); e.Handled = true; }
+            };
+        }
+
         public static bool IsRunningOnXbox =>
             Windows.System.Profile.AnalyticsInfo.VersionInfo.DeviceFamily == "Windows.Xbox";
     }
