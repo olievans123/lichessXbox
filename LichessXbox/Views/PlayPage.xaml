@@ -443,10 +443,12 @@
                         </Grid>
                         </StackPanel>
                         </ContentControl>
-                        <!-- Soft dark halo + crisp green ring (matches the board) — not a flat rect. -->
-                        <Grid x:Name="PlayMovesFocusRing" Margin="-4" IsHitTestVisible="False" Visibility="Collapsed">
-                            <Border CornerRadius="12" Margin="-2" BorderThickness="5"><Border.BorderBrush><SolidColorBrush Color="#5A000000" /></Border.BorderBrush></Border>
-                            <Border CornerRadius="10" BorderThickness="2.5"><Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush></Border>
+                        <!-- Soft dark halo + crisp green ring, extended flush to the card's
+                             left/right/top edges (bottom stays above the nav row). Top corners
+                             match the card's 18px radius; bottom corners are gently rounded. -->
+                        <Grid x:Name="PlayMovesFocusRing" Margin="-13,-9,-13,-4" IsHitTestVisible="False" Visibility="Collapsed">
+                            <Border CornerRadius="20,20,12,12" Margin="-2" BorderThickness="5"><Border.BorderBrush><SolidColorBrush Color="#5A000000" /></Border.BorderBrush></Border>
+                            <Border CornerRadius="18,18,10,10" BorderThickness="2.5"><Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush></Border>
                         </Grid>
                         </Grid>
                         <!-- Step through the game: first / previous / next / latest. -->
