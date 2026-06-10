@@ -46,7 +46,6 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
@@ -156,35 +155,35 @@
                 </StackPanel>
             </Border>
 
-            <!-- Study notes: the chapter author's commentary for the displayed move. Only
-                 present when a study chapter is loaded; fixed slot so stepping through
-                 moves never reflows the panel. -->
-            <Border x:Name="NotesCard" Grid.Row="4" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,8" Visibility="Collapsed">
-                <StackPanel Spacing="6">
-                    <TextBlock Text="Study notes" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource AccentGreenLightBrush}" FontWeight="SemiBold" />
-                    <!-- Focus-engageable so long notes scroll with the stick (A engages, B releases). -->
-                    <ScrollViewer x:Name="NotesScroller" MaxHeight="110" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
-                                  IsTabStop="True" IsFocusEngagementEnabled="True">
-                        <TextBlock x:Name="NotesText" Text="" FontSize="{StaticResource CaptionSize}"
-                                   Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
-                    </ScrollViewer>
-                </StackPanel>
-            </Border>
-
-            <!-- Opening explorer: fills the remaining height; the list scrolls internally. -->
-            <Border Grid.Row="5" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,8">
+            <!-- Opening explorer / study notes: ONE card sharing the flexible row. When a
+                 study chapter is loaded a small tab strip appears and the author's notes
+                 take the explorer's space (default), switchable back to the explorer —
+                 stepping through moves never reflows the panel either way. -->
+            <Border Grid.Row="4" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,8">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <StackPanel Grid.Row="0" Spacing="6" Margin="0,0,0,8">
+                    <StackPanel Grid.Row="0" x:Name="StudyTabs" Orientation="Horizontal" Spacing="8" Visibility="Collapsed" Margin="0,0,0,10">
+                        <Button x:Name="NotesTabButton" Style="{StaticResource TileButton}" Padding="14,6" Click="NotesTab_Click" Content="Study notes" />
+                        <Button x:Name="ExplorerTabButton" Style="{StaticResource TileButton}" Padding="14,6" Click="ExplorerTab_Click" Content="Explorer" />
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" x:Name="ExplorerHeader" Spacing="6" Margin="0,0,0,8">
                         <TextBlock x:Name="OpeningText" Text="Opening explorer" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                    Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
                         <TextBlock x:Name="ExplorerEmpty" Text="No opening data for this position." FontSize="{StaticResource CaptionSize}"
                                    Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
                     </StackPanel>
-                    <ListView Grid.Row="1" x:Name="ExplorerList" SelectionMode="None" IsItemClickEnabled="True"
+                    <!-- Focus-engageable so long notes scroll with the stick (A engages, B releases). -->
+                    <ScrollViewer Grid.Row="2" x:Name="NotesScroller" Visibility="Collapsed"
+                                  VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
+                                  IsTabStop="True" IsFocusEngagementEnabled="True">
+                        <TextBlock x:Name="NotesText" Text="" FontSize="{StaticResource CaptionSize}"
+                                   Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
+                    </ScrollViewer>
+                    <ListView Grid.Row="2" x:Name="ExplorerList" SelectionMode="None" IsItemClickEnabled="True"
                               ItemClick="Explorer_ItemClick" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                         <!-- Soft, thin focus outline (not the heavy green reveal ring) for these clickable rows. -->
                         <ListView.ItemContainerStyle>
@@ -219,7 +218,7 @@
             </Border>
 
             <!-- Tablebase (appears in endgames, below the explorer) -->
-            <Border x:Name="TablebaseCard" Grid.Row="6" Style="{StaticResource CardBorder}" Padding="12" Margin="0" Visibility="Collapsed">
+            <Border x:Name="TablebaseCard" Grid.Row="5" Style="{StaticResource CardBorder}" Padding="12" Margin="0" Visibility="Collapsed">
                 <StackPanel Spacing="10">
                     <TextBlock x:Name="TablebaseSummary" Text="Tablebase" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                Foreground="{StaticResource AccentGreenLightBrush}" />

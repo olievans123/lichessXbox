@@ -19,6 +19,11 @@ namespace LichessXbox
         public App()
         {
             this.InitializeComponent();
+            // CRITICAL for Xbox: UWP apps default to MOUSE EMULATION on console — the left
+            // stick drives a floating pointer and XY focus never engages, so none of the
+            // app's focus visuals or navigation are reachable. Opting out switches the
+            // whole app to native gamepad focus. Must be set before any UI exists.
+            this.RequiresPointerMode = ApplicationRequiresPointerMode.WhenRequested;
             this.Suspending += OnSuspending;
             // Surface any unhandled exception on screen (Debug output is stripped in Release).
             this.UnhandledException += async (s, e) =>

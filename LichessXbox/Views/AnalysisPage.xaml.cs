@@ -10,6 +10,7 @@ using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace LichessXbox.Views
@@ -32,6 +33,7 @@ namespace LichessXbox.Views
         readonly ObservableCollection<MoveRowVM> _moveRows = new ObservableCollection<MoveRowVM>();
         readonly List<string> _sans = new List<string>();   // cached SAN per ply (ToSan runs legal-move gen)
         readonly List<string> _notes = new List<string>();  // study notes: _notes[k] shown at ply k
+        bool _notesTab;                                     // study mode: showing notes (vs explorer)
         CancellationTokenSource _analysisCts;
         LocalEngine _engine;
         bool _useLocalEngine;
@@ -108,16 +110,16 @@ namespace LichessXbox.Views
 
             RebuildAnalysisMoves();
 
-            // Study notes: card stays visible (fixed slot, no reflow) whenever notes exist;
-            // shows the author's comment for the displayed ply, or a quiet dash without one.
+            // Study notes share the explorer's card via the tab strip; keep the text in
+            // step with the displayed ply (a quiet dash when the author wrote nothing).
             if (_notes.Count > 0)
             {
                 string note = _ply < _notes.Count ? _notes[_ply] : null;
                 NotesText.Text = string.IsNullOrEmpty(note) ? "—" : note;
-                NotesCard.Visibility = Visibility.Visible;
                 NotesScroller.ChangeView(null, 0, null, true);
             }
-            else NotesCard.Visibility = Visibility.Collapsed;
+            else _notesTab = false;   // study unloaded → the card is the explorer again
+            ApplyStudyTab();
 
             EvalText.Text = "…";
             BestLineText.Text = "Evaluating…";
@@ -254,6 +256,27 @@ namespace LichessXbox.Views
         }
 
         // -------------------------------------------------------------- navigation
+
+        // Study-mode tabs: notes and the opening explorer share one card.
+        void NotesTab_Click(object sender, RoutedEventArgs e) { _notesTab = true; ApplyStudyTab(); }
+        void ExplorerTab_Click(object sender, RoutedEventArgs e) { _notesTab = false; ApplyStudyTab(); }
+
+        void ApplyStudyTab()
+        {
+            bool study = _notes.Count > 0;
+            bool notes = study && _notesTab;
+            StudyTabs.Visibility = study ? Visibility.Visible : Visibility.Collapsed;
+            NotesScroller.Visibility = notes ? Visibility.Visible : Visibility.Collapsed;
+            ExplorerList.Visibility = notes ? Visibility.Collapsed : Visibility.Visible;
+            ExplorerHeader.Visibility = notes ? Visibility.Collapsed : Visibility.Visible;
+            if (study)
+            {
+                var on = (Brush)Application.Current.Resources["AccentGreenLightBrush"];
+                var off = (Brush)Application.Current.Resources["TextSecondaryBrush"];
+                NotesTabButton.Foreground = notes ? on : off;
+                ExplorerTabButton.Foreground = notes ? off : on;
+            }
+        }
 
         void First_Click(object sender, RoutedEventArgs e) { _ply = 0; Sync(); }
         void Back_Click(object sender, RoutedEventArgs e) { if (_ply > 0) { _ply--; Sync(); } }
@@ -496,7 +519,8 @@ namespace LichessXbox.Views
                 if (pendingNotes != null && pendingNotes.Count > 0)
                 {
                     _notes.AddRange(pendingNotes);
-                    _ply = 0;   // a study reads from the start — open on the intro note
+                    _notesTab = true;   // a study opens on its notes; Explorer is one tab away
+                    _ply = 0;           // ...and from the start, so the intro note shows
                     Sync();
                 }
             }
