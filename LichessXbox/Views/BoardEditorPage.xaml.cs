@@ -92,21 +92,44 @@ namespace LichessXbox.Views
                 }
         }
 
+        // Palette colours: black pieces sit on a light tile (like a board square) so they read
+        // as pieces, not greyed-out; the SELECTED piece gets a solid green FILL (distinct from
+        // the green focus RING, so "armed" vs "cursor" never look the same).
+        static readonly Color PaletteDark = Color.FromArgb(0xFF, 0x2A, 0x25, 0x1D);
+        static readonly Color PaletteLightTile = Color.FromArgb(0xFF, 0xD8, 0xD2, 0xC4);
+        static readonly Color SelectedFill = Color.FromArgb(0xFF, 0x6F, 0xA6, 0x30);
+        static readonly Color GreenEdge = Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F);
+        static readonly Color HairlineEdge = Color.FromArgb(0x33, 0xFF, 0xFF, 0xFF);
+
         void BuildPalette()
         {
             foreach (char c in "KQRBNP") WhitePalette.Children.Add(MakePaletteButton(c));
             foreach (char c in "kqrbnp") BlackPalette.Children.Add(MakePaletteButton(c));
             ToolPalette.Children.Add(MakePaletteButton('.')); // eraser
+            ToolPalette.Children.Add(new TextBlock
+            {
+                Text = "Eraser",
+                FontSize = 16,
+                Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0xA8, 0xA2, 0x96)),
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(4, 0, 0, 0),
+            });
         }
+
+        // A black piece sits on a light tile; white pieces / the eraser on the dark surface.
+        static Color IdleBg(char piece) =>
+            piece != '.' && !char.IsUpper(piece) ? PaletteLightTile : PaletteDark;
 
         Button MakePaletteButton(char piece)
         {
+            Color glyphColor = piece == '.' ? Color.FromArgb(0xFF, 0x9A, 0x94, 0x88)
+                             : char.IsUpper(piece) ? Colors.White : Color.FromArgb(0xFF, 0x26, 0x22, 0x1C);
             var glyph = new TextBlock
             {
                 Text = piece == '.' ? "⌫" : PieceGlyph(piece),
                 FontFamily = new FontFamily("Segoe UI Symbol"),
                 FontSize = piece == '.' ? 24 : 26,
-                Foreground = new SolidColorBrush(char.IsUpper(piece) ? Colors.White : Color.FromArgb(0xFF, 0x9A, 0x94, 0x88)),
+                Foreground = new SolidColorBrush(glyphColor),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
             };
@@ -117,8 +140,6 @@ namespace LichessXbox.Views
             var btn = new Button
             {
                 Width = 36, Height = 36,
-                Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x2A, 0x25, 0x1D)),
-                BorderBrush = new SolidColorBrush(piece == _selected ? Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F) : Color.FromArgb(0x33, 0xFF, 0xFF, 0xFF)),
                 BorderThickness = new Thickness(2),
                 CornerRadius = new CornerRadius(8),
                 Padding = new Thickness(0),
@@ -126,8 +147,9 @@ namespace LichessXbox.Views
                 Tag = piece,
             };
             btn.UseSystemFocusVisuals = true;
-            btn.FocusVisualPrimaryBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F));
+            btn.FocusVisualPrimaryBrush = new SolidColorBrush(GreenEdge);
             btn.Click += Palette_Click;
+            StylePaletteButton(btn, piece);
             if (piece != '.') _palette.Add((piece, glyph, img));
             return btn;
         }
@@ -140,12 +162,19 @@ namespace LichessXbox.Views
             RefreshPaletteBorders(ToolPalette);
         }
 
+        // Selected = solid green fill; otherwise the piece's idle tile. (Focus is the green
+        // ring drawn separately, so the two states never look identical.)
+        void StylePaletteButton(Button b, char piece)
+        {
+            bool sel = piece == _selected;
+            b.Background = new SolidColorBrush(sel ? SelectedFill : IdleBg(piece));
+            b.BorderBrush = new SolidColorBrush(sel ? GreenEdge : HairlineEdge);
+        }
+
         void RefreshPaletteBorders(Panel panel)
         {
             foreach (var child in panel.Children)
-                if (child is Button b && b.Tag is char c)
-                    b.BorderBrush = new SolidColorBrush(c == _selected
-                        ? Color.FromArgb(0xFF, 0x8F, 0xCB, 0x3F) : Color.FromArgb(0x33, 0xFF, 0xFF, 0xFF));
+                if (child is Button b && b.Tag is char c) StylePaletteButton(b, c);
         }
 
         void Cell_Click(object sender, RoutedEventArgs e)

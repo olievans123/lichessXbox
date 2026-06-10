@@ -11,7 +11,9 @@
         </Grid.ColumnDefinitions>
 
         <Viewbox Grid.Column="0" Stretch="Uniform" MaxWidth="560" MaxHeight="560" HorizontalAlignment="Center">
-            <Border CornerRadius="10" Background="{StaticResource BoardFrameBrush}" Padding="8">
+            <!-- Match the Play/Analysis ChessBoardControl frame: radius 12 + hairline border. -->
+            <Border CornerRadius="12" Background="{StaticResource BoardFrameBrush}"
+                    BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1" Padding="8">
                 <Grid x:Name="EditorGrid" Width="704" Height="704" />
             </Border>
         </Viewbox>
@@ -25,9 +27,9 @@
             <Border Style="{StaticResource CardBorder}" Padding="16">
                 <StackPanel Spacing="10">
                     <TextBlock Text="Palette" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
-                    <StackPanel x:Name="WhitePalette" Orientation="Horizontal" Spacing="2" />
-                    <StackPanel x:Name="BlackPalette" Orientation="Horizontal" Spacing="2" />
-                    <StackPanel x:Name="ToolPalette" Orientation="Horizontal" Spacing="2" />
+                    <StackPanel x:Name="WhitePalette" Orientation="Horizontal" Spacing="6" />
+                    <StackPanel x:Name="BlackPalette" Orientation="Horizontal" Spacing="6" />
+                    <StackPanel x:Name="ToolPalette" Orientation="Horizontal" Spacing="6" />
                 </StackPanel>
             </Border>
 
@@ -41,7 +43,7 @@
                               IsOn="True" Toggled="Side_Toggled" />
             </Grid>
 
-            <TextBox x:Name="FenBox" IsReadOnly="True" FontSize="{StaticResource CaptionSize}" MinHeight="64" TextWrapping="Wrap"
+            <TextBox x:Name="FenBox" IsReadOnly="True" IsTabStop="False" FontSize="{StaticResource CaptionSize}" MinHeight="64" TextWrapping="Wrap"
                      Header="FEN" />
 
             <StackPanel Orientation="Vertical" Spacing="10">
