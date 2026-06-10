@@ -96,9 +96,15 @@ do_launch() {  # launch needs an empty body (-d '') or WDP returns HTTP 411
     C=$(post -d '' "$BASE/api/taskmanager/app?appid=$(b64 "$AID")&package=$(b64 "$PFN")" -o /dev/null -w "%{http_code}")
     echo "[$i] launch HTTP $C"
     [ "$C" = "200" ] && { echo LAUNCHED; return 0; }
-    sleep 8   # right after install the app finalizes for ~30-60s; retry through 400s
+    sleep 8   # a clean install finalizes in <15s; persistent 400s = the limbo below
   done
-  echo "Could not launch (app may still be finalizing — wait and retry)"; return 1
+  echo
+  echo "!! Launch keeps 400ing = 'Not ready yet' LIMBO (blank green tile on the dashboard)."
+  echo "   On THIS console ANY remote re-deploy lands here — over an existing install OR"
+  echo "   after a remote uninstall. The ONLY reliable fix is a CONSOLE-side uninstall:"
+  echo "   My games & apps > Apps > Online Chess > Manage > Uninstall, THEN deploy.sh install"
+  echo "   (a single clean install over a truly-absent app launches first try)."
+  return 1
 }
 
 do_shot() { local O="${1:-/tmp/xbox.png}"; curl -sk -m 15 -o "$O" "$BASE/ext/screenshot?download=true" && echo "saved $O"; }

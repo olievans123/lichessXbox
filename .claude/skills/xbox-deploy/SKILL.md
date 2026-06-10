@@ -40,17 +40,19 @@ Override the console address with `XBOX=host:port` (default `192.168.1.64:11443`
 
 - **CSRF:** every non-GET to the portal 403s without a token. Do one GET to seed a
   cookie jar, then send the cookie's CSRF value back as `X-CSRF-Token`.
-- **Stop before redeploy:** deploying over the *running* app fails with
-  `0x80070005 "Access is denied"`. Always force-stop first (the script does).
-- **NEVER remote-uninstall to recover.** On this console the WDP uninstall only
-  half-deregisters (it has two registered users — `DefaultAccount` + `UserMgr1` —
-  and DELETE leaves a per-user registration), so the *next* install lands in the
-  **"Not ready yet" (0x80270300)** limbo where every launch returns HTTP 400.
-  Confirmed empirically: machine-side uninstall → remote install **works**; remote
-  uninstall → remote install **breaks**. The only reliable clear of the limbo is
-  from the console: **My games & apps → Apps → Online Chess → Manage → Uninstall**,
-  then `deploy.sh install`. Normal iteration (deploy a new build over a *working*
-  install, app stopped first) is fine and needs no uninstall.
+- **The reliable loop = CONSOLE uninstall → ONE clean remote install.** This is
+  the big one. On this console ANY remote re-deploy lands in the **"Not ready yet"
+  (0x80270300)** limbo (a blank green tile; every launch returns HTTP 400) — this
+  is true *both* when deploying over an existing install *and* after a remote
+  uninstall (WDP DELETE only half-deregisters; the box has two registered users,
+  `DefaultAccount` + `UserMgr1`). A single `deploy.sh install` over a *truly absent*
+  app (uninstalled from the console UI: **My games & apps → Apps → Online Chess →
+  Manage → Uninstall**) launches first try. So the iteration loop is: **(1)** ask
+  the user to uninstall from the console, **(2)** `deploy.sh install` once. There is
+  no working remote-only update path on this box — don't try to deploy over a live
+  install or remote-uninstall; both produce the limbo and waste a cycle.
+- **Stop before redeploy:** deploying over the *running* app also fails outright
+  with `0x80070005 "Access is denied"`. The script force-stops first regardless.
 - **Launch needs an empty body:** `POST /api/taskmanager/app` returns **HTTP 411**
   without one — send `-d ''`.
 - **Finalizing delay:** right after install, launch returns 400 for ~30–60s while
