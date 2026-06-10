@@ -126,19 +126,19 @@
                  The whole card is the engageable focus unit (green ring on the OUTER box,
                  press A to step in); the inner scroller just scrolls the focused move
                  into view. -->
-            <Border Grid.Row="3" Style="{StaticResource CardBorder}" Padding="3" Margin="0,0,0,8">
+            <Border Grid.Row="3" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,8">
               <Grid>
-                <!-- MovesFocusRing (toggled in code-behind) frames the WHOLE card when focus is
-                     anywhere inside it — the focus outline belongs on the outer box, not a row. -->
-                <ContentControl x:Name="MovesHost" IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="False" Padding="9"
-                                HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                <!-- MovesFocusRing frames the whole card while the moves list is focused as a
+                     UNIT; pressing A engages the (natively engageable) ScrollViewer, the ring
+                     hides, and the focused move shows its own highlight. B steps back out. -->
                 <StackPanel Spacing="6">
                     <TextBlock Text="Moves" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                     <!-- Whole multiple of the ~27px move-row height: 2 clean rows, no half-clipped third. -->
                     <Grid Height="54">
                         <TextBlock x:Name="MovesEmpty" Text="No moves yet." FontSize="{StaticResource CaptionSize}"
                                    Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Top" />
-                        <ScrollViewer x:Name="AnalysisMoveScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+                        <ScrollViewer x:Name="AnalysisMoveScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
+                                      IsFocusEngagementEnabled="True" UseSystemFocusVisuals="False">
                             <ItemsControl x:Name="AnalysisMoveRows">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -161,8 +161,7 @@
                     </ScrollViewer>
                     </Grid>
                 </StackPanel>
-                </ContentControl>
-                <Border x:Name="MovesFocusRing" Margin="-3" CornerRadius="18" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
+                <Border x:Name="MovesFocusRing" Margin="-12" CornerRadius="18" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
                     <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
                 </Border>
               </Grid>
@@ -172,12 +171,11 @@
                  study chapter is loaded a small tab strip appears and the author's notes
                  take the explorer's space (default), switchable back to the explorer —
                  stepping through moves never reflows the panel either way. -->
-            <Border Grid.Row="4" Style="{StaticResource CardBorder}" Padding="3" Margin="0,0,0,8">
+            <Border Grid.Row="4" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,8">
               <Grid>
-                <!-- One engageable host; ExplorerFocusRing frames the whole card on focus.
-                     A steps in (to the tabs / list / notes), B steps back out. -->
-                <ContentControl x:Name="ExplorerHost" IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="False" Padding="9"
-                                HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                <!-- ExplorerFocusRing frames the card while the list/notes is focused as a UNIT;
+                     A engages the (natively engageable) list/scroller and the ring hides. The
+                     tabs are their own focus stops. -->
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -197,12 +195,13 @@
                     <!-- Focus-engageable so long notes scroll with the stick (A engages, B releases). -->
                     <ScrollViewer Grid.Row="2" x:Name="NotesScroller" Visibility="Collapsed"
                                   VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
-                                  IsTabStop="True" UseSystemFocusVisuals="False">
+                                  IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="False">
                         <TextBlock x:Name="NotesText" Text="" FontSize="{StaticResource CaptionSize}"
                                    Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
                     </ScrollViewer>
                     <ListView Grid.Row="2" x:Name="ExplorerList" SelectionMode="None" IsItemClickEnabled="True"
-                              ItemClick="Explorer_ItemClick" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                              ItemClick="Explorer_ItemClick" ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                              IsFocusEngagementEnabled="True" UseSystemFocusVisuals="False">
                         <!-- Soft, thin focus outline (not the heavy green reveal ring) for these clickable rows. -->
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
@@ -233,23 +232,21 @@
                         </ListView.ItemTemplate>
                     </ListView>
                 </Grid>
-                </ContentControl>
-                <Border x:Name="ExplorerFocusRing" Margin="-3" CornerRadius="18" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
+                <Border x:Name="ExplorerFocusRing" Margin="-12" CornerRadius="18" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
                     <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
                 </Border>
               </Grid>
             </Border>
 
             <!-- Tablebase (appears in endgames, below the explorer) -->
-            <Border x:Name="TablebaseCard" Grid.Row="5" Style="{StaticResource CardBorder}" Padding="3" Margin="0" Visibility="Collapsed">
+            <Border x:Name="TablebaseCard" Grid.Row="5" Style="{StaticResource CardBorder}" Padding="12" Margin="0" Visibility="Collapsed">
               <Grid>
-                <ContentControl x:Name="TablebaseHost" IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="False" Padding="9"
-                                HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                 <StackPanel Spacing="10">
                     <TextBlock x:Name="TablebaseSummary" Text="Tablebase" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                Foreground="{StaticResource AccentGreenLightBrush}" />
                     <ListView x:Name="TablebaseList" SelectionMode="None" IsItemClickEnabled="True"
-                              ItemClick="Tablebase_ItemClick" MaxHeight="160" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                              ItemClick="Tablebase_ItemClick" MaxHeight="160" ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                              IsFocusEngagementEnabled="True" UseSystemFocusVisuals="False">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
                                 <Setter Property="FocusVisualPrimaryBrush" Value="#59EFEADF" />
@@ -271,8 +268,7 @@
                         </ListView.ItemTemplate>
                     </ListView>
                 </StackPanel>
-                </ContentControl>
-                <Border x:Name="TablebaseFocusRing" Margin="-3" CornerRadius="18" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
+                <Border x:Name="TablebaseFocusRing" Margin="-12" CornerRadius="18" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
                     <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
                 </Border>
               </Grid>

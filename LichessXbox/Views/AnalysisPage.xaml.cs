@@ -61,10 +61,12 @@ namespace LichessXbox.Views
                 Sync();
                 Board.FocusBoard();
             };
-            // Frame each side-panel card with the focus ring on its OUTER box.
-            MovesHost.FrameOnFocus(MovesFocusRing);
-            ExplorerHost.FrameOnFocus(ExplorerFocusRing);
-            TablebaseHost.FrameOnFocus(TablebaseFocusRing);
+            // Frame each side-panel card on its OUTER box while the (natively engageable)
+            // list/scroller holds focus as a unit; A engages it and the ring hides.
+            AnalysisMoveScroller.FrameOnFocus(MovesFocusRing);
+            ExplorerList.FrameOnFocus(ExplorerFocusRing);
+            NotesScroller.FrameOnFocus(ExplorerFocusRing);   // notes share the explorer card's ring
+            TablebaseList.FrameOnFocus(TablebaseFocusRing);
         }
 
         void EnsureEngine()

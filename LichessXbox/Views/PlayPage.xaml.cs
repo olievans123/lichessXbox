@@ -127,7 +127,7 @@ namespace LichessXbox.Views
 
             MoveRows.ItemsSource = _moveRows;
             Board.MoveRequested += Board_MoveRequested;
-            PlayMovesHost.FrameOnFocus(PlayMovesFocusRing);   // focus ring on the moves box, not a row
+            MoveScroller.FrameOnFocus(PlayMovesFocusRing);   // focus ring on the moves box, not a row
             _clockTimer.Interval = TimeSpan.FromMilliseconds(200);
             _clockTimer.Tick += ClockTick;
 

@@ -401,17 +401,17 @@
                              frames this box on focus (A steps into the moves); the nav buttons
                              below stay as their own direct focus stops. -->
                         <Grid>
-                        <ContentControl x:Name="PlayMovesHost" IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="False"
-                                        HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                         <StackPanel Spacing="8">
                         <TextBlock x:Name="StatusBanner" Text="Your move" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                    Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
                         <!-- Move history (SAN): a FIXED-size box so it doesn't grow as moves are played —
-                             a placeholder shows until the first move, then it scrolls within the fixed height. -->
+                             a placeholder shows until the first move, then it scrolls within the fixed height.
+                             The scroller is the engageable unit; PlayMovesFocusRing frames it on focus. -->
                         <Grid Height="84">
                             <TextBlock x:Name="MovesEmpty" Text="No moves yet." FontSize="{StaticResource CaptionSize}"
                                        Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Top" />
-                            <ScrollViewer x:Name="MoveScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+                            <ScrollViewer x:Name="MoveScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
+                                          IsFocusEngagementEnabled="True" UseSystemFocusVisuals="False">
                             <ItemsControl x:Name="MoveRows">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -435,7 +435,6 @@
                         </ScrollViewer>
                         </Grid>
                         </StackPanel>
-                        </ContentControl>
                         <Border x:Name="PlayMovesFocusRing" Margin="-4" CornerRadius="10" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
                             <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
                         </Border>
