@@ -162,7 +162,7 @@
                     </Grid>
                 </StackPanel>
                 </ContentControl>
-                <Border x:Name="MovesFocusRing" Margin="-3" CornerRadius="16" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
+                <Border x:Name="MovesFocusRing" Margin="-3" CornerRadius="18" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
                     <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
                 </Border>
               </Grid>
@@ -234,7 +234,7 @@
                     </ListView>
                 </Grid>
                 </ContentControl>
-                <Border x:Name="ExplorerFocusRing" Margin="-3" CornerRadius="16" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
+                <Border x:Name="ExplorerFocusRing" Margin="-3" CornerRadius="18" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
                     <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
                 </Border>
               </Grid>
@@ -272,7 +272,7 @@
                     </ListView>
                 </StackPanel>
                 </ContentControl>
-                <Border x:Name="TablebaseFocusRing" Margin="-3" CornerRadius="16" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
+                <Border x:Name="TablebaseFocusRing" Margin="-3" CornerRadius="18" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
                     <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
                 </Border>
               </Grid>
