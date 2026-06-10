@@ -127,10 +127,10 @@
                  press A to step in); the inner scroller just scrolls the focused move
                  into view. -->
             <Border Grid.Row="3" Style="{StaticResource CardBorder}" Padding="3" Margin="0,0,0,8">
-                <!-- The focus host fills the card (carrying the inner padding) so its green
-                     focus rect hugs the OUTER card box, not the inner move rows. -->
-                <ContentControl IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="True" Padding="9"
-                                FocusVisualPrimaryBrush="{StaticResource AccentGreenLightBrush}" FocusVisualSecondaryBrush="#99000000"
+              <Grid>
+                <!-- MovesFocusRing (toggled in code-behind) frames the WHOLE card when focus is
+                     anywhere inside it — the focus outline belongs on the outer box, not a row. -->
+                <ContentControl x:Name="MovesHost" IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="False" Padding="9"
                                 HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                 <StackPanel Spacing="6">
                     <TextBlock Text="Moves" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
@@ -162,6 +162,10 @@
                     </Grid>
                 </StackPanel>
                 </ContentControl>
+                <Border x:Name="MovesFocusRing" Margin="-3" CornerRadius="16" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
+                    <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
+                </Border>
+              </Grid>
             </Border>
 
             <!-- Opening explorer / study notes: ONE card sharing the flexible row. When a
@@ -169,10 +173,10 @@
                  take the explorer's space (default), switchable back to the explorer —
                  stepping through moves never reflows the panel either way. -->
             <Border Grid.Row="4" Style="{StaticResource CardBorder}" Padding="3" Margin="0,0,0,8">
-                <!-- One engageable host so the green focus ring hugs the OUTER card box;
+              <Grid>
+                <!-- One engageable host; ExplorerFocusRing frames the whole card on focus.
                      A steps in (to the tabs / list / notes), B steps back out. -->
-                <ContentControl IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="True" Padding="9"
-                                FocusVisualPrimaryBrush="{StaticResource AccentGreenLightBrush}" FocusVisualSecondaryBrush="#99000000"
+                <ContentControl x:Name="ExplorerHost" IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="False" Padding="9"
                                 HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -230,12 +234,16 @@
                     </ListView>
                 </Grid>
                 </ContentControl>
+                <Border x:Name="ExplorerFocusRing" Margin="-3" CornerRadius="16" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
+                    <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
+                </Border>
+              </Grid>
             </Border>
 
             <!-- Tablebase (appears in endgames, below the explorer) -->
             <Border x:Name="TablebaseCard" Grid.Row="5" Style="{StaticResource CardBorder}" Padding="3" Margin="0" Visibility="Collapsed">
-                <ContentControl IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="True" Padding="9"
-                                FocusVisualPrimaryBrush="{StaticResource AccentGreenLightBrush}" FocusVisualSecondaryBrush="#99000000"
+              <Grid>
+                <ContentControl x:Name="TablebaseHost" IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="False" Padding="9"
                                 HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                 <StackPanel Spacing="10">
                     <TextBlock x:Name="TablebaseSummary" Text="Tablebase" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
@@ -264,6 +272,10 @@
                     </ListView>
                 </StackPanel>
                 </ContentControl>
+                <Border x:Name="TablebaseFocusRing" Margin="-3" CornerRadius="16" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
+                    <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
+                </Border>
+              </Grid>
             </Border>
         </Grid>
     </Grid>

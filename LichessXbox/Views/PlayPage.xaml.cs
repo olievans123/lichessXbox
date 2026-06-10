@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using LichessXbox.Chess;
+using LichessXbox.Helpers;
 using LichessXbox.Models;
 using LichessXbox.Services;
 using Newtonsoft.Json.Linq;
@@ -126,6 +127,7 @@ namespace LichessXbox.Views
 
             MoveRows.ItemsSource = _moveRows;
             Board.MoveRequested += Board_MoveRequested;
+            PlayMovesHost.FrameOnFocus(PlayMovesFocusRing);   // focus ring on the moves box, not a row
             _clockTimer.Interval = TimeSpan.FromMilliseconds(200);
             _clockTimer.Tick += ClockTick;
 

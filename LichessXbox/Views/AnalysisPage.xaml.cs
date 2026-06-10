@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using LichessXbox.Chess;
+using LichessXbox.Helpers;
 using LichessXbox.Models;
 using LichessXbox.Services;
 using Windows.System;
@@ -60,6 +61,10 @@ namespace LichessXbox.Views
                 Sync();
                 Board.FocusBoard();
             };
+            // Frame each side-panel card with the focus ring on its OUTER box.
+            MovesHost.FrameOnFocus(MovesFocusRing);
+            ExplorerHost.FrameOnFocus(ExplorerFocusRing);
+            TablebaseHost.FrameOnFocus(TablebaseFocusRing);
         }
 
         void EnsureEngine()

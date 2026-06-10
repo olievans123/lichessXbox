@@ -397,11 +397,11 @@
 
                 <Border Style="{StaticResource CardBorder}" Padding="12,8">
                     <StackPanel Spacing="8">
-                        <!-- Status + move history = one engageable unit so the focus ring hugs
-                             this box (A steps into the moves); the nav buttons below stay as
-                             their own direct focus stops. -->
-                        <ContentControl IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="True"
-                                        FocusVisualPrimaryBrush="{StaticResource AccentGreenLightBrush}" FocusVisualSecondaryBrush="#99000000"
+                        <!-- Status + move history = one engageable unit; PlayMovesFocusRing
+                             frames this box on focus (A steps into the moves); the nav buttons
+                             below stay as their own direct focus stops. -->
+                        <Grid>
+                        <ContentControl x:Name="PlayMovesHost" IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="False"
                                         HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                         <StackPanel Spacing="8">
                         <TextBlock x:Name="StatusBanner" Text="Your move" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
@@ -436,6 +436,10 @@
                         </Grid>
                         </StackPanel>
                         </ContentControl>
+                        <Border x:Name="PlayMovesFocusRing" Margin="-4" CornerRadius="10" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
+                            <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
+                        </Border>
+                        </Grid>
                         <!-- Step through the game: first / previous / next / latest. -->
                         <Grid ColumnSpacing="6">
                             <Grid.ColumnDefinitions>
