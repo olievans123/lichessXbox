@@ -1,3 +1,4 @@
+using LichessXbox.Helpers;
 using LichessXbox.Models;
 using LichessXbox.Services;
 using LichessXbox.Views;
@@ -124,14 +125,7 @@ namespace LichessXbox
         // Land focus on the first focusable element inside a just-opened flyout, so its top
         // card is selected immediately (not left on the gutter button behind it). Deferred a
         // tick so the flyout's content is realized before we search it.
-        void FocusFirst(DependencyObject scope)
-        {
-            _ = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-                if (FocusManager.FindFirstFocusableElement(scope) is Control c)
-                    c.Focus(FocusState.Programmatic);
-            });
-        }
+        void FocusFirst(DependencyObject scope) => this.FocusFirstInside(scope);
 
         void ToggleNav_Click(object sender, RoutedEventArgs e) => SetPane(!NavSplit.IsPaneOpen);
 

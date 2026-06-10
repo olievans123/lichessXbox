@@ -19,6 +19,33 @@ namespace LichessXbox.Helpers
             control.Loaded += (s, e) => control.Focus(FocusState.Programmatic);
         }
 
+        /// <summary>First focusable Control in the visual subtree (depth-first) — TextBlocks and
+        /// other non-Control elements are skipped, so this returns the first real button/row.</summary>
+        public static Control FirstFocusable(DependencyObject root)
+        {
+            if (root == null) return null;
+            int n = VisualTreeHelper.GetChildrenCount(root);
+            for (int i = 0; i < n; i++)
+            {
+                var child = VisualTreeHelper.GetChild(root, i);
+                if (child is Control c && c.IsTabStop && c.IsEnabled && c.Visibility == Visibility.Visible)
+                    return c;
+                var deeper = FirstFocusable(child);
+                if (deeper != null) return deeper;
+            }
+            return null;
+        }
+
+        /// <summary>Focus the first focusable Control inside <paramref name="scope"/>, deferred a
+        /// tick so the framework's own post-event focus (engagement, item-click, flyout-open)
+        /// has settled first — a synchronous Focus() there gets overridden.</summary>
+        public static void FocusFirstInside(this Control owner, DependencyObject scope)
+        {
+            if (owner == null || scope == null) return;
+            _ = owner.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                FirstFocusable(scope)?.Focus(FocusState.Keyboard));
+        }
+
         /// <summary>Frame a side-panel card (Moves, Explorer…) with <paramref name="ring"/> while
         /// it holds focus AS A UNIT. Pressing A engages the card: focus moves to an inner item
         /// (which shows its own highlight) and the outer ring HIDES — exactly like the board's

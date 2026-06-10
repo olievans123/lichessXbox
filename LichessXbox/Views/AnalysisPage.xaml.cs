@@ -67,10 +67,9 @@ namespace LichessXbox.Views
             ExplorerList.FrameOnFocus(ExplorerFocusRing);
             NotesScroller.FrameOnFocus(ExplorerFocusRing);   // notes share the explorer card's ring
             TablebaseList.FrameOnFocus(TablebaseFocusRing);
-            // Engaging a ScrollViewer lands focus on the scroll region, not its first child —
-            // jump straight to move 1 so there's no dead first step.
-            AnalysisMoveScroller.FocusEngaged += (s, e) =>
-                (FocusManager.FindFirstFocusableElement(AnalysisMoveScroller) as Control)?.Focus(FocusState.Keyboard);
+            // Engaging a ScrollViewer lands focus on the scroll region (scroll-mode), not its
+            // first child — jump (deferred, after engagement settles) straight to move 1.
+            AnalysisMoveScroller.FocusEngaged += (s, e) => this.FocusFirstInside(AnalysisMoveScroller);
         }
 
         void EnsureEngine()
