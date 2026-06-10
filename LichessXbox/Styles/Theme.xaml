@@ -343,16 +343,17 @@
                 <ControlTemplate TargetType="Button">
                     <Grid>
                         <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" />
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
-                                          Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
                         <Border x:Name="Sheen" CornerRadius="{TemplateBinding CornerRadius}" IsHitTestVisible="False" Opacity="0">
                             <Border.Background><SolidColorBrush Color="#FFFFFF" Opacity="0.12" /></Border.Background>
                         </Border>
-                        <!-- Inset a touch so the ring doesn't run under a corner count badge
-                             (games/challenges tabs), which made the badge number hard to read. -->
+                        <!-- Inset a touch so the ring doesn't run under a corner count badge. -->
                         <Border x:Name="Ring" CornerRadius="{TemplateBinding CornerRadius}" Margin="2" BorderThickness="2.5" IsHitTestVisible="False" Opacity="0">
                             <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
                         </Border>
+                        <!-- Content LAST so a corner count badge sits ON TOP of the focus ring
+                             (the ring was drawn over the number, making it hard to read). -->
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
                                 <VisualState x:Name="Normal" />
