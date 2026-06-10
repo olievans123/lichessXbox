@@ -397,6 +397,13 @@
 
                 <Border Style="{StaticResource CardBorder}" Padding="12,8">
                     <StackPanel Spacing="8">
+                        <!-- Status + move history = one engageable unit so the focus ring hugs
+                             this box (A steps into the moves); the nav buttons below stay as
+                             their own direct focus stops. -->
+                        <ContentControl IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="True"
+                                        FocusVisualPrimaryBrush="{StaticResource AccentGreenLightBrush}" FocusVisualSecondaryBrush="#99000000"
+                                        HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                        <StackPanel Spacing="8">
                         <TextBlock x:Name="StatusBanner" Text="Your move" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                    Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
                         <!-- Move history (SAN): a FIXED-size box so it doesn't grow as moves are played —
@@ -404,9 +411,7 @@
                         <Grid Height="84">
                             <TextBlock x:Name="MovesEmpty" Text="No moves yet." FontSize="{StaticResource CaptionSize}"
                                        Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Top" />
-                            <ScrollViewer x:Name="MoveScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
-                                          IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="True"
-                                          FocusVisualPrimaryBrush="{StaticResource AccentGreenLightBrush}" FocusVisualSecondaryBrush="#99000000">
+                            <ScrollViewer x:Name="MoveScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
                             <ItemsControl x:Name="MoveRows">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -429,6 +434,8 @@
                             </ItemsControl>
                         </ScrollViewer>
                         </Grid>
+                        </StackPanel>
+                        </ContentControl>
                         <!-- Step through the game: first / previous / next / latest. -->
                         <Grid ColumnSpacing="6">
                             <Grid.ColumnDefinitions>

@@ -122,17 +122,23 @@
                 <Button Grid.Column="4" Style="{StaticResource TileButton}" Click="Flip_Click" FontFamily="Segoe MDL2 Assets" Content="&#xE8AB;" Padding="0,10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTipService.ToolTip="Flip board" />
             </Grid>
 
-            <!-- Moves: clickable, jump the board to any position (like the Play board) -->
-            <Border Grid.Row="3" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,8">
+            <!-- Moves: clickable, jump the board to any position (like the Play board).
+                 The whole card is the engageable focus unit (green ring on the OUTER box,
+                 press A to step in); the inner scroller just scrolls the focused move
+                 into view. -->
+            <Border Grid.Row="3" Style="{StaticResource CardBorder}" Padding="3" Margin="0,0,0,8">
+                <!-- The focus host fills the card (carrying the inner padding) so its green
+                     focus rect hugs the OUTER card box, not the inner move rows. -->
+                <ContentControl IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="True" Padding="9"
+                                FocusVisualPrimaryBrush="{StaticResource AccentGreenLightBrush}" FocusVisualSecondaryBrush="#99000000"
+                                HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                 <StackPanel Spacing="6">
                     <TextBlock Text="Moves" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                     <!-- Whole multiple of the ~27px move-row height: 2 clean rows, no half-clipped third. -->
                     <Grid Height="54">
                         <TextBlock x:Name="MovesEmpty" Text="No moves yet." FontSize="{StaticResource CaptionSize}"
                                    Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Top" />
-                        <ScrollViewer x:Name="AnalysisMoveScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
-                                      IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="True"
-                                      FocusVisualPrimaryBrush="{StaticResource AccentGreenLightBrush}" FocusVisualSecondaryBrush="#99000000">
+                        <ScrollViewer x:Name="AnalysisMoveScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
                             <ItemsControl x:Name="AnalysisMoveRows">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -155,13 +161,19 @@
                     </ScrollViewer>
                     </Grid>
                 </StackPanel>
+                </ContentControl>
             </Border>
 
             <!-- Opening explorer / study notes: ONE card sharing the flexible row. When a
                  study chapter is loaded a small tab strip appears and the author's notes
                  take the explorer's space (default), switchable back to the explorer —
                  stepping through moves never reflows the panel either way. -->
-            <Border Grid.Row="4" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,8">
+            <Border Grid.Row="4" Style="{StaticResource CardBorder}" Padding="3" Margin="0,0,0,8">
+                <!-- One engageable host so the green focus ring hugs the OUTER card box;
+                     A steps in (to the tabs / list / notes), B steps back out. -->
+                <ContentControl IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="True" Padding="9"
+                                FocusVisualPrimaryBrush="{StaticResource AccentGreenLightBrush}" FocusVisualSecondaryBrush="#99000000"
+                                HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -181,15 +193,12 @@
                     <!-- Focus-engageable so long notes scroll with the stick (A engages, B releases). -->
                     <ScrollViewer Grid.Row="2" x:Name="NotesScroller" Visibility="Collapsed"
                                   VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
-                                  IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="True"
-                                  FocusVisualPrimaryBrush="{StaticResource AccentGreenLightBrush}" FocusVisualSecondaryBrush="#99000000">
+                                  IsTabStop="True" UseSystemFocusVisuals="False">
                         <TextBlock x:Name="NotesText" Text="" FontSize="{StaticResource CaptionSize}"
                                    Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
                     </ScrollViewer>
                     <ListView Grid.Row="2" x:Name="ExplorerList" SelectionMode="None" IsItemClickEnabled="True"
-                              ItemClick="Explorer_ItemClick" ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                              IsFocusEngagementEnabled="True" UseSystemFocusVisuals="True"
-                              FocusVisualPrimaryBrush="{StaticResource AccentGreenLightBrush}" FocusVisualSecondaryBrush="#99000000">
+                              ItemClick="Explorer_ItemClick" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                         <!-- Soft, thin focus outline (not the heavy green reveal ring) for these clickable rows. -->
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
@@ -220,17 +229,19 @@
                         </ListView.ItemTemplate>
                     </ListView>
                 </Grid>
+                </ContentControl>
             </Border>
 
             <!-- Tablebase (appears in endgames, below the explorer) -->
-            <Border x:Name="TablebaseCard" Grid.Row="5" Style="{StaticResource CardBorder}" Padding="12" Margin="0" Visibility="Collapsed">
+            <Border x:Name="TablebaseCard" Grid.Row="5" Style="{StaticResource CardBorder}" Padding="3" Margin="0" Visibility="Collapsed">
+                <ContentControl IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="True" Padding="9"
+                                FocusVisualPrimaryBrush="{StaticResource AccentGreenLightBrush}" FocusVisualSecondaryBrush="#99000000"
+                                HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                 <StackPanel Spacing="10">
                     <TextBlock x:Name="TablebaseSummary" Text="Tablebase" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                Foreground="{StaticResource AccentGreenLightBrush}" />
                     <ListView x:Name="TablebaseList" SelectionMode="None" IsItemClickEnabled="True"
-                              ItemClick="Tablebase_ItemClick" MaxHeight="160" ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                              IsFocusEngagementEnabled="True" UseSystemFocusVisuals="True"
-                              FocusVisualPrimaryBrush="{StaticResource AccentGreenLightBrush}" FocusVisualSecondaryBrush="#99000000">
+                              ItemClick="Tablebase_ItemClick" MaxHeight="160" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
                                 <Setter Property="FocusVisualPrimaryBrush" Value="#59EFEADF" />
@@ -252,6 +263,7 @@
                         </ListView.ItemTemplate>
                     </ListView>
                 </StackPanel>
+                </ContentControl>
             </Border>
         </Grid>
     </Grid>
