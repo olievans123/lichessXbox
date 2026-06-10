@@ -411,7 +411,7 @@
                             <TextBlock x:Name="MovesEmpty" Text="No moves yet." FontSize="{StaticResource CaptionSize}"
                                        Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Top" />
                             <ScrollViewer x:Name="MoveScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
-                                          IsFocusEngagementEnabled="True" UseSystemFocusVisuals="False">
+                                          UseSystemFocusVisuals="False">
                             <ItemsControl x:Name="MoveRows">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>

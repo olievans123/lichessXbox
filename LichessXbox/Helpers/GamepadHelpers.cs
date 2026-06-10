@@ -1,3 +1,4 @@
+using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -65,5 +66,92 @@ namespace LichessXbox.Helpers
 
         public static bool IsRunningOnXbox =>
             Windows.System.Profile.AnalyticsInfo.VersionInfo.DeviceFamily == "Windows.Xbox";
+    }
+
+    /// <summary>
+    /// Manual focus engagement for a scroller full of clickable buttons (the move list).
+    /// Built-in ScrollViewer engagement is scroll-mode — the stick scrolls but NO move gets
+    /// focus — so we mirror the board: the inner buttons are non-focusable (IsTabStop=false
+    /// via style) until the user presses A on the box, which enables them and focuses the
+    /// LAST (current) move; B (via the page's back handler) puts them away again. The ring
+    /// frames the box only while it's the focus unit.
+    /// </summary>
+    public sealed class ButtonListEngager
+    {
+        readonly ScrollViewer _host;
+        readonly UIElement _ring;
+        bool _engaged;
+
+        public ButtonListEngager(ScrollViewer host, UIElement ring)
+        {
+            _host = host;
+            _ring = ring;
+            _host.IsTabStop = true;   // the box is a single focus stop (its buttons are not)
+            _host.KeyDown += OnKeyDown;
+            _host.GotFocus += (s, e) =>
+                _ring.Visibility = ReferenceEquals(e.OriginalSource, _host) ? Visibility.Visible : Visibility.Collapsed;
+            _host.LostFocus += (s, e) =>
+            {
+                if (ReferenceEquals(e.OriginalSource, _host)) _ring.Visibility = Visibility.Collapsed;
+            };
+        }
+
+        void OnKeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if (_engaged) return;
+            if (e.Key == VirtualKey.GamepadA || e.Key == VirtualKey.Enter || e.Key == VirtualKey.Space)
+            {
+                SetButtonsFocusable(true);
+                var last = LastButton(_host);
+                if (last == null) { SetButtonsFocusable(false); return; }   // empty list — nothing to enter
+                _engaged = true;
+                last.Focus(FocusState.Keyboard);
+                _ring.Visibility = Visibility.Collapsed;
+                e.Handled = true;
+            }
+        }
+
+        /// <summary>B: put the buttons away and return to the box. True if it was engaged.</summary>
+        public bool Disengage()
+        {
+            if (!_engaged) return false;
+            _engaged = false;
+            SetButtonsFocusable(false);
+            _host.Focus(FocusState.Programmatic);
+            return true;
+        }
+
+        void SetButtonsFocusable(bool on)
+        {
+            void Walk(DependencyObject node)
+            {
+                int n = VisualTreeHelper.GetChildrenCount(node);
+                for (int i = 0; i < n; i++)
+                {
+                    var c = VisualTreeHelper.GetChild(node, i);
+                    if (c is Button b) b.IsTabStop = on;
+                    Walk(c);
+                }
+            }
+            Walk(_host);
+        }
+
+        // The LAST visible focusable button in the list = the current/latest move.
+        static Control LastButton(DependencyObject root)
+        {
+            Control found = null;
+            void Walk(DependencyObject node)
+            {
+                int n = VisualTreeHelper.GetChildrenCount(node);
+                for (int i = 0; i < n; i++)
+                {
+                    var c = VisualTreeHelper.GetChild(node, i);
+                    if (c is Button b && b.IsTabStop && b.Visibility == Visibility.Visible) found = b;
+                    Walk(c);
+                }
+            }
+            Walk(root);
+            return found;
+        }
     }
 }
