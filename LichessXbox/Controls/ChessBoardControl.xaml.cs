@@ -9,6 +9,7 @@ using Windows.UI;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Media.Imaging;
@@ -93,6 +94,10 @@ namespace LichessXbox.Controls
             this.InitializeComponent();
             BuildBoard();
             ApplyInteractivity();
+            // Mid-gesture (a piece picked up) the cursor stays on the board: one overshoot
+            // at the h-file otherwise dumps focus into the side panel with the clock running.
+            // B cancels the selection (via CancelSelection) and frees the cursor again.
+            this.LosingFocus += OnLosingFocus;
             _reTheme = () => ReTheme();
             this.Loaded += async (s, e) =>
             {
@@ -775,6 +780,30 @@ namespace LichessXbox.Controls
         {
             _selected = -1;
             _legalFromSelected.Clear();
+        }
+
+        /// <summary>Put down a picked-up piece (B button). True if there was one to put down.</summary>
+        public bool CancelSelection()
+        {
+            if (_selected < 0) return false;
+            ClearSelection();
+            Render();
+            return true;
+        }
+
+        // While a piece is selected, directional focus moves may not leave the board —
+        // programmatic moves (game-over card, page changes) always pass through.
+        void OnLosingFocus(UIElement sender, LosingFocusEventArgs e)
+        {
+            if (_selected < 0 || !Interactive) return;
+            if (e.InputDevice != FocusInputDeviceKind.GameController && e.InputDevice != FocusInputDeviceKind.Keyboard) return;
+            var d = e.NewFocusedElement as DependencyObject;
+            while (d != null)
+            {
+                if (d == this) return;   // still on the board (cells, promotion picker)
+                d = VisualTreeHelper.GetParent(d);
+            }
+            e.TryCancel();
         }
 
         void CommitMove(ChessMove move)

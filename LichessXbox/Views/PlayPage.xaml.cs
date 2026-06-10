@@ -40,7 +40,7 @@ namespace LichessXbox.Views
     {
         readonly ObservableCollection<TimeControlPreset> _presets = new ObservableCollection<TimeControlPreset>();
 
-        /// <summary>B peels game layers: result card → live position (when reviewing) → leave.</summary>
+        /// <summary>B peels game layers: result card → picked-up piece → review → leave.</summary>
         public bool HandleBack()
         {
             if (ResultOverlay.Visibility == Visibility.Visible)
@@ -48,6 +48,7 @@ namespace LichessXbox.Views
                 DismissResult_Click(null, null);
                 return true;
             }
+            if (Board.CancelSelection()) return true;   // put the piece down, free the cursor
             if (GamePanel.Visibility == Visibility.Visible && _viewPly < _plies.Count)
             {
                 SetViewPly(_plies.Count);   // reviewing history — snap back to the live game

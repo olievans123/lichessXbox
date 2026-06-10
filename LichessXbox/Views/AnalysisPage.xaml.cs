@@ -18,8 +18,11 @@ namespace LichessXbox.Views
     /// Free analysis board: explore any line, with cloud-engine eval, opening
     /// explorer, and tablebase — all from the Lichess APIs.
     /// </summary>
-    public sealed partial class AnalysisPage : Page
+    public sealed partial class AnalysisPage : Page, IBackHandler
     {
+        /// <summary>B puts a picked-up piece down before it navigates away from the page.</summary>
+        public bool HandleBack() => Board.CancelSelection();
+
         readonly List<ChessPosition> _history = new List<ChessPosition> { ChessPosition.Starting() };
         readonly List<ChessMove> _moves = new List<ChessMove>();
         int _ply;
