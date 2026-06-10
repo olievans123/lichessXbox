@@ -212,6 +212,9 @@
     <Style x:Key="MoveButton" TargetType="Button">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
+        <!-- Non-focusable until the move box is engaged (ButtonListEngager toggles this), so
+             XY-nav treats the moves card as a single unit until you press A. -->
+        <Setter Property="IsTabStop" Value="False" />
         <Setter Property="Padding" Value="6,2" />
         <Setter Property="FontSize" Value="{StaticResource CaptionSize}" />
         <Setter Property="FontWeight" Value="SemiBold" />
