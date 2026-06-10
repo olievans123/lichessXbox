@@ -4,12 +4,26 @@ using LichessXbox.Models;
 using LichessXbox.Services;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace LichessXbox.Views
 {
-    public sealed partial class TournamentsPage : Page
+    public sealed partial class TournamentsPage : Page, IBackHandler
     {
+        /// <summary>B in the right-hand detail (Join / standings) returns to the tournament
+        /// list; pressed on the list itself it falls through (to Home).</summary>
+        public bool HandleBack()
+        {
+            var f = FocusManager.GetFocusedElement() as DependencyObject;
+            if (f == null) return false;
+            for (var n = f; n != null; n = VisualTreeHelper.GetParent(n))
+                if (ReferenceEquals(n, TournamentList)) return false;   // already on the list
+            TournamentList.Focus(FocusState.Programmatic);
+            return true;
+        }
+
         string _selectedId;
         bool _joined;   // current selection: are we entered? (Join ↔ Leave toggle)
         // Arenas we entered must survive page re-creation (each navigation builds a new

@@ -75,14 +75,15 @@
                     <TextBlock Grid.Column="1" x:Name="DetailStatus" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
                                Visibility="Collapsed" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,8,0,0" />
                 </Grid>
-                <!-- Informational only: clickable (so a gamepad can focus + scroll it) but never
-                     "selected", so no persistent green selection ring lingers on a row. -->
+                <!-- Standings: focusable rows so Down from Join scrolls through the usernames,
+                     each showing a green focus ring as you go. -->
                 <ListView Grid.Row="3" x:Name="StandingsList" SelectionMode="None" IsItemClickEnabled="True"
                           Padding="0,0,0,12" ScrollViewer.VerticalScrollBarVisibility="Hidden">
-                    <!-- Read-only standings: focusable for gamepad scrolling, but no focus ring (nothing to click). -->
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem">
-                            <Setter Property="UseSystemFocusVisuals" Value="False" />
+                            <Setter Property="UseSystemFocusVisuals" Value="True" />
+                            <Setter Property="FocusVisualPrimaryBrush" Value="{StaticResource AccentGreenLightBrush}" />
+                            <Setter Property="FocusVisualSecondaryBrush" Value="#99000000" />
                             <!-- Stretch each row to the full width so the * name column expands and the score right-aligns. -->
                             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                         </Style>
