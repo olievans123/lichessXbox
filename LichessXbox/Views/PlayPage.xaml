@@ -399,24 +399,26 @@
 
                 <Border Style="{StaticResource CardBorder}" Padding="12,8">
                     <StackPanel Spacing="8">
-                        <!-- Status + move history = one engageable unit; PlayMovesFocusRing
-                             frames this box on focus (A steps into the moves); the nav buttons
-                             below stay as their own direct focus stops. -->
+                        <!-- Status + moves are one focusable UNIT (a ContentControl, NOT the
+                             scroller — a focused ScrollViewer eats the left stick to scroll).
+                             PlayMovesFocusRing frames it; the right stick scrolls the history;
+                             the left stick just moves focus off it. -->
                         <Grid>
+                        <ContentControl x:Name="PlayMovesHost" IsTabStop="True" UseSystemFocusVisuals="False"
+                                        HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                         <StackPanel Spacing="8">
                         <TextBlock x:Name="StatusBanner" Text="Your move" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                    Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
                         <!-- Move history (SAN): a FIXED-size box so it doesn't grow as moves are played —
-                             a placeholder shows until the first move, then it scrolls within the fixed height.
-                             The scroller is the engageable unit; PlayMovesFocusRing frames it on focus. -->
+                             a placeholder shows until the first move, then it scrolls within the fixed height. -->
                         <Grid Height="84">
                             <TextBlock x:Name="MovesEmpty" Text="No moves yet." FontSize="{StaticResource CaptionSize}"
                                        Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Top" />
-                            <!-- In-game: the moves box is a focusable unit (ring on focus) that the
-                                 RIGHT STICK scrolls to review history — no A-to-engage. The left
-                                 stick just moves focus off it. -->
+                            <!-- IsTabStop=False so it never holds focus (and so never eats the
+                                 left stick); the host above is the focus target, scrolled by the
+                                 right stick via code. -->
                             <ScrollViewer x:Name="MoveScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
-                                          IsTabStop="True" UseSystemFocusVisuals="False">
+                                          IsTabStop="False" UseSystemFocusVisuals="False">
                             <ItemsControl x:Name="MoveRows">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -440,6 +442,7 @@
                         </ScrollViewer>
                         </Grid>
                         </StackPanel>
+                        </ContentControl>
                         <Border x:Name="PlayMovesFocusRing" Margin="-4" CornerRadius="10" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
                             <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
                         </Border>

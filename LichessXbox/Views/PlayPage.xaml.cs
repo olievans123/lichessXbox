@@ -139,8 +139,8 @@ namespace LichessXbox.Views
 
             MoveRows.ItemsSource = _moveRows;
             Board.MoveRequested += Board_MoveRequested;
-            MoveScroller.FrameOnFocus(PlayMovesFocusRing);   // focus the box → ring
-            MoveScroller.KeyDown += MoveScroller_KeyDown;    // right stick scrolls the history (left stick = focus nav)
+            PlayMovesHost.FrameOnFocus(PlayMovesFocusRing);   // the non-scrolling host holds focus → ring
+            PlayMovesHost.KeyDown += MoveScroller_KeyDown;    // right stick scrolls the history (left stick = focus nav)
             _clockTimer.Interval = TimeSpan.FromMilliseconds(200);
             _clockTimer.Tick += ClockTick;
 
