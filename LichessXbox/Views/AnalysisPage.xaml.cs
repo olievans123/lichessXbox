@@ -390,7 +390,7 @@ namespace LichessXbox.Views
             EnsureEngine();
             _showEngine = true;
             EvalText.Text = "…";
-            BestLineText.Text = _engine.IsReady ? "Analyzing locally…" : "Starting engine…";
+            BestLineText.Text = _engine.IsReady ? "Analyzing…" : "Starting engine…";
             _engine.Analyze(pos);
         }
 
@@ -399,7 +399,7 @@ namespace LichessXbox.Views
         void OnEngineReady(bool ready)
         {
             if (!ready || !_showEngine || _engine == null) return;
-            BestLineText.Text = "Analyzing locally…";
+            BestLineText.Text = "Analyzing…";
             _engine.Analyze(Current);
         }
 
