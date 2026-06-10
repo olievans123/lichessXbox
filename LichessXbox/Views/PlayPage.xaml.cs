@@ -7,9 +7,11 @@ using LichessXbox.Chess;
 using LichessXbox.Models;
 using LichessXbox.Services;
 using Newtonsoft.Json.Linq;
+using Windows.System;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
@@ -34,9 +36,36 @@ namespace LichessXbox.Views
         void Raise(string n) => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(n));
     }
 
-    public sealed partial class PlayPage : Page
+    public sealed partial class PlayPage : Page, IBackHandler
     {
         readonly ObservableCollection<TimeControlPreset> _presets = new ObservableCollection<TimeControlPreset>();
+
+        /// <summary>B peels game layers: result card → live position (when reviewing) → leave.</summary>
+        public bool HandleBack()
+        {
+            if (ResultOverlay.Visibility == Visibility.Visible)
+            {
+                DismissResult_Click(null, null);
+                return true;
+            }
+            if (GamePanel.Visibility == Visibility.Visible && _viewPly < _plies.Count)
+            {
+                SetViewPly(_plies.Count);   // reviewing history — snap back to the live game
+                return true;
+            }
+            return false;
+        }
+
+        // Shoulder buttons step through the game's moves; triggers jump to the ends.
+        // (Review during a live game disables board input until back at the latest move.)
+        void Page_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if (GamePanel.Visibility != Visibility.Visible) return;
+            if (e.Key == VirtualKey.GamepadLeftShoulder) { SetViewPly(_viewPly - 1); e.Handled = true; }
+            else if (e.Key == VirtualKey.GamepadRightShoulder) { SetViewPly(_viewPly + 1); e.Handled = true; }
+            else if (e.Key == VirtualKey.GamepadLeftTrigger) { SetViewPly(0); e.Handled = true; }
+            else if (e.Key == VirtualKey.GamepadRightTrigger) { SetViewPly(_plies.Count); e.Handled = true; }
+        }
         CancellationTokenSource _eventCts;
         CancellationTokenSource _seekCts;
         CancellationTokenSource _gameCts;
@@ -70,6 +99,7 @@ namespace LichessXbox.Views
         public PlayPage()
         {
             this.InitializeComponent();
+            this.KeyDown += Page_KeyDown;
             foreach (var p in TimeControlPreset.Defaults) _presets.Add(p);
             PresetGrid.ItemsSource = _presets;
 

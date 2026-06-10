@@ -162,7 +162,9 @@
             <Border x:Name="NotesCard" Grid.Row="4" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,8" Visibility="Collapsed">
                 <StackPanel Spacing="6">
                     <TextBlock Text="Study notes" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource AccentGreenLightBrush}" FontWeight="SemiBold" />
-                    <ScrollViewer x:Name="NotesScroller" MaxHeight="110" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+                    <!-- Focus-engageable so long notes scroll with the stick (A engages, B releases). -->
+                    <ScrollViewer x:Name="NotesScroller" MaxHeight="110" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
+                                  IsTabStop="True" IsFocusEngagementEnabled="True">
                         <TextBlock x:Name="NotesText" Text="" FontSize="{StaticResource CaptionSize}"
                                    Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
                     </ScrollViewer>

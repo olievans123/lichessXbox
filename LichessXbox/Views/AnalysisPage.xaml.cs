@@ -392,6 +392,9 @@ namespace LichessXbox.Views
         {
             if (e.Key == VirtualKey.GamepadLeftShoulder) { Back_Click(null, null); e.Handled = true; }
             else if (e.Key == VirtualKey.GamepadRightShoulder) { Forward_Click(null, null); e.Handled = true; }
+            else if (e.Key == VirtualKey.GamepadLeftTrigger) { First_Click(null, null); e.Handled = true; }
+            else if (e.Key == VirtualKey.GamepadRightTrigger) { Last_Click(null, null); e.Handled = true; }
+            else if (e.Key == VirtualKey.GamepadY) { Flip_Click(null, null); e.Handled = true; }
         }
 
         // ---------------------------------------------------------------- import

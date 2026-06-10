@@ -17,6 +17,14 @@ using Windows.UI.Xaml.Media.Animation;
 
 namespace LichessXbox
 {
+    /// <summary>A page that can consume the B button before frame-level Back runs —
+    /// closing its own overlays / inner panels (result card, chapter list) instead of
+    /// leaving the page. Return true when the press was used.</summary>
+    public interface IBackHandler
+    {
+        bool HandleBack();
+    }
+
     public sealed partial class MainPage : Page
     {
         string _pendingAnalysisParam;
@@ -65,12 +73,19 @@ namespace LichessXbox
             };
         }
 
-        // The gamepad Menu (or View) button toggles the nav from anywhere; B / Esc closes it.
+        // Gamepad Menu toggles the nav from anywhere; View jumps to your games (where arena
+        // pairings and resumable boards live) — falling back to the nav when there are none.
         void Page_KeyDown(object sender, KeyRoutedEventArgs e)
         {
-            if (e.Key == VirtualKey.GamepadMenu || e.Key == VirtualKey.GamepadView)
+            if (e.Key == VirtualKey.GamepadMenu)
             {
                 SetPane(!NavSplit.IsPaneOpen);
+                e.Handled = true;
+            }
+            else if (e.Key == VirtualKey.GamepadView)
+            {
+                if (OngoingTab.Visibility == Visibility.Visible) OngoingTab.Flyout?.ShowAt(OngoingTab);
+                else SetPane(!NavSplit.IsPaneOpen);
                 e.Handled = true;
             }
             else if (NavSplit.IsPaneOpen && (e.Key == VirtualKey.GamepadB || e.Key == VirtualKey.Escape))
@@ -101,11 +116,13 @@ namespace LichessXbox
 
         // ----------------------------------------------------- back navigation
 
-        // The gamepad B button (and the system back chrome) route here.
+        // The gamepad B button (and the system back chrome) route here. B peels layers
+        // outside-in: nav pane → the page's own overlays/panels → frame back-stack.
         void OnBackRequested(object sender, BackRequestedEventArgs e)
         {
             if (e.Handled) return;
             if (NavSplit.IsPaneOpen) { ClosePane(); e.Handled = true; return; }
+            if (ContentFrame.Content is IBackHandler page && page.HandleBack()) { e.Handled = true; return; }
             if (ContentFrame.CanGoBack) { ContentFrame.GoBack(); e.Handled = true; }
         }
 

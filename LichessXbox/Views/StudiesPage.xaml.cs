@@ -15,9 +15,20 @@ namespace LichessXbox.Views
         public string Pgn { get; set; }
     }
 
-    public sealed partial class StudiesPage : Page
+    public sealed partial class StudiesPage : Page, IBackHandler
     {
         bool _opening;   // guards against a double-press firing two analysis navigations
+
+        /// <summary>B steps out one layer: chapter picker → study list (not out of the page).</summary>
+        public bool HandleBack()
+        {
+            if (ChaptersPanel.Visibility == Visibility.Visible)
+            {
+                ChaptersBack_Click(null, null);
+                return true;
+            }
+            return false;
+        }
 
         public StudiesPage()
         {

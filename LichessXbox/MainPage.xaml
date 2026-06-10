@@ -17,9 +17,11 @@
                 <ScrollViewer x:Name="NavScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel x:Name="NavItems" Padding="12,16,12,16" Spacing="3">
                         <StackPanel Orientation="Horizontal" Spacing="12" Margin="6,2,6,6">
-                            <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource AccentGradientBrush}">
-                                <TextBlock Text="♞" FontFamily="Segoe UI Symbol" FontSize="26" Foreground="#0E1207"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <!-- The real app icon (knight artwork), not a glyph approximation. -->
+                            <Border Width="40" Height="40" CornerRadius="10">
+                                <Border.Background>
+                                    <ImageBrush ImageSource="ms-appx:///Assets/Square150x150Logo.scale-200.png" Stretch="UniformToFill" />
+                                </Border.Background>
                             </Border>
                             <StackPanel VerticalAlignment="Center">
                                 <TextBlock Text="Online Chess" FontSize="{StaticResource BodySize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
@@ -150,6 +152,11 @@
                                 <TextBlock Grid.Column="1" Text="Settings" Margin="8,0,0,0" />
                             </Grid>
                         </Button>
+
+                        <!-- Controller crib sheet — quiet, at the end of the list. -->
+                        <TextBlock Margin="10,16,6,4" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}"
+                                   TextWrapping="Wrap" LineHeight="20"
+                                   Text="☰ Menu — this panel&#10;Ⓑ — back / close&#10;⧉ View — your games" />
                     </StackPanel>
                 </ScrollViewer>
             </SplitView.Pane>
