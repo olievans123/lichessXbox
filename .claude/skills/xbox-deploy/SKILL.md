@@ -41,10 +41,16 @@ Override the console address with `XBOX=host:port` (default `192.168.1.64:11443`
 - **CSRF:** every non-GET to the portal 403s without a token. Do one GET to seed a
   cookie jar, then send the cookie's CSRF value back as `X-CSRF-Token`.
 - **Stop before redeploy:** deploying over the *running* app fails with
-  `0x80070005 "Access is denied"` and leaves it half-registered — the console
-  shows **"Not ready yet" (0x80270300)** and every launch returns HTTP 400. Always
-  force-stop first; if it's already in that limbo, a **full uninstall + clean
-  reinstall** is the only recovery (the script does this automatically).
+  `0x80070005 "Access is denied"`. Always force-stop first (the script does).
+- **NEVER remote-uninstall to recover.** On this console the WDP uninstall only
+  half-deregisters (it has two registered users — `DefaultAccount` + `UserMgr1` —
+  and DELETE leaves a per-user registration), so the *next* install lands in the
+  **"Not ready yet" (0x80270300)** limbo where every launch returns HTTP 400.
+  Confirmed empirically: machine-side uninstall → remote install **works**; remote
+  uninstall → remote install **breaks**. The only reliable clear of the limbo is
+  from the console: **My games & apps → Apps → Online Chess → Manage → Uninstall**,
+  then `deploy.sh install`. Normal iteration (deploy a new build over a *working*
+  install, app stopped first) is fine and needs no uninstall.
 - **Launch needs an empty body:** `POST /api/taskmanager/app` returns **HTTP 411**
   without one — send `-d ''`.
 - **Finalizing delay:** right after install, launch returns 400 for ~30–60s while

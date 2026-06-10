@@ -59,9 +59,8 @@ stop_app() {
 do_install() {
   fetch_artifact
   auth
-  # CRITICAL: stop the app first. Redeploying over the running app fails with
-  # 0x80070005 "Access is denied" and leaves it in a half-registered "Not ready
-  # yet" (0x80270300) limbo that only a full uninstall clears.
+  # CRITICAL: stop the app first. Deploying over the RUNNING app fails with
+  # 0x80070005 "Access is denied".
   stop_app
   sleep 3
   echo "Deploying (bundle + x64 dependencies)..."
@@ -75,12 +74,20 @@ do_install() {
   case "$R" in
     *'"Success" : true'*) do_launch ;;
     *0x80070005*|*'Not ready'*|*0x80270300*)
-      echo "Half-registered — uninstalling and reinstalling clean..."
-      do_uninstall; sleep 5; do_install ;;
+      echo
+      echo "!! HALF-REGISTERED LIMBO. Do NOT remote-uninstall — on this console the WDP"
+      echo "   uninstall leaves a per-user registration (two users: DefaultAccount +"
+      echo "   UserMgr1) that breaks the next install. The ONLY reliable clear is from"
+      echo "   the console: My games & apps > Apps > Online Chess > Manage > Uninstall."
+      echo "   Then run: deploy.sh install"
+      exit 1 ;;
     *) echo "Deploy failed; see RESULT above"; exit 1 ;;
   esac
 }
 
+# NOTE: remote uninstall is UNRELIABLE on this Xbox — it half-deregisters and the
+# next install lands in 'Not ready yet' limbo. Uninstall from the console UI instead.
+# Kept only for completeness / diagnostics.
 do_uninstall() { auth; delete "$BASE/api/app/packagemanager/package?package=$PFN" -w "\nuninstall: HTTP %{http_code}\n"; wait_state >/dev/null 2>&1; }
 
 do_launch() {  # launch needs an empty body (-d '') or WDP returns HTTP 411
