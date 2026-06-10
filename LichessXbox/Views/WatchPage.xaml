@@ -34,7 +34,7 @@
             </Grid>
 
             <Viewbox Grid.Row="1" Stretch="Uniform">
-                <controls:ChessBoardControl x:Name="Board" Interactive="False" SoundsEnabled="True" />
+                <controls:ChessBoardControl x:Name="Board" Interactive="False" IsTabStop="False" SoundsEnabled="True" />
             </Viewbox>
 
             <Grid Grid.Row="2" Margin="0,10,0,0">
@@ -65,7 +65,7 @@
                 </StackPanel>
 
                 <TextBlock Text="Channels" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                <ListView x:Name="ChannelList" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Channel_ItemClick" ScrollViewer.VerticalScrollMode="Disabled">
+                <ListView x:Name="ChannelList" SelectionMode="Single" SingleSelectionFollowsFocus="False" IsItemClickEnabled="True" ItemClick="Channel_ItemClick" ScrollViewer.VerticalScrollMode="Disabled">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid Padding="4,8">

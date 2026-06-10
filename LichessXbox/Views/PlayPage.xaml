@@ -222,7 +222,7 @@
                                                     <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled" />
                                                 </Style>
                                             </Flyout.FlyoutPresenterStyle>
-                                            <GridView x:Name="FriendClockGrid" SelectionMode="Single" IsItemClickEnabled="True"
+                                            <GridView x:Name="FriendClockGrid" SelectionMode="Single" SingleSelectionFollowsFocus="False" IsItemClickEnabled="True"
                                                       ItemClick="FriendClock_ItemClick" MaxWidth="384" ScrollViewer.VerticalScrollBarVisibility="Auto">
                                                 <GridView.ItemTemplate>
                                                     <DataTemplate>
@@ -277,7 +277,7 @@
                                             <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled" />
                                         </Style>
                                     </Flyout.FlyoutPresenterStyle>
-                                    <GridView x:Name="VariantGrid" SelectionMode="Single" IsItemClickEnabled="True"
+                                    <GridView x:Name="VariantGrid" SelectionMode="Single" SingleSelectionFollowsFocus="False" IsItemClickEnabled="True"
                                               ItemClick="Variant_ItemClick" MaxWidth="448" ScrollViewer.VerticalScrollBarVisibility="Auto">
                                         <GridView.ItemTemplate>
                                             <DataTemplate>
