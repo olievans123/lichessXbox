@@ -8,7 +8,8 @@
 
     <Viewbox Stretch="Uniform">
         <Grid x:Name="BoardRoot" Width="720" Height="720">
-            <Border CornerRadius="10" Background="{StaticResource BoardFrameBrush}" />
+            <Border CornerRadius="12" Background="{StaticResource BoardFrameBrush}"
+                    BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1" />
             <Grid x:Name="BoardGrid" Margin="8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" /><RowDefinition Height="*" /><RowDefinition Height="*" /><RowDefinition Height="*" />

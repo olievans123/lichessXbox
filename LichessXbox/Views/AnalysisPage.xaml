@@ -46,6 +46,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
@@ -155,8 +156,21 @@
                 </StackPanel>
             </Border>
 
+            <!-- Study notes: the chapter author's commentary for the displayed move. Only
+                 present when a study chapter is loaded; fixed slot so stepping through
+                 moves never reflows the panel. -->
+            <Border x:Name="NotesCard" Grid.Row="4" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,8" Visibility="Collapsed">
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Study notes" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource AccentGreenLightBrush}" FontWeight="SemiBold" />
+                    <ScrollViewer x:Name="NotesScroller" MaxHeight="110" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+                        <TextBlock x:Name="NotesText" Text="" FontSize="{StaticResource CaptionSize}"
+                                   Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
+                    </ScrollViewer>
+                </StackPanel>
+            </Border>
+
             <!-- Opening explorer: fills the remaining height; the list scrolls internally. -->
-            <Border Grid.Row="4" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,8">
+            <Border Grid.Row="5" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,8">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -203,7 +217,7 @@
             </Border>
 
             <!-- Tablebase (appears in endgames, below the explorer) -->
-            <Border x:Name="TablebaseCard" Grid.Row="5" Style="{StaticResource CardBorder}" Padding="12" Margin="0" Visibility="Collapsed">
+            <Border x:Name="TablebaseCard" Grid.Row="6" Style="{StaticResource CardBorder}" Padding="12" Margin="0" Visibility="Collapsed">
                 <StackPanel Spacing="10">
                     <TextBlock x:Name="TablebaseSummary" Text="Tablebase" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
                                Foreground="{StaticResource AccentGreenLightBrush}" />

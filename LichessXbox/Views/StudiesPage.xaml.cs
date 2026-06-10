@@ -137,7 +137,8 @@ namespace LichessXbox.Views
         {
             if (_opening) return;   // ignore a second press while we're navigating
             _opening = true;
-            var (fen, uci) = ChessPosition.PgnToMoves(pgn);
+            var (fen, uci, notes) = ChessPosition.PgnToMovesWithNotes(pgn);
+            AppState.Current.PendingAnalysisNotes = notes;   // the analysis board shows these per ply
             ((Window.Current.Content as Frame)?.Content as MainPage)?.OpenAnalysis(fen + "|" + uci);
         }
 

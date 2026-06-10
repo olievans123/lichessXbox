@@ -560,6 +560,86 @@ namespace LichessXbox.Chess
             return (fen, uci.ToString().Trim());
         }
 
+        /// <summary>
+        /// Like <see cref="PgnToMoves"/>, but also collects the author's prose: notes[k] is
+        /// the comment shown at ply k (0 = the chapter intro, before any move). Only
+        /// main-line comments are kept — variations and their commentary are skipped — and
+        /// lichess metadata tags ([%clk …], [%cal …], …) are stripped out of the text.
+        /// </summary>
+        public static (string fen, string uci, System.Collections.Generic.List<string> notes) PgnToMovesWithNotes(string pgn)
+        {
+            var notes = new System.Collections.Generic.List<string>();
+            if (string.IsNullOrWhiteSpace(pgn)) return ("startpos", "", notes);
+
+            string fen = "startpos";
+            foreach (var line in pgn.Split('\n'))
+            {
+                var l = line.Trim();
+                if (l.StartsWith("[FEN", StringComparison.OrdinalIgnoreCase))
+                {
+                    int q1 = l.IndexOf('"'), q2 = l.LastIndexOf('"');
+                    if (q1 >= 0 && q2 > q1) fen = l.Substring(q1 + 1, q2 - q1 - 1);
+                }
+            }
+
+            var bodySb = new StringBuilder();
+            foreach (var line in pgn.Split('\n'))
+                if (!line.TrimStart().StartsWith("[")) bodySb.Append(line).Append(' ');
+            string text = bodySb.ToString();
+
+            var pos = fen == "startpos" ? Starting() : FromFen(fen);
+            var uci = new StringBuilder();
+            var tok = new StringBuilder();
+            int depth = 0, applied = 0;
+            bool dead = false;
+
+            void Flush()
+            {
+                if (tok.Length == 0) return;
+                string t = tok.ToString();
+                tok.Clear();
+                if (depth > 0 || dead) return;
+                if (t[0] == '$') return;
+                if (t.Contains(".")) t = t.Substring(t.LastIndexOf('.') + 1);
+                if (t.Length == 0 || t == "1-0" || t == "0-1" || t == "1/2-1/2" || t == "*") return;
+                var mv = pos.ParseSan(t);
+                if (mv == null) return;
+                var next = pos.Apply(mv.Value);
+                if (next == null) { dead = true; return; }
+                uci.Append(mv.Value.ToUci()).Append(' ');
+                pos = next;
+                applied++;
+            }
+
+            for (int i = 0; i < text.Length; i++)
+            {
+                char c = text[i];
+                if (c == '{')
+                {
+                    Flush();
+                    int end = text.IndexOf('}', i + 1);
+                    string comment = text.Substring(i + 1, (end > i ? end : text.Length) - i - 1);
+                    i = end > i ? end : text.Length;
+                    if (depth == 0 && !dead)
+                    {
+                        comment = System.Text.RegularExpressions.Regex.Replace(comment, @"\[%[^\]]*\]", " ");
+                        comment = System.Text.RegularExpressions.Regex.Replace(comment, @"\s+", " ").Trim();
+                        if (comment.Length > 0)
+                        {
+                            while (notes.Count <= applied) notes.Add(null);
+                            notes[applied] = notes[applied] == null ? comment : notes[applied] + " " + comment;
+                        }
+                    }
+                }
+                else if (c == '(') { Flush(); depth++; }
+                else if (c == ')') { Flush(); if (depth > 0) depth--; }
+                else if (char.IsWhiteSpace(c)) Flush();
+                else tok.Append(c);
+            }
+            Flush();
+            return (fen, uci.ToString().Trim(), notes);
+        }
+
         static string StripDelimited(string s, char open, char close)
         {
             var sb = new StringBuilder();

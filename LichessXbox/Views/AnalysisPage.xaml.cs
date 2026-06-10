@@ -28,6 +28,7 @@ namespace LichessXbox.Views
         readonly ObservableCollection<TablebaseRow> _tablebase = new ObservableCollection<TablebaseRow>();
         readonly ObservableCollection<MoveRowVM> _moveRows = new ObservableCollection<MoveRowVM>();
         readonly List<string> _sans = new List<string>();   // cached SAN per ply (ToSan runs legal-move gen)
+        readonly List<string> _notes = new List<string>();  // study notes: _notes[k] shown at ply k
         CancellationTokenSource _analysisCts;
         LocalEngine _engine;
         bool _useLocalEngine;
@@ -83,6 +84,8 @@ namespace LichessXbox.Views
                 _moves.RemoveRange(_ply, _moves.Count - _ply);
                 // The move at _ply changes with the new variation, so drop its (now stale) SAN too.
                 if (_sans.Count > _ply) _sans.RemoveRange(_ply, _sans.Count - _ply);
+                // Study notes past this point described the ORIGINAL line — they no longer apply.
+                if (_notes.Count > _ply + 1) _notes.RemoveRange(_ply + 1, _notes.Count - _ply - 1);
             }
             _history.Add(next);
             _moves.Add(move);
@@ -101,6 +104,17 @@ namespace LichessXbox.Views
             Board.Position = cur;
 
             RebuildAnalysisMoves();
+
+            // Study notes: card stays visible (fixed slot, no reflow) whenever notes exist;
+            // shows the author's comment for the displayed ply, or a quiet dash without one.
+            if (_notes.Count > 0)
+            {
+                string note = _ply < _notes.Count ? _notes[_ply] : null;
+                NotesText.Text = string.IsNullOrEmpty(note) ? "—" : note;
+                NotesCard.Visibility = Visibility.Visible;
+                NotesScroller.ChangeView(null, 0, null, true);
+            }
+            else NotesCard.Visibility = Visibility.Collapsed;
 
             EvalText.Text = "…";
             BestLineText.Text = "Evaluating…";
@@ -411,6 +425,7 @@ namespace LichessXbox.Views
             _history.Clear();
             _moves.Clear();
             _sans.Clear();
+            _notes.Clear();
             _history.Add(pos);
             _ply = 0;
             Sync();
@@ -422,6 +437,7 @@ namespace LichessXbox.Views
             _history.Clear();
             _moves.Clear();
             _sans.Clear();
+            _notes.Clear();
             ChessPosition pos;
             try
             {
@@ -464,10 +480,19 @@ namespace LichessXbox.Views
             // Optionally arrive with a game to replay: "initialFen|moves[|whiteName|blackName]".
             if (e.Parameter is string param && param.Contains("|"))
             {
+                // Study notes ride alongside via AppState (the nav param stays a plain string).
+                var pendingNotes = AppState.Current.PendingAnalysisNotes;
+                AppState.Current.PendingAnalysisNotes = null;
                 var parts = param.Split('|');   // FEN/SAN never contain '|', so a full split is safe
                 LoadGame(parts[0], parts.Length > 1 ? parts[1] : "");
                 _whiteName = parts.Length > 2 ? parts[2] : null;
                 _blackName = parts.Length > 3 ? parts[3] : null;
+                if (pendingNotes != null && pendingNotes.Count > 0)
+                {
+                    _notes.AddRange(pendingNotes);
+                    _ply = 0;   // a study reads from the start — open on the intro note
+                    Sync();
+                }
             }
             else { _whiteName = _blackName = null; }
             ShowPlayers();

@@ -15,6 +15,10 @@ namespace LichessXbox.Services
         public LichessApiService Api { get; }
         public LichessAccount Account { get; private set; }
 
+        /// <summary>Study-chapter notes handed from StudiesPage to the next AnalysisPage
+        /// navigation (notes[k] = author comment at ply k). Consumed (nulled) on pickup.</summary>
+        public System.Collections.Generic.List<string> PendingAnalysisNotes;
+
         public bool IsSignedIn => Auth.IsAuthenticated;
 
         AppState()

@@ -675,7 +675,6 @@ namespace LichessXbox.Views
             {
                 case 0:
                     title = "You won!";
-                    ResultAccent.Background = Res("AccentGreenBrush");
                     ResultTitle.Foreground = Res("AccentGreenLightBrush");
                     ResultIcon.Text = "";   // filled star
                     ResultIcon.Foreground = Res("AccentGreenLightBrush");
@@ -683,18 +682,15 @@ namespace LichessXbox.Views
                     break;
                 case 1:
                     title = "You lost";
-                    ResultAccent.Background = Res("ErrorBrush");
-                    ResultTitle.Foreground = Res("TextPrimaryBrush");
+                    ResultTitle.Foreground = Res("ErrorBrush");
                     break;
                 case 3:
                     title = "Game aborted";
-                    ResultAccent.Background = Res("HairlineBrush");
-                    ResultTitle.Foreground = Res("TextPrimaryBrush");
+                    ResultTitle.Foreground = Res("TextSecondaryBrush");
                     break;
                 default:
                     title = "Draw";
-                    ResultAccent.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0xF2, 0xD2, 0x6B));
-                    ResultTitle.Foreground = Res("TextPrimaryBrush");
+                    ResultTitle.Foreground = Res("WarningBrush");
                     break;
             }
 
@@ -719,7 +715,7 @@ namespace LichessXbox.Views
             if (rc == null || !_resultShown || gameId != _gameId) return;
 
             var (rating, diff) = rc.Value;
-            ResultRating.Text = rating.ToString();
+            ResultRating.Text = "Rating " + rating;   // bare "1758 -29" read as a cryptic code
             if (diff != 0)
             {
                 ResultRatingDelta.Text = (diff > 0 ? "+" : "") + diff;

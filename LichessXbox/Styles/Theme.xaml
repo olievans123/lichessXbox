@@ -84,7 +84,10 @@
     <Thickness x:Key="PagePadding">40,28</Thickness>
 
     <!-- ============ Semantic tokens promoted from one-off literals ============ -->
-    <SolidColorBrush x:Key="BoardFrameBrush" Color="#0E0C09" />
+    <!-- Warm card tone, NOT near-black: darker than the page made the whole board column
+         read as one unstyled black slab. Matching the surface palette makes the board sit
+         on the page like every other card. -->
+    <SolidColorBrush x:Key="BoardFrameBrush" Color="#2A251D" />
     <SolidColorBrush x:Key="SurfaceSunkenBrush" Color="#16130F" />   <!-- graph/well backdrops -->
     <SolidColorBrush x:Key="WarningBrush" Color="#F2D26B" />          <!-- amber: challenge / draw -->
     <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#33F2D26B" />
