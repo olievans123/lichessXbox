@@ -16,7 +16,7 @@
                 <TextBlock Text="Settings" FontSize="{StaticResource TitleSize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
 
                 <TextBlock Text="Board theme" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
-                <GridView x:Name="ThemeGrid" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="Theme_ItemClick" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                <GridView x:Name="ThemeGrid" SelectionMode="Single" SingleSelectionFollowsFocus="False" IsItemClickEnabled="True" ItemClick="Theme_ItemClick" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                     <GridView.ItemTemplate>
                         <DataTemplate>
                             <Border Width="138" Height="104" CornerRadius="14"
@@ -45,7 +45,7 @@
                 <TextBlock Text="Pieces" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" Foreground="{StaticResource AccentGreenLightBrush}" />
                 <TextBlock Text="Open-source lichess sets, downloaded on first use. Press A on a set to apply it."
                            FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
-                <GridView x:Name="PieceGrid" SelectionMode="Single" IsItemClickEnabled="True"
+                <GridView x:Name="PieceGrid" SelectionMode="Single" SingleSelectionFollowsFocus="False" IsItemClickEnabled="True"
                           ItemClick="PieceSet_ItemClick" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                     <GridView.ItemTemplate>
                         <DataTemplate>

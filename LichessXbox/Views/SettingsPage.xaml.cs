@@ -54,6 +54,10 @@ namespace LichessXbox.Views
             PopulatePieces(false);
             SelectCurrentPiece();
             PreviewSet(BoardTheme.PieceSet);   // side board shows the CURRENT set; only A changes it
+            // Make the "Show all sets" button reliably reachable from the grid and back, so
+            // Down out of the picker doesn't sometimes skip past it.
+            PieceGrid.XYFocusDown = ShowAllButton;
+            ShowAllButton.XYFocusUp = PieceGrid;
             _loaded = true;
             ThemeGrid.FocusOnLoad();
         }
@@ -118,7 +122,10 @@ namespace LichessXbox.Views
             }
             _expanded = !_expanded;
             SelectCurrentPiece();
-            PieceGrid.Focus(FocusState.Programmatic);
+            // Land focus on a piece (deferred so the freshly added/removed containers are
+            // realized first) — pressing the button should drop you back into the grid.
+            _ = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+                () => PieceGrid.Focus(FocusState.Programmatic));
         }
 
         void Theme_ItemClick(object sender, ItemClickEventArgs e)
