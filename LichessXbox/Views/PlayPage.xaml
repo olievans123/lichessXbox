@@ -358,7 +358,9 @@
                                         Content="New game" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
                                 <Button x:Name="ResultReviewButton" Style="{StaticResource TileButton}" Padding="16,11" Click="ReviewGame_Click"
                                         Content="Review game" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-                                <Button x:Name="ResultViewBoardButton" Style="{StaticResource MoveButton}" Padding="8,6" Margin="0,6,0,0"
+                                <!-- Uses MoveButton's look but must stay focusable (that style sets
+                                     IsTabStop=False for the move list) — or the button is unreachable. -->
+                                <Button x:Name="ResultViewBoardButton" Style="{StaticResource MoveButton}" IsTabStop="True" Padding="8,6" Margin="0,6,0,0"
                                         FontSize="{StaticResource CaptionSize}" Click="DismissResult_Click"
                                         Content="View board" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                                         Foreground="{StaticResource TextSecondaryBrush}" />
@@ -410,8 +412,11 @@
                         <Grid Height="84">
                             <TextBlock x:Name="MovesEmpty" Text="No moves yet." FontSize="{StaticResource CaptionSize}"
                                        Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Top" />
+                            <!-- In-game: the moves box is a focusable unit (ring on focus) that the
+                                 RIGHT STICK scrolls to review history — no A-to-engage. The left
+                                 stick just moves focus off it. -->
                             <ScrollViewer x:Name="MoveScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
-                                          UseSystemFocusVisuals="False">
+                                          IsTabStop="True" UseSystemFocusVisuals="False">
                             <ItemsControl x:Name="MoveRows">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
