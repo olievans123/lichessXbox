@@ -161,7 +161,7 @@
                     </ScrollViewer>
                     </Grid>
                 </StackPanel>
-                <Border x:Name="MovesFocusRing" Margin="-12" CornerRadius="18" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
+                <Border x:Name="MovesFocusRing" Margin="-13" CornerRadius="18" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
                     <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
                 </Border>
               </Grid>
@@ -232,7 +232,7 @@
                         </ListView.ItemTemplate>
                     </ListView>
                 </Grid>
-                <Border x:Name="ExplorerFocusRing" Margin="-12" CornerRadius="18" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
+                <Border x:Name="ExplorerFocusRing" Margin="-13" CornerRadius="18" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
                     <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
                 </Border>
               </Grid>
@@ -268,7 +268,7 @@
                         </ListView.ItemTemplate>
                     </ListView>
                 </StackPanel>
-                <Border x:Name="TablebaseFocusRing" Margin="-12" CornerRadius="18" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
+                <Border x:Name="TablebaseFocusRing" Margin="-13" CornerRadius="18" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
                     <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
                 </Border>
               </Grid>
