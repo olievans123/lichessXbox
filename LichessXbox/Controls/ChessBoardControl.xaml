@@ -37,6 +37,19 @@
                     <StackPanel x:Name="PromotionButtons" Orientation="Horizontal" Spacing="14" />
                 </StackPanel>
             </Border>
+
+            <!-- Whole-board focus state: shown when the board holds focus as a single unit
+                 (before you press A to engage). A soft dark halo lifts it off the page and a
+                 bright accent ring says "this is selected — press A to play the board". Once
+                 engaged it hides and the per-square cream cursor takes over. -->
+            <Grid x:Name="BoardGlow" Visibility="Collapsed" IsHitTestVisible="False">
+                <Border CornerRadius="15" Margin="-4" BorderThickness="7">
+                    <Border.BorderBrush><SolidColorBrush Color="#73000000" /></Border.BorderBrush>
+                </Border>
+                <Border CornerRadius="12" BorderThickness="4">
+                    <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
+                </Border>
+            </Grid>
         </Grid>
     </Viewbox>
 </UserControl>

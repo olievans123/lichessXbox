@@ -48,7 +48,8 @@ namespace LichessXbox.Views
                 DismissResult_Click(null, null);
                 return true;
             }
-            if (Board.CancelSelection()) return true;   // put the piece down, free the cursor
+            if (Board.CancelSelection()) return true;   // put the piece down (stay engaged)
+            if (Board.DisengageBoard()) return true;    // leave the board → whole-board unit
             if (GamePanel.Visibility == Visibility.Visible && _viewPly < _plies.Count)
             {
                 SetViewPly(_plies.Count);   // reviewing history — snap back to the live game

@@ -93,6 +93,32 @@ namespace LichessXbox
                 ClosePane();
                 e.Handled = true;
             }
+            else if (!NavSplit.IsPaneOpen &&
+                     (e.Key == VirtualKey.GamepadDPadLeft || e.Key == VirtualKey.GamepadLeftThumbstickLeft || e.Key == VirtualKey.Left))
+            {
+                // At the left edge of a page (nothing further left inside it), Left jumps to the
+                // gutter — the burger, or the games tab if it's showing — so the menu is always
+                // one press away. If there IS something to the left in the page, let XY-nav run.
+                var focused = FocusManager.GetFocusedElement() as DependencyObject;
+                if (focused != null && IsDescendantOf(focused, ContentFrame))
+                {
+                    var next = FocusManager.FindNextElement(
+                        FocusNavigationDirection.Left,
+                        new FindNextElementOptions { SearchRoot = ContentFrame });
+                    if (next == null)
+                    {
+                        MenuButton.Focus(FocusState.Programmatic);
+                        e.Handled = true;
+                    }
+                }
+            }
+        }
+
+        static bool IsDescendantOf(DependencyObject node, DependencyObject root)
+        {
+            for (; node != null; node = VisualTreeHelper.GetParent(node))
+                if (ReferenceEquals(node, root)) return true;
+            return false;
         }
 
         void ToggleNav_Click(object sender, RoutedEventArgs e) => SetPane(!NavSplit.IsPaneOpen);

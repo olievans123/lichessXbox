@@ -21,8 +21,8 @@ namespace LichessXbox.Views
     /// </summary>
     public sealed partial class AnalysisPage : Page, IBackHandler
     {
-        /// <summary>B puts a picked-up piece down before it navigates away from the page.</summary>
-        public bool HandleBack() => Board.CancelSelection();
+        /// <summary>B peels board layers before leaving: drop a held piece, then disengage.</summary>
+        public bool HandleBack() => Board.CancelSelection() || Board.DisengageBoard();
 
         readonly List<ChessPosition> _history = new List<ChessPosition> { ChessPosition.Starting() };
         readonly List<ChessMove> _moves = new List<ChessMove>();
@@ -269,6 +269,8 @@ namespace LichessXbox.Views
             NotesScroller.Visibility = notes ? Visibility.Visible : Visibility.Collapsed;
             ExplorerList.Visibility = notes ? Visibility.Collapsed : Visibility.Visible;
             ExplorerHeader.Visibility = notes ? Visibility.Collapsed : Visibility.Visible;
+            // In study mode the "Explorer" tab already labels this; the static title is noise.
+            OpeningText.Visibility = study ? Visibility.Collapsed : Visibility.Visible;
             if (study)
             {
                 var on = (Brush)Application.Current.Resources["AccentGreenLightBrush"];

@@ -46,6 +46,7 @@ namespace LichessXbox.Controls
         ChessPosition _position = ChessPosition.Starting();
         readonly List<ChessMove> _legalFromSelected = new List<ChessMove>();
         int _selected = -1;
+        bool _engaged;   // gamepad focus engaged: per-square cursor active (vs whole-board unit)
         ChessMove _pendingPromotion;
 
         // Sound bookkeeping: play a sound whenever the highlighted last move changes.
@@ -94,10 +95,13 @@ namespace LichessXbox.Controls
             this.InitializeComponent();
             BuildBoard();
             ApplyInteractivity();
-            // Mid-gesture (a piece picked up) the cursor stays on the board: one overshoot
-            // at the h-file otherwise dumps focus into the side panel with the clock running.
-            // B cancels the selection (via CancelSelection) and frees the cursor again.
+            // Two-level focus: the board is ONE focus stop showing a whole-board glow; press
+            // A to engage (per-square cursor), B to disengage. While engaged, focus is
+            // trapped on the board so the cursor can't fall into the side panel mid-move.
             this.LosingFocus += OnLosingFocus;
+            this.KeyDown += Board_KeyDown;
+            this.GotFocus += Board_FocusChanged;
+            this.LostFocus += Board_FocusChanged;
             _reTheme = () => ReTheme();
             this.Loaded += async (s, e) =>
             {
@@ -344,16 +348,20 @@ namespace LichessXbox.Controls
         void ApplyInteractivity()
         {
             bool on = Interactive;
-            // The board itself is a gamepad focus stop only while interactive, so a watch /
-            // preview / reviewed board never steals focus (live boards focus a cell directly).
+            // The board is a single gamepad focus stop while interactive; the 64 cells become
+            // focus stops only once engaged (so XY-nav treats the board as one unit and can
+            // step OFF it to the gutter/side-panel until you press A). Cells stay pointer-
+            // clickable so a mouse/touch can move directly.
             IsTabStop = on;
+            _engaged = false;
             for (int sq = 0; sq < 64; sq++)
             {
                 var cell = _cells[sq];
                 if (cell == null) continue;
-                cell.IsTabStop = on;
+                cell.IsTabStop = false;
                 cell.IsHitTestVisible = on;
             }
+            UpdateBoardGlow();
             // If input is disabled mid-promotion (game ended, or the user is reviewing a past
             // move), dismiss the picker so it can't commit a move for a position they've left.
             if (!on && PromotionOverlay != null)
@@ -690,6 +698,9 @@ namespace LichessXbox.Controls
         void Cell_Click(object sender, RoutedEventArgs e)
         {
             if (!IsHumanTurn) return;
+            // A pointer click (or A on a cell) means the board is being interacted with —
+            // keep the engaged/glow state consistent with that.
+            if (!_engaged) { _engaged = true; SetCellsFocusable(true); IsTabStop = false; UpdateBoardGlow(); }
             int sq = (int)((Button)sender).Tag;
 
             char piece = _position.PieceAt(sq);
@@ -727,21 +738,24 @@ namespace LichessXbox.Controls
         }
 
         /// <summary>
-        /// Move gamepad focus onto the board. Focusing a real Button is reliable, but the
-        /// board may not be laid out the instant it becomes visible, so retry across the
-        /// next few layout passes until it sticks.
+        /// Rest gamepad focus on the board as a single unit (the whole-board glow, before
+        /// engaging). The board may not be laid out the instant it becomes visible, so retry
+        /// across the next few layout passes until focus sticks.
         /// </summary>
         public void FocusBoard()
         {
             if (!Interactive) return;
+            _engaged = false;
+            SetCellsFocusable(false);
+            IsTabStop = true;
             DetachFocusRetry();          // never stack retry handlers across repeated calls
-            if (TryFocusCell()) return;
+            if (TryFocusUnit()) return;
             _focusRetryTries = 0;
             _focusRetryHandler = (s, e) =>
             {
                 // Stop once it sticks, if interactivity was revoked, or after a generous budget
                 // (a slow cold start can burn many layout passes before the board is ready).
-                if (!Interactive || TryFocusCell() || ++_focusRetryTries > 90) DetachFocusRetry();
+                if (!Interactive || TryFocusUnit() || ++_focusRetryTries > 90) DetachFocusRetry();
             };
             LayoutUpdated += _focusRetryHandler;
         }
@@ -751,12 +765,89 @@ namespace LichessXbox.Controls
             if (_focusRetryHandler != null) { LayoutUpdated -= _focusRetryHandler; _focusRetryHandler = null; }
         }
 
+        // Focus the board as a whole (the single-stop / glow state).
+        bool TryFocusUnit()
+        {
+            if (!Interactive || Visibility != Visibility.Visible || ActualWidth <= 0) return false;
+            bool ok = Focus(FocusState.Programmatic);
+            if (ok) UpdateBoardGlow();
+            return ok;
+        }
+
+        // Engage: switch from the whole-board unit to the per-square cursor (A button).
+        void EngageBoard()
+        {
+            if (!Interactive || _engaged) return;
+            _engaged = true;
+            SetCellsFocusable(true);
+            IsTabStop = false;           // cells are the focus stops now; the unit yields
+            UpdateBoardGlow();
+            if (!TryFocusCell())
+            {
+                DetachFocusRetry();
+                _focusRetryTries = 0;
+                _focusRetryHandler = (s, e) =>
+                {
+                    if (!Interactive || !_engaged || TryFocusCell() || ++_focusRetryTries > 90) DetachFocusRetry();
+                };
+                LayoutUpdated += _focusRetryHandler;
+            }
+        }
+
+        /// <summary>Disengage the per-square cursor, returning to the whole-board unit (B button).
+        /// True if the board was engaged.</summary>
+        public bool DisengageBoard()
+        {
+            if (!_engaged) return false;
+            ClearSelection();
+            _engaged = false;
+            SetCellsFocusable(false);
+            IsTabStop = Interactive;
+            Render();
+            Focus(FocusState.Programmatic);   // land back on the whole-board unit (glow shows)
+            UpdateBoardGlow();
+            return true;
+        }
+
+        void SetCellsFocusable(bool on)
+        {
+            for (int sq = 0; sq < 64; sq++)
+                if (_cells[sq] != null) _cells[sq].IsTabStop = on;
+        }
+
         bool TryFocusCell()
         {
             if (!Interactive || Visibility != Visibility.Visible || ActualWidth <= 0) return false;
             int sq = _selected >= 0 ? _selected : DefaultFocusSquare();
             var cell = _cells[sq] ?? _cells[DefaultFocusSquare()];
             return cell != null && cell.Focus(FocusState.Programmatic);
+        }
+
+        // Press A on the whole-board unit to engage the per-square cursor. (Once engaged, the
+        // cell buttons handle A themselves to pick up / drop pieces.)
+        void Board_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if (!Interactive || _engaged) return;
+            if (e.Key == Windows.System.VirtualKey.GamepadA ||
+                e.Key == Windows.System.VirtualKey.Enter ||
+                e.Key == Windows.System.VirtualKey.Space)
+            {
+                EngageBoard();
+                e.Handled = true;
+            }
+        }
+
+        // Show the whole-board glow only while the board holds focus directly (as a unit) and
+        // is not engaged. When engaged, a cell holds focus and the per-square cursor shows.
+        void Board_FocusChanged(object sender, RoutedEventArgs e)
+        {
+            if (ReferenceEquals(e.OriginalSource, this)) UpdateBoardGlow();
+        }
+
+        void UpdateBoardGlow()
+        {
+            bool show = Interactive && !_engaged && ReferenceEquals(FocusManager.GetFocusedElement(), this);
+            if (BoardGlow != null) BoardGlow.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
         }
 
         // A sensible square to land on: the side-to-move's king (always present), else a
@@ -791,11 +882,12 @@ namespace LichessXbox.Controls
             return true;
         }
 
-        // While a piece is selected, directional focus moves may not leave the board —
-        // programmatic moves (game-over card, page changes) always pass through.
+        // While engaged, directional focus moves can't leave the board — you entered it with
+        // A and leave with B (DisengageBoard). Programmatic moves (game-over card, page
+        // changes) always pass through; pointer focus is never trapped.
         void OnLosingFocus(UIElement sender, LosingFocusEventArgs e)
         {
-            if (_selected < 0 || !Interactive) return;
+            if (!_engaged || !Interactive) return;
             if (e.InputDevice != FocusInputDeviceKind.GameController && e.InputDevice != FocusInputDeviceKind.Keyboard) return;
             var d = e.NewFocusedElement as DependencyObject;
             while (d != null)
