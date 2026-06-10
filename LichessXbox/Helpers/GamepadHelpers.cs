@@ -92,27 +92,19 @@ namespace LichessXbox.Helpers
                 _ring.Visibility = ReferenceEquals(e.OriginalSource, _host) ? Visibility.Visible : Visibility.Collapsed;
             _host.LostFocus += (s, e) =>
             {
-                // Focus left the moves entirely (e.g. scrolled past the last move into the
-                // explorer)? Reset to the unit state so the box is a single stop again and can
-                // be re-entered on the way back. Moving BETWEEN moves stays engaged.
-                if (!FocusInsideHost())
-                {
-                    if (_engaged) { _engaged = false; SetButtonsFocusable(false); }
-                    _ring.Visibility = Visibility.Collapsed;
-                }
-                else if (ReferenceEquals(e.OriginalSource, _host))
-                {
-                    _ring.Visibility = Visibility.Collapsed;   // stepped from the box into a move
-                }
+                if (ReferenceEquals(e.OriginalSource, _host)) _ring.Visibility = Visibility.Collapsed;
             };
-        }
-
-        bool FocusInsideHost()
-        {
-            var f = FocusManager.GetFocusedElement() as DependencyObject;
-            for (; f != null; f = VisualTreeHelper.GetParent(f))
-                if (ReferenceEquals(f, _host)) return true;
-            return false;
+            // While engaged, trap focus inside the moves (just like the explorer ListView and the
+            // board): scrolling past the first/last move does NOTHING — B is the only way out,
+            // which returns to the box. Keeps every side-panel section consistent.
+            _host.LosingFocus += (s, e) =>
+            {
+                if (!_engaged) return;
+                if (e.InputDevice != FocusInputDeviceKind.GameController && e.InputDevice != FocusInputDeviceKind.Keyboard) return;
+                for (var d = e.NewFocusedElement as DependencyObject; d != null; d = VisualTreeHelper.GetParent(d))
+                    if (ReferenceEquals(d, _host)) return;   // staying inside the moves — allow
+                e.TryCancel();
+            };
         }
 
         void OnKeyDown(object sender, KeyRoutedEventArgs e)

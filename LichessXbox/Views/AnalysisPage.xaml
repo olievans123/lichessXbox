@@ -34,8 +34,10 @@
         </Viewbox>
 
         <!-- Hidden host for the local Stockfish engine -->
+        <!-- Hidden Stockfish host. IsTabStop=False or gamepad XY-focus lands on this invisible
+             1x1 element (it showed up as a phantom stop between the nav arrows and the moves). -->
         <WebView x:Name="EngineWeb" Grid.Column="0" Width="1" Height="1" Opacity="0"
-                 IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                 IsTabStop="False" IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Top" />
 
         <!-- Side panel: a fixed, height-bounded grid. Every region keeps a stable size and scrolls
              INTERNALLY, so playing a move never reflows or jars the panel. The explorer fills the
