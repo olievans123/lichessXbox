@@ -22,8 +22,8 @@ namespace LichessXbox.Views
     /// </summary>
     public sealed partial class AnalysisPage : Page, IBackHandler
     {
-        /// <summary>B peels board layers before leaving: drop a held piece, then disengage.</summary>
-        public bool HandleBack() => Board.CancelSelection() || Board.DisengageBoard();
+        /// <summary>B peels layers before leaving: held piece, board, then the moves list.</summary>
+        public bool HandleBack() => Board.CancelSelection() || Board.DisengageBoard() || (_movesEngager?.Disengage() ?? false);
 
         readonly List<ChessPosition> _history = new List<ChessPosition> { ChessPosition.Starting() };
         readonly List<ChessMove> _moves = new List<ChessMove>();
@@ -63,14 +63,18 @@ namespace LichessXbox.Views
             };
             // Frame each side-panel card on its OUTER box while the (natively engageable)
             // list/scroller holds focus as a unit; A engages it and the ring hides.
-            // Moves: same model as the Play board — focus the box (ring), right stick scrolls,
-            // left stick moves focus off (the host is non-scrolling so it can't trap the stick).
-            MovesHost.FrameOnFocus(MovesFocusRing);
+            // Moves (study): focus the box (ring) → right stick scrolls history, left stick
+            // moves focus off; A engages to pick a move to jump to (B exits). Hybrid of the
+            // Play scroll model + click-to-jump. The engager owns the ring + A/B; the host is a
+            // non-scrolling ContentControl so the left stick isn't trapped when not engaged.
+            _movesEngager = new ButtonListEngager(MovesHost, MovesFocusRing);
             MovesHost.ScrollOnRightStick(AnalysisMoveScroller);
             ExplorerList.FrameOnFocus(ExplorerFocusRing);
             NotesScroller.FrameOnFocus(ExplorerFocusRing);   // notes share the explorer card's ring
             TablebaseList.FrameOnFocus(TablebaseFocusRing);
         }
+
+        ButtonListEngager _movesEngager;
 
         void EnsureEngine()
         {

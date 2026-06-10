@@ -94,11 +94,11 @@ namespace LichessXbox.Helpers
     /// </summary>
     public sealed class ButtonListEngager
     {
-        readonly ScrollViewer _host;
+        readonly Control _host;   // a non-scrolling focus host (ContentControl); buttons live inside it
         readonly UIElement _ring;
         bool _engaged;
 
-        public ButtonListEngager(ScrollViewer host, UIElement ring)
+        public ButtonListEngager(Control host, UIElement ring)
         {
             _host = host;
             _ring = ring;
