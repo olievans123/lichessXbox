@@ -59,6 +59,18 @@ namespace LichessXbox.Views
             return false;
         }
 
+        // Right stick scrolls the move history while the box is focused (a plain ScrollViewer
+        // doesn't stick-scroll on Xbox without engagement — which we dropped as too clunky). The
+        // left stick / D-pad still just move focus off the box.
+        void MoveScroller_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            const double step = 28;   // ~one move row
+            if (e.Key == VirtualKey.GamepadRightThumbstickUp)
+            { MoveScroller.ChangeView(null, MoveScroller.VerticalOffset - step, null, false); e.Handled = true; }
+            else if (e.Key == VirtualKey.GamepadRightThumbstickDown)
+            { MoveScroller.ChangeView(null, MoveScroller.VerticalOffset + step, null, false); e.Handled = true; }
+        }
+
         // Shoulder buttons step through the game's moves; triggers jump to the ends.
         // (Review during a live game disables board input until back at the latest move.)
         void Page_KeyDown(object sender, KeyRoutedEventArgs e)
@@ -127,7 +139,8 @@ namespace LichessXbox.Views
 
             MoveRows.ItemsSource = _moveRows;
             Board.MoveRequested += Board_MoveRequested;
-            MoveScroller.FrameOnFocus(PlayMovesFocusRing);   // focus the box → ring; right stick scrolls history
+            MoveScroller.FrameOnFocus(PlayMovesFocusRing);   // focus the box → ring
+            MoveScroller.KeyDown += MoveScroller_KeyDown;    // right stick scrolls the history (left stick = focus nav)
             _clockTimer.Interval = TimeSpan.FromMilliseconds(200);
             _clockTimer.Tick += ClockTick;
 
