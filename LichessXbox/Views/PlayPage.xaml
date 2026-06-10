@@ -443,9 +443,11 @@
                         </Grid>
                         </StackPanel>
                         </ContentControl>
-                        <Border x:Name="PlayMovesFocusRing" Margin="-4" CornerRadius="10" BorderThickness="3" IsHitTestVisible="False" Visibility="Collapsed">
-                            <Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush>
-                        </Border>
+                        <!-- Soft dark halo + crisp green ring (matches the board) — not a flat rect. -->
+                        <Grid x:Name="PlayMovesFocusRing" Margin="-4" IsHitTestVisible="False" Visibility="Collapsed">
+                            <Border CornerRadius="12" Margin="-2" BorderThickness="5"><Border.BorderBrush><SolidColorBrush Color="#5A000000" /></Border.BorderBrush></Border>
+                            <Border CornerRadius="10" BorderThickness="2.5"><Border.BorderBrush><SolidColorBrush Color="{StaticResource AccentGreenLightColor}" /></Border.BorderBrush></Border>
+                        </Grid>
                         </Grid>
                         <!-- Step through the game: first / previous / next / latest. -->
                         <Grid ColumnSpacing="6">

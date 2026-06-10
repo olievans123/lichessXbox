@@ -51,6 +51,7 @@ namespace LichessXbox.Views
             }
             if (Board.CancelSelection()) return true;   // put the piece down (stay engaged)
             if (Board.DisengageBoard()) return true;    // leave the board → whole-board unit
+            if (_movesEngager?.Disengage() ?? false) return true;   // leave the moves list
             if (GamePanel.Visibility == Visibility.Visible && _viewPly < _plies.Count)
             {
                 SetViewPly(_plies.Count);   // reviewing history — snap back to the live game
@@ -58,6 +59,8 @@ namespace LichessXbox.Views
             }
             return false;
         }
+
+        ButtonListEngager _movesEngager;
 
         // Shoulder buttons step through the game's moves; triggers jump to the ends.
         // (Review during a live game disables board input until back at the latest move.)
@@ -127,8 +130,10 @@ namespace LichessXbox.Views
 
             MoveRows.ItemsSource = _moveRows;
             Board.MoveRequested += Board_MoveRequested;
-            PlayMovesHost.FrameOnFocus(PlayMovesFocusRing);          // the non-scrolling host holds focus → ring
-            PlayMovesHost.ScrollOnRightStick(MoveScroller);          // right stick scrolls history (left stick = focus nav)
+            // Same hybrid as Analysis: right stick scrolls, left stick leaves, A engages to pick
+            // a move (jumps the review position), B exits.
+            _movesEngager = new ButtonListEngager(PlayMovesHost, PlayMovesFocusRing);
+            PlayMovesHost.ScrollOnRightStick(MoveScroller);
             _clockTimer.Interval = TimeSpan.FromMilliseconds(200);
             _clockTimer.Tick += ClockTick;
 
