@@ -104,6 +104,9 @@ namespace LichessXbox.Views
                 ? Visibility.Visible : Visibility.Collapsed;
             JoinButton.Content = _joined ? "Leave arena" : "Join";
             JoinButton.IsEnabled = true;
+            // Land focus on Join the moment a tournament is picked, so it's one press to enter
+            // (not a hunt across the standings).
+            if (JoinButton.Visibility == Visibility.Visible) JoinButton.Focus(FocusState.Programmatic);
             StandingsList.ItemsSource = null;
 
             // The waiting banner belongs to the arena we ENTERED — selecting a different

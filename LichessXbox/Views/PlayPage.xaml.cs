@@ -128,6 +128,10 @@ namespace LichessXbox.Views
             MoveRows.ItemsSource = _moveRows;
             Board.MoveRequested += Board_MoveRequested;
             MoveScroller.FrameOnFocus(PlayMovesFocusRing);   // focus ring on the moves box, not a row
+            // Engaging the scroller lands on the scroll region; jump to the first move so there's
+            // no dead step before move 1.
+            MoveScroller.FocusEngaged += (s, e) =>
+                (FocusManager.FindFirstFocusableElement(MoveScroller) as Control)?.Focus(FocusState.Keyboard);
             _clockTimer.Interval = TimeSpan.FromMilliseconds(200);
             _clockTimer.Tick += ClockTick;
 

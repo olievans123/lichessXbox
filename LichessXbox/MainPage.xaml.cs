@@ -44,12 +44,12 @@ namespace LichessXbox
             // card and strands the gamepad — hold rebuilds until the flyout closes, then refresh.
             if (OngoingTab.Flyout != null)
             {
-                OngoingTab.Flyout.Opened += (s, e) => _ongoingFlyoutOpen = true;
+                OngoingTab.Flyout.Opened += (s, e) => { _ongoingFlyoutOpen = true; FocusFirst(OngoingList); };
                 OngoingTab.Flyout.Closed += (s, e) => { _ongoingFlyoutOpen = false; _ = RefreshOngoingAsync(); };
             }
             if (ChallengeTab.Flyout != null)
             {
-                ChallengeTab.Flyout.Opened += (s, e) => _challengeFlyoutOpen = true;
+                ChallengeTab.Flyout.Opened += (s, e) => { _challengeFlyoutOpen = true; FocusFirst(ChallengeList); };
                 ChallengeTab.Flyout.Closed += (s, e) => { _challengeFlyoutOpen = false; _ = RefreshOngoingAsync(); };
             }
             // Keep nav state in sync on every navigation (forward AND Back); drive the Back button.
@@ -119,6 +119,18 @@ namespace LichessXbox
             for (; node != null; node = VisualTreeHelper.GetParent(node))
                 if (ReferenceEquals(node, root)) return true;
             return false;
+        }
+
+        // Land focus on the first focusable element inside a just-opened flyout, so its top
+        // card is selected immediately (not left on the gutter button behind it). Deferred a
+        // tick so the flyout's content is realized before we search it.
+        void FocusFirst(DependencyObject scope)
+        {
+            _ = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            {
+                if (FocusManager.FindFirstFocusableElement(scope) is Control c)
+                    c.Focus(FocusState.Programmatic);
+            });
         }
 
         void ToggleNav_Click(object sender, RoutedEventArgs e) => SetPane(!NavSplit.IsPaneOpen);
