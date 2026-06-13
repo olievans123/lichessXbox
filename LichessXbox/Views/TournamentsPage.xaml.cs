@@ -36,6 +36,7 @@ namespace LichessXbox.Views
         readonly System.Collections.Generic.HashSet<string> _knownGames = new System.Collections.Generic.HashSet<string>();
         bool _watching;
         bool _tickBusy;
+        bool _active;   // page is the live frame content — guards async continuations after navigate-away
 
         public TournamentsPage()
         {
@@ -44,13 +45,16 @@ namespace LichessXbox.Views
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
+            _active = true;
             await ReloadAsync();
+            if (!_active) return;   // navigated away during the load — don't start a watch on a detached page
             // Still entered in an arena (e.g. back from a finished round)? Re-assert
             // pairMeAsap (each pairing needs it afresh — we're never "on the page") and
             // resume the watch so the next pairing opens by itself.
             if (_joinedIds.Count > 0 && AppState.Current.IsSignedIn)
             {
                 await NudgeJoinedArenasAsync();
+                if (!_active) return;
                 if (_joinedIds.Count > 0) await StartPairingWatchAsync(true);
             }
         }
@@ -69,7 +73,7 @@ namespace LichessXbox.Views
             }
         }
 
-        protected override void OnNavigatedFrom(NavigationEventArgs e) => StopPairingWatch();
+        protected override void OnNavigatedFrom(NavigationEventArgs e) { _active = false; StopPairingWatch(); }
 
         async void Retry_Click(object sender, RoutedEventArgs e) => await ReloadAsync();
 
@@ -182,25 +186,32 @@ namespace LichessXbox.Views
                     : await AppState.Current.Api.JoinTournamentAsync(id);
             }
             catch { err = leaving ? "Couldn't leave — try again." : "Couldn't join — try again."; }
-            if (_selectedId != id) return;   // user moved to another tournament meanwhile
+
+            // Commit the server-confirmed membership + (re)start the pairing watch BEFORE the
+            // stale-selection bail. The server has actually entered/withdrawn us regardless of what
+            // the user has since selected; gating this behind `_selectedId == id` would silently drop
+            // an arena we're really in (the server pairs us, but no board ever opens → time-forfeit).
+            if (err == null)
+            {
+                if (leaving) _joinedIds.Remove(id); else _joinedIds.Add(id);
+                if (!leaving) await StartPairingWatchAsync(false);        // baseline snapshotted above
+                else if (_joinedIds.Count > 0) await StartPairingWatchAsync(true);   // still entered elsewhere
+                else StopPairingWatch();
+            }
+            if (!_active) return;
+
+            if (_selectedId != id) return;   // selection moved on — only the selection-bound UI is skipped
             JoinButton.IsEnabled = true;
             if (err == null)
             {
                 _joined = !leaving;
-                if (_joined) _joinedIds.Add(id); else _joinedIds.Remove(id);
                 JoinButton.Content = _joined ? "Leave arena" : "Join";
-                if (_joined)
+                if (!_joined)
                 {
-                    await StartPairingWatchAsync(false);   // baseline already snapshotted above
-                }
-                else
-                {
-                    StopPairingWatch();
                     DetailStatus.Text = "";
                     DetailStatus.Visibility = Visibility.Collapsed;
-                    // Still entered elsewhere? Keep watching for that arena's pairing.
-                    if (_joinedIds.Count > 0) await StartPairingWatchAsync(true);
                 }
+                // (When joined, StartPairingWatchAsync already showed the "waiting for pairing" banner.)
             }
             else
             {
@@ -228,6 +239,7 @@ namespace LichessXbox.Views
         async System.Threading.Tasks.Task StartPairingWatchAsync(bool resnapshot)
         {
             if (resnapshot) await SnapshotKnownGamesAsync();
+            if (!_active) return;   // navigated away during the snapshot — don't arm a timer on a dead page
             if (_pairTimer == null)
             {
                 _pairTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
@@ -251,7 +263,9 @@ namespace LichessXbox.Views
         void StopPairingWatch()
         {
             _watching = false;
-            _pairTimer?.Stop();
+            // Fully tear the timer down (unsubscribe + null), so a leaked/detached instance can't keep
+            // ticking; StartPairingWatchAsync recreates it on demand.
+            if (_pairTimer != null) { _pairTimer.Stop(); _pairTimer.Tick -= PairTimer_Tick; _pairTimer = null; }
             PairRing.IsActive = false;
             PairRing.Visibility = Visibility.Collapsed;
         }

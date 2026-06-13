@@ -970,6 +970,22 @@ namespace LichessXbox.Controls
                 ((Button)PromotionButtons.Children[0]).Focus(FocusState.Programmatic);
         }
 
+        /// <summary>B while the promotion picker is open: dismiss it WITHOUT moving, put the pawn
+        /// down, and re-home focus to the board (it was on a now-hidden picker button). Returns true
+        /// if the picker was open. MUST be peeled BEFORE CancelSelection in a page's back handler —
+        /// otherwise the underlying selection clears but the overlay is left floating with a focused
+        /// button that could still commit the (cancelled) promotion.</summary>
+        public bool CancelPromotion()
+        {
+            if (PromotionOverlay.Visibility != Visibility.Visible) return false;
+            PromotionOverlay.Visibility = Visibility.Collapsed;
+            _pendingPromotion = new ChessMove(-1, -1);   // so a stray A can't commit it
+            ClearSelection();
+            Render();
+            FocusBoard();   // focus was on the hidden picker button; land back on the whole-board unit
+            return true;
+        }
+
         #endregion
     }
 }

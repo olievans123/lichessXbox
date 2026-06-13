@@ -49,6 +49,7 @@ namespace LichessXbox.Views
                 DismissResult_Click(null, null);
                 return true;
             }
+            if (Board.CancelPromotion()) return true;   // dismiss the promotion picker without moving
             if (Board.CancelSelection()) return true;   // put the piece down (stay engaged)
             if (Board.DisengageBoard()) return true;    // leave the board → whole-board unit
             if (_movesEngager?.Disengage() ?? false) return true;   // leave the moves list
@@ -92,6 +93,7 @@ namespace LichessXbox.Views
         long _whiteMs, _blackMs;
         bool _whiteToMove = true;
         bool _gameActive;
+        bool _clockless;   // unlimited / no-clock game (e.g. vs Computer with clock=null): hide + don't tick
 
         readonly List<string> _plies = new List<string>();   // UCI moves of the live game
         int _viewPly;                                         // plies shown on the board (== _plies.Count → live/latest)
@@ -449,6 +451,13 @@ namespace LichessXbox.Views
             _plies.Clear();
             _sans.Clear();
             _viewPly = 0;
+            // Reset clock state so the previous game's time can't bleed into this one (clockless
+            // games omit wtime/btime, and ApplyState's "?? _whiteMs" would otherwise keep the old
+            // value and visibly tick it down). gameFull decides whether to show the chips at all.
+            _whiteMs = _blackMs = 0;
+            _clockless = false;
+            BottomClock.Text = TopClock.Text = "--:--";
+            TopClockChip.Visibility = BottomClockChip.Visibility = Visibility.Visible;
             ResignButton.Visibility = Visibility.Visible;
             DrawButton.Visibility = Visibility.Visible;
             TakebackButton.Visibility = Visibility.Visible;
@@ -500,6 +509,10 @@ namespace LichessXbox.Views
 
                 // Remember this game's time control etc. for a faithful rematch.
                 var gclock = msg["clock"];
+                // No clock object → unlimited game (vs Computer / casual): hide the clock pills and
+                // skip the countdown, so we never show or tick a phantom clock.
+                _clockless = gclock == null;
+                TopClockChip.Visibility = BottomClockChip.Visibility = _clockless ? Visibility.Collapsed : Visibility.Visible;
                 _gameClockLimitSec = (gclock?.Value<int?>("initial") ?? 300000) / 1000;   // ms → s
                 _gameClockIncSec = (gclock?.Value<int?>("increment") ?? 0) / 1000;
                 _gameDays = msg.Value<int?>("daysPerTurn") ?? 0;
@@ -928,6 +941,7 @@ namespace LichessXbox.Views
         void ClockTick(object sender, object e)
         {
             if (!_gameActive) return;
+            if (_clockless) return;         // unlimited game — no clock to run
             if (_plies.Count < 2) return;   // lichess clocks don't run until both sides have moved
             if (_whiteToMove) _whiteMs = Math.Max(0, _whiteMs - 200);
             else _blackMs = Math.Max(0, _blackMs - 200);

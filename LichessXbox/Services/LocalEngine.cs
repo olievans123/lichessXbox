@@ -23,8 +23,12 @@ namespace LichessXbox.Services
         /// <summary>Fires with (depth, evalText, pvSan, bestMoveUci) as analysis deepens.</summary>
         public event Action<int, string, string, string> Info;
         public event Action<bool> ReadyChanged;
+        /// <summary>Fires once if the engine fails to load (no bundled/CDN source, worker error) so
+        /// the UI can stop waiting on a permanent "Starting engine…".</summary>
+        public event Action<string> Failed;
 
         public bool IsReady => _ready;
+        public bool HasFailed { get; private set; }
 
         public LocalEngine(WebView web)
         {
@@ -92,6 +96,14 @@ namespace LichessXbox.Services
             else if (line.StartsWith("info ") && line.Contains(" pv "))
             {
                 if (!_fence) ParseInfo(line);
+            }
+            else if (line.StartsWith("engineerror"))
+            {
+                // Every worker source failed (missing bundle + unreachable CDN), or the worker errored.
+                // Without handling this the consumer hangs forever on "Starting engine…".
+                _ready = false;
+                HasFailed = true;
+                Failed?.Invoke(line);
             }
         }
 

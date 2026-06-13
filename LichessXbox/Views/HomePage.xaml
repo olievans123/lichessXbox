@@ -31,7 +31,7 @@
                             <TextBlock Text="&#x265F;&#xFE0F;" FontSize="28" />
                             <StackPanel>
                                 <TextBlock Text="Play online" FontSize="{StaticResource BodySize}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-                                <TextBlock Text="Rapid · Classical · Daily — or any speed vs a friend" FontSize="{StaticResource CaptionSize}"
+                                <TextBlock Text="Rapid · Classical · Daily" FontSize="{StaticResource CaptionSize}"
                                            Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
                             </StackPanel>
                         </StackPanel>

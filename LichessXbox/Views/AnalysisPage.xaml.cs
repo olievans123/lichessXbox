@@ -23,7 +23,7 @@ namespace LichessXbox.Views
     public sealed partial class AnalysisPage : Page, IBackHandler
     {
         /// <summary>B peels layers before leaving: held piece, board, then the moves list.</summary>
-        public bool HandleBack() => Board.CancelSelection() || Board.DisengageBoard() || (_movesEngager?.Disengage() ?? false);
+        public bool HandleBack() => Board.CancelPromotion() || Board.CancelSelection() || Board.DisengageBoard() || (_movesEngager?.Disengage() ?? false);
 
         readonly List<ChessPosition> _history = new List<ChessPosition> { ChessPosition.Starting() };
         readonly List<ChessMove> _moves = new List<ChessMove>();
@@ -94,6 +94,16 @@ namespace LichessXbox.Views
             _engine = new LocalEngine(EngineWeb);
             _engine.Info += OnEngineInfo;
             _engine.ReadyChanged += OnEngineReady;
+            _engine.Failed += OnEngineFailed;
+        }
+
+        // The local engine couldn't load (missing bundle + no network). Stop waiting on "Starting
+        // engine…". Runs on the UI thread (ScriptNotify is delivered there).
+        void OnEngineFailed(string reason)
+        {
+            if (!_showEngine) return;
+            EvalText.Text = "—";
+            BestLineText.Text = "Engine unavailable.";
         }
 
         ChessPosition Current => _history[_ply];
@@ -263,7 +273,14 @@ namespace LichessXbox.Views
 
         void Tablebase_ItemClick(object sender, ItemClickEventArgs e)
         {
-            if (e.ClickedItem is TablebaseRow row) PlayUci(row.Uci);
+            if (e.ClickedItem is TablebaseRow row)
+            {
+                // The tablebase list reloads for the new position (still ≤7 pieces), recycling the
+                // clicked row out from under the controller — hand focus to the board first (mirrors
+                // Explorer_ItemClick).
+                Board.FocusBoard();
+                PlayUci(row.Uci);
+            }
         }
 
         void PlayUci(string uci)
@@ -426,6 +443,12 @@ namespace LichessXbox.Views
         {
             EnsureEngine();
             _showEngine = true;
+            if (_engine.HasFailed)   // already failed to load earlier — don't hang on "Starting engine…"
+            {
+                EvalText.Text = "—";
+                BestLineText.Text = "Engine unavailable.";
+                return;
+            }
             EvalText.Text = "…";
             BestLineText.Text = _engine.IsReady ? "Analyzing…" : "Starting engine…";
             _engine.Analyze(pos);

@@ -125,6 +125,16 @@ namespace LichessXbox.Services
             using (var req = Build(HttpMethod.Get, path))
             using (var resp = await _http.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, ct))
             {
+                if ((int)resp.StatusCode == 429)
+                {
+                    // Rate-limited: honor Lichess's "wait a full minute" guidance instead of letting
+                    // the consumer's reconnect loop re-open this stream every ~1s and escalate the ban.
+                    // Wait here (Retry-After, floored at 60s), then return so the loop reconnects late.
+                    var wait = resp.Headers.RetryAfter?.Delta ?? TimeSpan.FromSeconds(60);
+                    if (wait < TimeSpan.FromSeconds(60)) wait = TimeSpan.FromSeconds(60);
+                    await Task.Delay(wait, ct);
+                    return;
+                }
                 resp.EnsureSuccessStatusCode();
                 using (var stream = await resp.Content.ReadAsStreamAsync())
                 using (var reader = new StreamReader(stream))
