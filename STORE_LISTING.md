@@ -49,3 +49,12 @@ Powered by lichess.org. **Unofficial — not affiliated with or endorsed by lich
 - Do NOT use "Lichess" as the brand/name — only "powered by lichess (unofficial)" in copy
   (nominative reference). Keep the unofficial/not-affiliated disclaimer visible.
 - Screenshots: capture Home, Play, Analysis (with explorer), Puzzles, and a live Watch game at 1920×1080.
+
+## Assigned by the Store (Partner Center, for reference)
+- Reserved name: `Big Board Chess: Online Chess`
+- Package/Identity/Name: `PatrickEvans.BigBoardChessOnlineChess`
+- Package/Identity/Publisher: `CN=DD4A08DE-5C68-4ADB-AD6A-7D89ECF3CE17`
+- PublisherDisplayName: `Patrick Evans`
+- PFN: `PatrickEvans.BigBoardChessOnlineChess_cvq2b8ak7ejk4`
+- Store ID: `9N067RD4F0L1` · Listing URL: https://apps.microsoft.com/detail/9N067RD4F0L1
+- (These are stamped into the Store package automatically by `.github/workflows/build-store.yml`.)

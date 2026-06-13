@@ -1,15 +1,19 @@
 name: Build Store package (.msixupload)
 
 # Produces the package you upload to Partner Center (Microsoft/Xbox Store).
-# MANUAL ONLY (workflow_dispatch) — run it from the Actions tab once the manifest
-# Identity matches your Partner Center app.
+# MANUAL ONLY (workflow_dispatch) — run it from the Actions tab.
 #
-# PREREQUISITE — set the real Store identity in LichessXbox/Package.appxmanifest first
-# (from Partner Center → Product management → Product identity), or the upload is rejected
-# with "package identity doesn't match your account":
-#   <Identity Name="<Package/Identity Name>" Publisher="CN=<your GUID>" Version="1.0.0.0" />
-#   <PublisherDisplayName><your publisher display name></PublisherDisplayName>
-# Unlike the sideload build, this is NOT self-signed — the Store signs it on ingestion.
+# It STAMPS your Partner Center identity into the manifest at build time (see the
+# "Stamp Store identity" step), so the committed Package.appxmanifest can stay
+# dev/sideload-friendly (CN=LichessXbox, used by the dev-Xbox deploy) while the
+# Store package carries the real identity. Unlike the sideload build this is NOT
+# self-signed — the Store signs it on ingestion.
+#
+# Store identity (Partner Center → Product identity for "Big Board Chess: Online Chess"):
+#   Package/Identity/Name              PatrickEvans.BigBoardChessOnlineChess
+#   Package/Identity/Publisher         CN=DD4A08DE-5C68-4ADB-AD6A-7D89ECF3CE17
+#   Package/Properties/PublisherDisplayName  Patrick Evans
+#   Store ID 9N067RD4F0L1 · PFN PatrickEvans.BigBoardChessOnlineChess_cvq2b8ak7ejk4
 
 on:
   workflow_dispatch:
@@ -35,6 +39,20 @@ jobs:
       - name: Restore packages
         run: nuget restore $env:Solution
 
+      # Replace the dev identity with the real Store identity for this build only (the working tree
+      # is discarded after the run; the committed manifest is untouched). Properties/DisplayName is
+      # already "Big Board Chess: Online Chess" and matches the reserved name, so it's left as-is.
+      - name: Stamp Store identity
+        shell: pwsh
+        run: |
+          $m = "LichessXbox/Package.appxmanifest"
+          $x = Get-Content $m -Raw
+          $x = $x -replace 'Name="Lichess\.Xbox\.Chess"', 'Name="PatrickEvans.BigBoardChessOnlineChess"'
+          $x = $x -replace 'Publisher="CN=LichessXbox"', 'Publisher="CN=DD4A08DE-5C68-4ADB-AD6A-7D89ECF3CE17"'
+          $x = $x -replace '<PublisherDisplayName>LichessXbox</PublisherDisplayName>', '<PublisherDisplayName>Patrick Evans</PublisherDisplayName>'
+          Set-Content $m $x -NoNewline
+          Write-Host "Stamped Store identity:"; Select-String -Path $m -Pattern 'Identity|PublisherDisplayName|<DisplayName'
+
       # Pick a UWP SDK actually installed on the runner (same guard as the sideload build).
       - name: Detect installed Windows SDK
         shell: pwsh
@@ -52,9 +70,9 @@ jobs:
           if ($vers.Count -eq 0) { Write-Error "No usable UWP platform SDK found on runner"; exit 1 }
           echo "TPV=$($vers[0])" >> $env:GITHUB_ENV
 
-      # StoreUpload mode emits a .msixupload (the bundle + symbols) — the exact file Partner
-      # Center expects. Signing is OFF: the Store re-signs with your account's certificate.
-      # x64 covers Xbox + 64-bit Windows; add x86/arm64 to AppxBundlePlatforms for wider Windows reach.
+      # StoreUpload mode emits a .msixupload (the bundle + symbols) — the exact file Partner Center
+      # expects. Signing is OFF: the Store re-signs with your account's certificate. x64 covers
+      # Xbox + 64-bit Windows; add x86/arm64 to AppxBundlePlatforms for wider Windows reach.
       - name: Build Store package
         run: >
           msbuild $env:Solution
