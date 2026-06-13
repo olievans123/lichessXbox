@@ -24,7 +24,7 @@
                                 </Border.Background>
                             </Border>
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="Online Chess" FontSize="{StaticResource BodySize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                                <TextBlock Text="Big Board Chess" FontSize="{StaticResource BodySize}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
                                 <TextBlock Text="powered by lichess" FontSize="{StaticResource CaptionSize}" Foreground="{StaticResource TextSecondaryBrush}" />
                             </StackPanel>
                         </StackPanel>

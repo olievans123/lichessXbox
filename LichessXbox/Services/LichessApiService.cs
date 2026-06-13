@@ -25,7 +25,7 @@ namespace LichessXbox.Services
         {
             _auth = auth;
             _http = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
-            _http.DefaultRequestHeaders.UserAgent.ParseAdd("LichessXbox/1.0");
+            _http.DefaultRequestHeaders.UserAgent.ParseAdd("BigBoardChess/1.0");
         }
 
         HttpRequestMessage Build(HttpMethod method, string path, HttpContent content = null)
