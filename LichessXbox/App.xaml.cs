@@ -69,6 +69,12 @@ namespace LichessXbox
             // Keep content inside the TV title-safe area (the default). NOTE: opting into
             // UseCoreWindow draws into the overscan region and gets clipped on many TVs.
 
+            // PC (Windows.Universal) guard-rail: floor the window so the fixed-width side panels
+            // can't be squeezed off-screen / clipped in a narrow window. The platform coerces this
+            // to a max of 500x500 effective px, so it's a floor — not a full responsive layout —
+            // and a no-op on Xbox (fixed 960x540 canvas). Must run before Window.Activate to apply.
+            ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(500, 500));
+
             Frame rootFrame = Window.Current.Content as Frame;
             if (rootFrame == null)
             {
