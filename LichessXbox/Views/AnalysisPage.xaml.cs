@@ -69,6 +69,15 @@ namespace LichessXbox.Views
             _movesEngager = new ButtonListEngager(MovesHost, MovesFocusRing);
             MovesHost.ScrollOnRightStick(AnalysisMoveScroller);
             ExplorerList.FrameOnFocus(ExplorerFocusRing);
+            // Explicit Down/Up routing between the two sibling focus UNITS. The XY engine won't
+            // reliably pick the engageable ExplorerList as the down-candidate below MovesHost —
+            // especially when it has no items (signed-out / "no opening data"), where an empty
+            // engageable ListView is not a directional stop — so Down would otherwise dead-end on
+            // the Moves card (the nav row is ABOVE the moves, not below, unlike PlayPage). Pinning
+            // the hint guarantees Moves→Explorer regardless of item count; ExplorerList stays
+            // engageable (A to engage, B to exit) and is reached AS A UNIT (ring via FrameOnFocus).
+            MovesHost.XYFocusDown = ExplorerList;
+            ExplorerList.XYFocusUp = MovesHost;
             // Notes live in a translucent flyout now; focus lands on the scroller when it opens and
             // the right stick scrolls long notes (the Moves list's scroll idiom).
             NotesScroller.ScrollOnRightStick(NotesScroller);
@@ -272,6 +281,22 @@ namespace LichessXbox.Views
         {
             bool study = _notes.Count > 0;
             NotesButton.Visibility = study ? Visibility.Visible : Visibility.Collapsed;
+            // Keep the vertical focus flow intact as the notes button comes and goes. With a study
+            // loaded it sits between the Moves card and the explorer (Moves → notes → explorer);
+            // otherwise Moves routes straight to the explorer. (The explorer list isn't a reliable
+            // XY-down candidate on its own — see the constructor — so the hints are re-pinned here.)
+            if (study)
+            {
+                MovesHost.XYFocusDown = NotesButton;
+                NotesButton.XYFocusUp = MovesHost;
+                NotesButton.XYFocusDown = ExplorerList;
+                ExplorerList.XYFocusUp = NotesButton;
+            }
+            else
+            {
+                MovesHost.XYFocusDown = ExplorerList;
+                ExplorerList.XYFocusUp = MovesHost;
+            }
             if (!study) return;
             string note = _ply < _notes.Count ? _notes[_ply] : null;
             bool hasNote = !string.IsNullOrEmpty(note);
