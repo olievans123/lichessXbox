@@ -832,6 +832,10 @@ namespace LichessXbox.Views
             }
             // Keep the current move visible — scroll up when stepping back, down when following live.
             ScrollCurrentMoveIntoView();
+            // The ItemsControl just (re)generated/recycled its Button containers; re-assert the
+            // not-engaged invariant so a recycled container that kept a stale IsTabStop=true can't
+            // let XY-nav descend into the move list without an A press.
+            _movesEngager?.ResyncFocusable();
         }
 
         // Bring the row holding the current ply into the fixed move box (only scrolls if it's off-screen).

@@ -359,6 +359,10 @@ namespace LichessXbox.Views
             }
             MovesEmpty.Visibility = n > 0 ? Visibility.Collapsed : Visibility.Visible;
             ScrollCurrentMoveIntoView();
+            // The ItemsControl just (re)generated/recycled its Button containers; if a recycled
+            // container kept a stale IsTabStop=true, XY-nav could descend into the list without an
+            // A press. Re-assert the not-engaged invariant on the freshly realized containers.
+            _movesEngager?.ResyncFocusable();
         }
 
         // Keep the compact move list scrolled to the current move. When a new move comes in the
