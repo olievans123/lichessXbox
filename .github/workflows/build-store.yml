@@ -16,7 +16,9 @@ name: Build Store package (.msixupload)
 #   Store ID 9N067RD4F0L1 · PFN PatrickEvans.BigBoardChessOnlineChess_cvq2b8ak7ejk4
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:   # works once this file is on the default branch (after merging to main)
+  push:
+    branches: [ deploy/study-notes-and-resolution ]   # build the Store package on each push to the ship branch
 
 jobs:
   store:
