@@ -51,7 +51,7 @@ sponsored by lichess.org**. "lichess" is a trademark of its respective owner and
 is used only to describe what the app connects to.
 
 ## Contact
-Questions about this policy: **<your-contact-email@example.com>**
+Questions about this policy: **oliievanss@gmail.com**
 
 ## Changes
 If this policy changes, the "Last updated" date above will change with it.
