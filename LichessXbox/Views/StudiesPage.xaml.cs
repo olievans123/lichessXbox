@@ -53,20 +53,29 @@ namespace LichessXbox.Views
                           : (StudyList.Items != null && StudyList.Items.Count > 0) ? StudyList : null);
         }
 
-        // Focus the first real item of a SelectionMode="None" ListView AFTER a dispatcher tick.
-        // A synchronous Focus() on a just-revealed/just-populated list (or during a Back transition)
-        // lands on NOTHING — the bare list has no SelectedItem and its item containers aren't
-        // realized in the same pass — which jams the gamepad (no focused element to move from).
-        // Deferring lets the containers materialize, then FirstFocusable walks to a real item
-        // Control; UserBox (a TextBox, always focusable) is the fallback. Pass null → the search box.
+        // Reliably land gamepad focus on the FIRST row of a SelectionMode="None" ListView. A
+        // synchronous Focus() (or a single deferred tick) fails two ways: the row containers aren't
+        // realized yet (Focus lands on nothing → falls back to the search box), and on a Back
+        // transition the framework's own post-nav focus pass clobbers an early attempt (→ jam).
+        // So we wait across LAYOUT passes until ContainerFromIndex(0) actually exists, then focus it
+        // — the same retry idiom as ChessBoardControl.FocusBoard. Pass null → the search box.
         void FocusListSoon(ListView list)
         {
-            _ = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            if (list == null || list.Items == null || list.Items.Count == 0)
             {
-                var target = list != null ? GamepadHelpers.FirstFocusable(list) : null;
-                if (target != null) target.Focus(FocusState.Programmatic);
-                else UserBox.Focus(FocusState.Programmatic);
-            });
+                _ = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () => UserBox.Focus(FocusState.Programmatic));
+                return;
+            }
+            int tries = 0;
+            EventHandler<object> onLayout = null;
+            onLayout = (s, e) =>
+            {
+                var row = list.ContainerFromIndex(0) as Control;
+                if (row == null && ++tries < 8) return;   // first row not realized yet — wait a pass
+                LayoutUpdated -= onLayout;
+                (row ?? GamepadHelpers.FirstFocusable(list) ?? (Control)UserBox).Focus(FocusState.Programmatic);
+            };
+            LayoutUpdated += onLayout;
         }
 
         async void Load_Click(object sender, RoutedEventArgs e)
