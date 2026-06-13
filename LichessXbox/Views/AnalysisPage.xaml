@@ -169,39 +169,77 @@
               </Grid>
             </Border>
 
-            <!-- Opening explorer / study notes: ONE card sharing the flexible row. When a
-                 study chapter is loaded a small tab strip appears and the author's notes
-                 take the explorer's space (default), switchable back to the explorer —
-                 stepping through moves never reflows the panel either way. -->
+            <!-- Opening explorer fills this flexible row. When a study chapter is loaded a notes
+                 button appears in the header; pressing it opens the author's notes in a translucent,
+                 scrollable popup — so the explorer keeps the whole card and stepping through moves
+                 never reflows the panel. -->
             <Border Grid.Row="4" Style="{StaticResource CardBorder}" Padding="12" Margin="0,0,0,8">
               <Grid>
-                <!-- ExplorerFocusRing frames the card while the list/notes is focused as a UNIT;
-                     A engages the (natively engageable) list/scroller and the ring hides. The
-                     tabs are their own focus stops. -->
+                <!-- ExplorerFocusRing frames the explorer while the list is focused as a UNIT;
+                     A engages the (natively engageable) list and the ring hides. -->
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <StackPanel Grid.Row="0" x:Name="StudyTabs" Orientation="Horizontal" Spacing="8" Visibility="Collapsed" Margin="0,0,0,10">
-                        <Button x:Name="NotesTabButton" Style="{StaticResource TileButton}" Padding="14,6" Click="NotesTab_Click" Content="Study notes" />
-                        <Button x:Name="ExplorerTabButton" Style="{StaticResource TileButton}" Padding="14,6" Click="ExplorerTab_Click" Content="Explorer" />
-                    </StackPanel>
-                    <StackPanel Grid.Row="1" x:Name="ExplorerHeader" Spacing="6" Margin="0,0,0,8">
-                        <TextBlock x:Name="OpeningText" Text="Opening explorer" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
-                                   Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
-                        <TextBlock x:Name="ExplorerEmpty" Text="No opening data for this position." FontSize="{StaticResource CaptionSize}"
-                                   Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
-                    </StackPanel>
-                    <!-- Focus-engageable so long notes scroll with the stick (A engages, B releases). -->
-                    <ScrollViewer Grid.Row="2" x:Name="NotesScroller" Visibility="Collapsed"
-                                  VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
-                                  IsTabStop="True" IsFocusEngagementEnabled="True" UseSystemFocusVisuals="False">
-                        <TextBlock x:Name="NotesText" Text="" FontSize="{StaticResource CaptionSize}"
-                                   Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
-                    </ScrollViewer>
-                    <ListView Grid.Row="2" x:Name="ExplorerList" SelectionMode="None" IsItemClickEnabled="True"
+                    <!-- Header: the opening title (left) and the study-notes button (right). -->
+                    <Grid Grid.Row="0" Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Spacing="6" VerticalAlignment="Center">
+                            <TextBlock x:Name="OpeningText" Text="Opening explorer" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
+                                       Foreground="{StaticResource AccentGreenLightBrush}" TextWrapping="Wrap" />
+                            <TextBlock x:Name="ExplorerEmpty" Text="No opening data for this position." FontSize="{StaticResource CaptionSize}"
+                                       Foreground="{StaticResource TextSecondaryBrush}" Visibility="Collapsed" />
+                        </StackPanel>
+                        <!-- Study notes live behind this button: pressing it opens a translucent,
+                             scrollable popup, so the explorer keeps the whole card. The button only
+                             appears once a study chapter is loaded; its glyph glows when the current
+                             position carries an authored note. -->
+                        <Button Grid.Column="1" x:Name="NotesButton" Visibility="Collapsed"
+                                Style="{StaticResource IconButton}" Width="40" Height="40" CornerRadius="20"
+                                VerticalAlignment="Top" Background="{StaticResource AppSurfaceHighBrush}"
+                                FontFamily="Segoe MDL2 Assets" FontSize="17" Content="&#xE70B;"
+                                ToolTipService.ToolTip="Study notes">
+                            <Button.Flyout>
+                                <Flyout x:Name="NotesFlyout" Placement="Left" Opened="NotesFlyout_Opened">
+                                    <Flyout.FlyoutPresenterStyle>
+                                        <!-- Translucent glass card: the board shows softly through it. -->
+                                        <Style TargetType="FlyoutPresenter">
+                                            <Setter Property="Background" Value="#E81A1712" />
+                                            <Setter Property="BorderBrush" Value="#40FFFFFF" />
+                                            <Setter Property="BorderThickness" Value="1" />
+                                            <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}" />
+                                            <Setter Property="Padding" Value="18" />
+                                            <Setter Property="MinWidth" Value="0" />
+                                            <Setter Property="MaxWidth" Value="420" />
+                                            <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled" />
+                                            <Setter Property="ScrollViewer.VerticalScrollMode" Value="Disabled" />
+                                        </Style>
+                                    </Flyout.FlyoutPresenterStyle>
+                                    <StackPanel Width="360" Spacing="12">
+                                        <StackPanel Spacing="2">
+                                            <TextBlock Text="Study notes" FontSize="{StaticResource BodySize}" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource AccentGreenLightBrush}" />
+                                            <TextBlock x:Name="NotesMoveContext" Text="" FontSize="{StaticResource CaptionSize}"
+                                                       Foreground="{StaticResource TextSecondaryBrush}" />
+                                        </StackPanel>
+                                        <Border Height="1" Background="{StaticResource HairlineBrush}" />
+                                        <!-- Right stick scrolls long notes (focused on open); B closes the popup. -->
+                                        <ScrollViewer x:Name="NotesScroller" MaxHeight="360"
+                                                      VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"
+                                                      IsTabStop="True" IsFocusEngagementEnabled="False" UseSystemFocusVisuals="False">
+                                            <TextBlock x:Name="NotesText" Text="" FontSize="{StaticResource CaptionSize}" LineHeight="24"
+                                                       Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
+                                        </ScrollViewer>
+                                    </StackPanel>
+                                </Flyout>
+                            </Button.Flyout>
+                        </Button>
+                    </Grid>
+                    <ListView Grid.Row="1" x:Name="ExplorerList" SelectionMode="None" IsItemClickEnabled="True"
                               ItemClick="Explorer_ItemClick" ScrollViewer.VerticalScrollBarVisibility="Hidden"
                               IsFocusEngagementEnabled="True" UseSystemFocusVisuals="False">
                         <!-- Soft, thin focus outline (not the heavy green reveal ring) for these clickable rows. -->

@@ -34,7 +34,6 @@ namespace LichessXbox.Views
         readonly ObservableCollection<MoveRowVM> _moveRows = new ObservableCollection<MoveRowVM>();
         readonly List<string> _sans = new List<string>();   // cached SAN per ply (ToSan runs legal-move gen)
         readonly List<string> _notes = new List<string>();  // study notes: _notes[k] shown at ply k
-        bool _notesTab;                                     // study mode: showing notes (vs explorer)
         CancellationTokenSource _analysisCts;
         LocalEngine _engine;
         bool _useLocalEngine;
@@ -70,7 +69,9 @@ namespace LichessXbox.Views
             _movesEngager = new ButtonListEngager(MovesHost, MovesFocusRing);
             MovesHost.ScrollOnRightStick(AnalysisMoveScroller);
             ExplorerList.FrameOnFocus(ExplorerFocusRing);
-            NotesScroller.FrameOnFocus(ExplorerFocusRing);   // notes share the explorer card's ring
+            // Notes live in a translucent flyout now; focus lands on the scroller when it opens and
+            // the right stick scrolls long notes (the Moves list's scroll idiom).
+            NotesScroller.ScrollOnRightStick(NotesScroller);
             TablebaseList.FrameOnFocus(TablebaseFocusRing);
         }
 
@@ -124,16 +125,9 @@ namespace LichessXbox.Views
 
             RebuildAnalysisMoves();
 
-            // Study notes share the explorer's card via the tab strip; keep the text in
-            // step with the displayed ply (a quiet dash when the author wrote nothing).
-            if (_notes.Count > 0)
-            {
-                string note = _ply < _notes.Count ? _notes[_ply] : null;
-                NotesText.Text = string.IsNullOrEmpty(note) ? "—" : note;
-                NotesScroller.ChangeView(null, 0, null, true);
-            }
-            else _notesTab = false;   // study unloaded → the card is the explorer again
-            ApplyStudyTab();
+            // Study notes ride alongside the explorer behind the notes button; keep the popup's
+            // text and the button's state in step with the displayed ply.
+            ApplyStudyState();
 
             EvalText.Text = "…";
             BestLineText.Text = "Evaluating…";
@@ -271,27 +265,39 @@ namespace LichessXbox.Views
 
         // -------------------------------------------------------------- navigation
 
-        // Study-mode tabs: notes and the opening explorer share one card.
-        void NotesTab_Click(object sender, RoutedEventArgs e) { _notesTab = true; ApplyStudyTab(); }
-        void ExplorerTab_Click(object sender, RoutedEventArgs e) { _notesTab = false; ApplyStudyTab(); }
-
-        void ApplyStudyTab()
+        // Study notes: a translucent popup behind the notes button. The button only shows once a
+        // chapter is loaded; its glyph glows when THIS position carries an authored note, so the
+        // cue stays live as you step through the moves. The explorer keeps the whole card.
+        void ApplyStudyState()
         {
             bool study = _notes.Count > 0;
-            bool notes = study && _notesTab;
-            StudyTabs.Visibility = study ? Visibility.Visible : Visibility.Collapsed;
-            NotesScroller.Visibility = notes ? Visibility.Visible : Visibility.Collapsed;
-            ExplorerList.Visibility = notes ? Visibility.Collapsed : Visibility.Visible;
-            ExplorerHeader.Visibility = notes ? Visibility.Collapsed : Visibility.Visible;
-            // In study mode the "Explorer" tab already labels this; the static title is noise.
-            OpeningText.Visibility = study ? Visibility.Collapsed : Visibility.Visible;
-            if (study)
-            {
-                var on = (Brush)Application.Current.Resources["AccentGreenLightBrush"];
-                var off = (Brush)Application.Current.Resources["TextSecondaryBrush"];
-                NotesTabButton.Foreground = notes ? on : off;
-                ExplorerTabButton.Foreground = notes ? off : on;
-            }
+            NotesButton.Visibility = study ? Visibility.Visible : Visibility.Collapsed;
+            if (!study) return;
+            string note = _ply < _notes.Count ? _notes[_ply] : null;
+            bool hasNote = !string.IsNullOrEmpty(note);
+            NotesButton.Foreground = (Brush)Application.Current.Resources[hasNote ? "AccentGreenLightBrush" : "TextSecondaryBrush"];
+            NotesText.Text = hasNote ? note : "No note for this position.";
+            NotesMoveContext.Text = MoveContextLabel();
+        }
+
+        // "Starting position" / "After 5. Nf3" / "After 5… Nc6" — names the move that led to the shown ply.
+        string MoveContextLabel()
+        {
+            if (_ply <= 0) return "Starting position";
+            int idx = _ply - 1;   // half-move that produced the current position
+            int offset = _history.Count > 0 && !_history[0].WhiteToMove ? 1 : 0;
+            int moveNo = (idx + offset) / 2 + 1;
+            bool whiteMoved = (idx + offset) % 2 == 0;
+            string san = idx < _sans.Count ? _sans[idx] : "";
+            if (string.IsNullOrEmpty(san)) return "Move " + _ply;
+            return "After " + moveNo + (whiteMoved ? ". " : "… ") + san;
+        }
+
+        // Open the notes popup at the top and hand it focus so the right stick scrolls immediately.
+        void NotesFlyout_Opened(object sender, object e)
+        {
+            NotesScroller.ChangeView(null, 0, null, true);
+            NotesScroller.Focus(FocusState.Programmatic);
         }
 
         void First_Click(object sender, RoutedEventArgs e) { _ply = 0; Sync(); }
@@ -535,8 +541,7 @@ namespace LichessXbox.Views
                 if (pendingNotes != null && pendingNotes.Count > 0)
                 {
                     _notes.AddRange(pendingNotes);
-                    _notesTab = true;   // a study opens on its notes; Explorer is one tab away
-                    _ply = 0;           // ...and from the start, so the intro note shows
+                    _ply = 0;   // open at the start so the intro note is the current one
                     Sync();
                 }
             }
