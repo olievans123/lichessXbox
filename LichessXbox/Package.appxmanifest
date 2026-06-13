@@ -14,7 +14,10 @@
   <mp:PhoneIdentity PhoneProductId="8b1e0a11-1c2d-4f33-9a44-0c0f1e2d3a40" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
 
   <Properties>
-    <DisplayName>Big Board Chess</DisplayName>
+    <!-- Package/Store name: must match the reserved name in Partner Center. The longer
+         ": Online Chess" half is the search-discoverability part. The on-device TILE name is the
+         shorter VisualElements/DisplayName below ("Big Board Chess") so the dashboard stays clean. -->
+    <DisplayName>Big Board Chess: Online Chess</DisplayName>
     <PublisherDisplayName>LichessXbox</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
