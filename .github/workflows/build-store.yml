@@ -1,0 +1,75 @@
+name: Build Store package (.msixupload)
+
+# Produces the package you upload to Partner Center (Microsoft/Xbox Store).
+# MANUAL ONLY (workflow_dispatch) — run it from the Actions tab once the manifest
+# Identity matches your Partner Center app.
+#
+# PREREQUISITE — set the real Store identity in LichessXbox/Package.appxmanifest first
+# (from Partner Center → Product management → Product identity), or the upload is rejected
+# with "package identity doesn't match your account":
+#   <Identity Name="<Package/Identity Name>" Publisher="CN=<your GUID>" Version="1.0.0.0" />
+#   <PublisherDisplayName><your publisher display name></PublisherDisplayName>
+# Unlike the sideload build, this is NOT self-signed — the Store signs it on ingestion.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  store:
+    runs-on: windows-latest
+
+    env:
+      Solution: LichessXbox.sln
+      Configuration: Release
+      Platform: x64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Restore packages
+        run: nuget restore $env:Solution
+
+      # Pick a UWP SDK actually installed on the runner (same guard as the sideload build).
+      - name: Detect installed Windows SDK
+        shell: pwsh
+        run: |
+          $root = "C:\Program Files (x86)\Windows Kits\10\Platforms\UAP"
+          $vers = @()
+          if (Test-Path $root) {
+            $vers = Get-ChildItem $root -Directory |
+                    Where-Object { Test-Path (Join-Path $_.FullName 'Platform.xml') } |
+                    ForEach-Object { $_.Name } |
+                    Where-Object { $_ -match '^10\.0\.' } |
+                    Sort-Object { [version]$_ } -Descending
+          }
+          $vers = @($vers)
+          if ($vers.Count -eq 0) { Write-Error "No usable UWP platform SDK found on runner"; exit 1 }
+          echo "TPV=$($vers[0])" >> $env:GITHUB_ENV
+
+      # StoreUpload mode emits a .msixupload (the bundle + symbols) — the exact file Partner
+      # Center expects. Signing is OFF: the Store re-signs with your account's certificate.
+      # x64 covers Xbox + 64-bit Windows; add x86/arm64 to AppxBundlePlatforms for wider Windows reach.
+      - name: Build Store package
+        run: >
+          msbuild $env:Solution
+          /p:Configuration=$env:Configuration
+          /p:Platform=$env:Platform
+          /p:TargetPlatformVersion=$env:TPV
+          /p:AppxBundle=Always
+          /p:AppxBundlePlatforms="x64"
+          /p:UapAppxPackageBuildMode=StoreUpload
+          /p:AppxPackageSigningEnabled=false
+
+      - name: Upload .msixupload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BigBoardChess-store
+          path: |
+            **/AppPackages/**/*.msixupload
+          if-no-files-found: error
