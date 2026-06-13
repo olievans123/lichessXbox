@@ -38,27 +38,32 @@ namespace LichessXbox.Views
             // must land back on the SAME state (username, results, chapter list) — not a
             // blank page that forces the whole search again.
             NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
+            // The chapter-picker back button is a narrow, left-aligned button above a full-width
+            // list; pin explicit routing so it's reliably reachable (down from it enters the list,
+            // up from the list lands back on it) rather than depending on fuzzy geometric XY search.
+            ChaptersBackButton.XYFocusDown = ChapterList;
+            ChapterList.XYFocusUp = ChaptersBackButton;
         }
 
         protected override void OnNavigatedTo(Windows.UI.Xaml.Navigation.NavigationEventArgs e)
         {
             _opening = false;   // reset when returning (this cached instance is reused via Back)
             // Land focus where the user left off: chapter list → study list → username box.
-            // DEFER a tick: on Back to this cached page the restore runs mid-transition, where a
-            // synchronous Focus() is clobbered by the framework's post-nav focus pass (same hazard
-            // as GamepadHelpers.FocusFirstInside). And the ListViews have SelectionMode="None" (no
-            // SelectedItem), so Focus() on the bare list has no item to delegate to — focus first an
-            // actual item Control inside it, with UserBox as the always-focusable fallback.
+            FocusListSoon(ChaptersPanel.Visibility == Visibility.Visible ? ChapterList
+                          : (StudyList.Items != null && StudyList.Items.Count > 0) ? StudyList : null);
+        }
+
+        // Focus the first real item of a SelectionMode="None" ListView AFTER a dispatcher tick.
+        // A synchronous Focus() on a just-revealed/just-populated list (or during a Back transition)
+        // lands on NOTHING — the bare list has no SelectedItem and its item containers aren't
+        // realized in the same pass — which jams the gamepad (no focused element to move from).
+        // Deferring lets the containers materialize, then FirstFocusable walks to a real item
+        // Control; UserBox (a TextBox, always focusable) is the fallback. Pass null → the search box.
+        void FocusListSoon(ListView list)
+        {
             _ = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                // By this tick the cached page's tree is reconnected and laid out, so the first item
-                // container is realized. FirstFocusable walks to a real focusable Control inside the
-                // SelectionMode="None" list (Focus() on the bare list has no SelectedItem to land on).
-                var list = ChaptersPanel.Visibility == Visibility.Visible ? ChapterList
-                         : (StudyList.Items != null && StudyList.Items.Count > 0) ? StudyList : null;
                 var target = list != null ? GamepadHelpers.FirstFocusable(list) : null;
-                // Fall back to the user box (a TextBox always takes focus) if the list is empty or its
-                // containers aren't realized yet — the gamepad always keeps an anchor to navigate from.
                 if (target != null) target.Focus(FocusState.Programmatic);
                 else UserBox.Focus(FocusState.Programmatic);
             });
@@ -77,7 +82,7 @@ namespace LichessXbox.Views
             {
                 var studies = await AppState.Current.Api.GetStudiesByUserAsync(user);
                 StudyList.ItemsSource = studies;
-                if (studies.Count > 0) StudyList.Focus(FocusState.Programmatic);
+                if (studies.Count > 0) FocusListSoon(StudyList);
                 if (studies.Count == 0) StatusText.Text = $"No public studies found for {user}.";
             }
             catch
@@ -134,7 +139,7 @@ namespace LichessXbox.Views
                 ChapterList.ItemsSource = chapters;
                 StudyList.Visibility = Visibility.Collapsed;
                 ChaptersPanel.Visibility = Visibility.Visible;
-                ChapterList.Focus(FocusState.Programmatic);
+                FocusListSoon(ChapterList);   // first chapter row, after the panel lays out
             }
             catch { StatusText.Text = "Couldn't open that study."; }
             finally
@@ -154,7 +159,7 @@ namespace LichessXbox.Views
         {
             ChaptersPanel.Visibility = Visibility.Collapsed;
             StudyList.Visibility = Visibility.Visible;
-            StudyList.Focus(FocusState.Programmatic);
+            FocusListSoon(StudyList);   // back to the study list — first row, after it re-lays out
         }
 
         void OpenChapter(string pgn)
