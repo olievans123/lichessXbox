@@ -105,21 +105,34 @@ namespace LichessXbox.Helpers
             _host.IsTabStop = true;   // the box is a single focus stop (its buttons are not)
             _host.KeyDown += OnKeyDown;
             _host.GotFocus += (s, e) =>
-                _ring.Visibility = ReferenceEquals(e.OriginalSource, _host) ? Visibility.Visible : Visibility.Collapsed;
+            {
+                bool onBox = ReferenceEquals(e.OriginalSource, _host);
+                _ring.Visibility = onBox ? Visibility.Visible : Visibility.Collapsed;
+                // Landing on the box itself is the un-entered, "highlighted" state — clear any stray
+                // engagement so the stick can't move/scroll the list until A is pressed again.
+                if (onBox && _engaged) ClearEngaged();
+            };
             _host.LostFocus += (s, e) =>
             {
                 if (ReferenceEquals(e.OriginalSource, _host)) _ring.Visibility = Visibility.Collapsed;
             };
-            // While engaged, trap focus inside the moves (just like the explorer ListView and the
-            // board): scrolling past the first/last move does NOTHING — B is the only way out,
-            // which returns to the box. Keeps every side-panel section consistent.
+            // While engaged, focus is trapped inside the moves for the STICK/keys — B is the only
+            // way out, and pushing past the first/last move does nothing. But when focus is taken
+            // programmatically (the board re-focusing right after a move is played) or by a pointer,
+            // we must let it go AND tear the engagement down — otherwise the move buttons stay
+            // focusable and the next hover lands straight inside the list, scrolling without an A
+            // press. Gamepad/keyboard out → cancel (trap); code/pointer out → disengage cleanly.
             _host.LosingFocus += (s, e) =>
             {
                 if (!_engaged) return;
-                if (e.InputDevice != FocusInputDeviceKind.GameController && e.InputDevice != FocusInputDeviceKind.Keyboard) return;
                 for (var d = e.NewFocusedElement as DependencyObject; d != null; d = VisualTreeHelper.GetParent(d))
-                    if (ReferenceEquals(d, _host)) return;   // staying inside the moves — allow
-                e.TryCancel();
+                    if (ReferenceEquals(d, _host)) return;   // staying inside the moves — keep engaged
+                if (e.InputDevice == FocusInputDeviceKind.GameController || e.InputDevice == FocusInputDeviceKind.Keyboard)
+                {
+                    e.TryCancel();
+                    return;
+                }
+                ClearEngaged();   // let the external focus through, but un-enter the list
             };
         }
 
@@ -142,10 +155,19 @@ namespace LichessXbox.Helpers
         public bool Disengage()
         {
             if (!_engaged) return false;
+            ClearEngaged();
+            _host.Focus(FocusState.Programmatic);   // B returns to the highlighted box
+            return true;
+        }
+
+        /// <summary>Tear down the entered state WITHOUT moving focus — used when something else
+        /// (the board re-focusing, a pointer) takes focus, so the move buttons never stay focusable
+        /// behind us (which would let the next hover land inside the list and scroll without an A).</summary>
+        void ClearEngaged()
+        {
             _engaged = false;
             SetButtonsFocusable(false);
-            _host.Focus(FocusState.Programmatic);
-            return true;
+            _ring.Visibility = Visibility.Collapsed;
         }
 
         void SetButtonsFocusable(bool on)
