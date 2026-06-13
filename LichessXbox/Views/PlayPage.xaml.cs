@@ -133,6 +133,8 @@ namespace LichessXbox.Views
             // Same hybrid as Analysis: right stick scrolls, left stick leaves, A engages to pick
             // a move (jumps the review position), B exits.
             _movesEngager = new ButtonListEngager(PlayMovesHost, PlayMovesFocusRing);
+            // A engages on the move the board is currently showing (Tag == _viewPly), not the latest.
+            _movesEngager.EngageTarget = b => b.Tag is int p && p == _viewPly;
             PlayMovesHost.ScrollOnRightStick(MoveScroller);
             _clockTimer.Interval = TimeSpan.FromMilliseconds(200);
             _clockTimer.Tick += ClockTick;

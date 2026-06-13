@@ -1,3 +1,4 @@
+using System;
 using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -98,6 +99,10 @@ namespace LichessXbox.Helpers
         readonly UIElement _ring;
         bool _engaged;
 
+        /// <summary>Optional: which button A should land on when engaging — return true for the
+        /// desired one (e.g. the current move). Unset or no match → first (when set) or last button.</summary>
+        public Func<Control, bool> EngageTarget;
+
         public ButtonListEngager(Control host, UIElement ring)
         {
             _host = host;
@@ -170,10 +175,11 @@ namespace LichessXbox.Helpers
             if (e.Key == VirtualKey.GamepadA || e.Key == VirtualKey.Enter || e.Key == VirtualKey.Space)
             {
                 SetButtonsFocusable(true);
-                var last = LastButton(_host);
-                if (last == null) { SetButtonsFocusable(false); return; }   // empty list — nothing to enter
+                var target = EngageButtonFor(_host);
+                if (target == null) { SetButtonsFocusable(false); return; }   // empty list — nothing to enter
                 _engaged = true;                       // set BEFORE Focus so the GettingFocus guard early-outs
-                last.Focus(FocusState.Keyboard);
+                target.Focus(FocusState.Keyboard);
+                target.StartBringIntoView();           // scroll the list to the engaged (current) move
                 _ring.Visibility = Visibility.Collapsed;
                 e.Handled = true;
             }
@@ -222,22 +228,29 @@ namespace LichessXbox.Helpers
             Walk(_host);
         }
 
-        // The LAST visible focusable button in the list = the current/latest move.
-        static Control LastButton(DependencyObject root)
+        // The button A lands on when engaging: the current move (via EngageTarget), else the first
+        // move when a selector is set (the board sits at the start / there's no current row), else the
+        // last visible button (default — live game, or no selector). Single pass over the realized rows.
+        Control EngageButtonFor(DependencyObject root)
         {
-            Control found = null;
+            Control match = null, first = null, last = null;
             void Walk(DependencyObject node)
             {
                 int n = VisualTreeHelper.GetChildrenCount(node);
                 for (int i = 0; i < n; i++)
                 {
                     var c = VisualTreeHelper.GetChild(node, i);
-                    if (c is Button b && b.IsTabStop && b.Visibility == Visibility.Visible) found = b;
+                    if (c is Button b && b.IsTabStop && b.Visibility == Visibility.Visible)
+                    {
+                        first = first ?? b;
+                        last = b;
+                        if (match == null && EngageTarget != null && EngageTarget(b)) match = b;
+                    }
                     Walk(c);
                 }
             }
             Walk(root);
-            return found;
+            return match ?? (EngageTarget != null ? first : last);
         }
     }
 }

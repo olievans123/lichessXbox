@@ -67,6 +67,8 @@ namespace LichessXbox.Views
             // Play scroll model + click-to-jump. The engager owns the ring + A/B; the host is a
             // non-scrolling ContentControl so the left stick isn't trapped when not engaged.
             _movesEngager = new ButtonListEngager(MovesHost, MovesFocusRing);
+            // A engages on the move the BOARD is at (its Tag is the ply), not always the last one.
+            _movesEngager.EngageTarget = b => b.Tag is int p && p == _ply;
             MovesHost.ScrollOnRightStick(AnalysisMoveScroller);
             ExplorerList.FrameOnFocus(ExplorerFocusRing);
             // Explicit Down/Up routing between the two sibling focus UNITS. The XY engine won't
