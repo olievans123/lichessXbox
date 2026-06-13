@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LichessXbox.Chess;
+using LichessXbox.Helpers;
 using LichessXbox.Models;
 using LichessXbox.Services;
 using Windows.UI.Xaml;
@@ -43,12 +44,24 @@ namespace LichessXbox.Views
         {
             _opening = false;   // reset when returning (this cached instance is reused via Back)
             // Land focus where the user left off: chapter list → study list → username box.
-            if (ChaptersPanel.Visibility == Visibility.Visible)
-                ChapterList.Focus(FocusState.Programmatic);
-            else if (StudyList.Items != null && StudyList.Items.Count > 0)
-                StudyList.Focus(FocusState.Programmatic);
-            else
-                UserBox.Focus(FocusState.Programmatic);
+            // DEFER a tick: on Back to this cached page the restore runs mid-transition, where a
+            // synchronous Focus() is clobbered by the framework's post-nav focus pass (same hazard
+            // as GamepadHelpers.FocusFirstInside). And the ListViews have SelectionMode="None" (no
+            // SelectedItem), so Focus() on the bare list has no item to delegate to — focus first an
+            // actual item Control inside it, with UserBox as the always-focusable fallback.
+            _ = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            {
+                // By this tick the cached page's tree is reconnected and laid out, so the first item
+                // container is realized. FirstFocusable walks to a real focusable Control inside the
+                // SelectionMode="None" list (Focus() on the bare list has no SelectedItem to land on).
+                var list = ChaptersPanel.Visibility == Visibility.Visible ? ChapterList
+                         : (StudyList.Items != null && StudyList.Items.Count > 0) ? StudyList : null;
+                var target = list != null ? GamepadHelpers.FirstFocusable(list) : null;
+                // Fall back to the user box (a TextBox always takes focus) if the list is empty or its
+                // containers aren't realized yet — the gamepad always keeps an anchor to navigate from.
+                if (target != null) target.Focus(FocusState.Programmatic);
+                else UserBox.Focus(FocusState.Programmatic);
+            });
         }
 
         async void Load_Click(object sender, RoutedEventArgs e)
